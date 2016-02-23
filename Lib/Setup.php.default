@@ -1,0 +1,17 @@
+<?php
+
+namespace Uglybob\MrClip\Lib;
+
+class Setup
+{
+    protected static $settings = [
+        'url' => 'https://prmurl.com',
+        'user' => 'user',
+        'pass' => 'pass',
+    ];
+
+    public static function getSettings()
+    {
+        return self::$settings;
+    }
+}

@@ -1,0 +1,9 @@
+{
+    "name": "uglybob/mrclip",
+    "autoload": {
+        "psr-4": { "Uglybob\\MrClip\\": "" }
+    },
+    "license": [
+        "GPL-2.0"
+    ]
+}
