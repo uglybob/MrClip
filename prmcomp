@@ -1,0 +1,7 @@
+
+_prmcomp() 
+{
+    COMPREPLY=( $(./prm comp ${COMP_WORDS[*]}) )
+    return 0
+}
+complete -F _prmcomp ./prm
