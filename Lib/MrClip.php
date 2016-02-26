@@ -10,6 +10,7 @@ class MrClip
         $options = str_replace(' : ', ':', $options);
 
         if ($command == 'comp') {
+            $options = str_replace('prm', '', $options);
             $cm = new Command($options);
             error_log($command . '|' . $options . '|' . $cm->at() . '|' . $cm->getHint() . "\n", 3, 'debug.log');
 
@@ -66,5 +67,5 @@ class MrClip
 require_once('vendor/autoload.php');
 
 $command = isset($argv[1]) ? $argv[1] : null;
-$options = array_slice($argv, 3, count($argv));
+$options = array_slice($argv, 2, count($argv));
 new MrClip($command, implode(' ', $options));

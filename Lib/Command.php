@@ -86,18 +86,7 @@ class Command
     protected function parseTimes($timesString)
     {
         preg_match_all("/{$this->rTime}/", $timesString, $matches);
-        $times = $matches[0];
-        $times = array_map(
-            function($value)
-            {
-                $split = explode(':', $value);
-                $dt = new \DateTime();
-                $dt->setTime($split[0], $split[1]);
-
-                return $dt;
-            },
-            $times
-        );
+        $times = (isset($matches[0])) ? $matches[0] : null;
 
         return $times;
     }
@@ -122,42 +111,60 @@ class Command
     // {{{ getStart
     public function getStart()
     {
-        $this->parse;
-        return $this->times[0]->getTimestamp();
+        $this->parse();
+
+        $dt = new \DateTime();
+
+        if (isset($this->times[0])) {
+            $split = explode(':', $this->times[0]);
+            $dt->setTime($split[0], $split[1]);
+        }
+
+        return $dt->getTimestamp();
     }
     // }}}
     // {{{ getEnd
     public function getEnd()
     {
-        $this->parse;
-        return $this->times[1]->getTimestamp();
+        $this->parse();
+
+        $end = null;
+
+        if (isset($this->times[1])) {
+            $split = explode(':', $this->times[1]);
+            $dt = new \DateTime();
+            $dt->setTime($split[0], $split[1]);
+            $end = $dt->getTimestamp();
+        }
+
+        return $end;
     }
     // }}}
     // {{{ getActivity
     public function getActivity()
     {
-        $this->parse;
+        $this->parse();
         return $this->activity;
     }
     // }}}
     // {{{ getCategory
     public function getCategory()
     {
-        $this->parse;
+        $this->parse();
         return $this->category;
     }
     // }}}
     // {{{ getTags
     public function getTags()
     {
-        $this->parse;
+        $this->parse();
         return $this->tags;
     }
     // }}}
     // {{{ getText
     public function getText()
     {
-        $this->parse;
+        $this->parse();
         return $this->text;
     }
     // }}}
