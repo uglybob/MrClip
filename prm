@@ -1,3 +1,3 @@
 #!/bin/bash
 
-php Lib/MrClip.php $@
+php Lib/MrClip.php "$@"

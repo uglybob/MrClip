@@ -6,72 +6,65 @@ class MrClip
 {
     public function __construct($command, $options)
     {
+        $this->prm = null;
+        $options = str_replace(' : ', ':', $options);
+
         if ($command == 'comp') {
-            error_log($command . ':' . $options . "\n", 3, 'debug.log');
+            $cm = new Command($options);
+            error_log($command . '|' . $options . '|' . $cm->at() . '|' . $cm->getHint() . "\n", 3, 'debug.log');
+
+            $at = $cm->at();
+
+            if ($at == 'start') {
+                echo " " . (new \Datetime())->format('H:i');
+            } elseif ($at == 'actigory') {
+                $activities = $this->getPrm()->getActivities();
+                $categories = $this->getPrm()->getCategories();
+
+                foreach($activities as $activity) {
+                    foreach($categories as $category) {
+                        $actigory = "$activity@$category";
+                        if (preg_match("/^{$cm->getHint()}/", $actigory)) {
+                            echo "$actigory ";
+                        }
+                    }
+                }
+            } elseif ($at == 'tag') {
+                $tags = $this->getPrm()->getTags();
+
+                foreach($tags as $tag) {
+                    if (preg_match("/^{$cm->getHint()}/", $tag)) {
+                        echo "+$tag ";
+                    }
+                }
+            }
         } elseif ($command == 'record') {
-            $times = '(?:\d{1,2}:\d{2}\s+){0,2}';
-            $string = '[a-zA-Z0-9 ]+';
-            $tags = "(?:\s+\+$string)*";
-            $text = "\s+:($string)";
-            $format = "($times)($string)@($string)($tags)(?:$text)?";
-            $regex = "/^\s*$format\s*$/";
+            $cm = new Command($options);
 
-            preg_match($regex, $options, $matches);
-
-            $times = isset($matches[1]) ? $matches[1] : null;
-            $activity = $matches[2];
-            $category = $matches[3];
-            $tags = isset($matches[4]) ? $matches[4] : null;
-            $text = isset($matches[5]) ? $matches[5] : null;
-
-            preg_match_all('/\d{1,2}:\d{2}/', $times, $matches);
-            $times = $matches[0];
-            $times = array_map(
-                function($value)
-                {
-                    $split = explode(':', $value);
-                    $dt = new \DateTime();
-                    $dt->setTime($split[0], $split[1]);
-
-                    return $dt;
-                },
-                $times
-            );
-
-            preg_match_all("/\+($string)/", $tags, $matches);
-            $tags = $matches[1];
-            $tags = array_map(
-                function($value)
-                {
-                    return trim($value);
-                },
-                $tags
-            );
-
-            $soapOptions = [
-                'location' => Setup::get('url') . '/soap.php',
-                'uri' => 'http://localhost/',
-            ];
-
-            $prm = new \SoapClient(null, $soapOptions);
-
-            $prm->login('sebastian', 'test');
-            $prm->editRecord(null, $times[0]->getTimestamp(), $times[1]->getTimestamp(), $activity, $category, $tags, $text);
+            $this->getPrm()->editRecord(null, $cm->getStart(), $cm->getEnd(), $cm->getActivity(), $cm->getCategory(), $cm->getTags(), $cm->getText());
         } else {
-            $soapOptions = [
-                'location' => Setup::get('url') . '/soap.php',
-                'uri' => 'http://localhost/',
-            ];
-
-            $prm = new \SoapClient(null, $soapOptions);
-            var_dump($prm->login('sebastian', 'test'));
 
         }
+    }
+
+    protected function getPrm()
+    {
+        if (!$this->prm) {
+            $soapOptions = [
+                'location' => Setup::get('url') . '/soap.php',
+                'uri' => 'http://localhost/',
+            ];
+
+            $this->prm = new \SoapClient(null, $soapOptions);
+            $this->prm->login(Setup::get('user'), Setup::get('pass'));
+        }
+
+        return $this->prm;
     }
 }
 
 require_once('vendor/autoload.php');
 
 $command = isset($argv[1]) ? $argv[1] : null;
-$options = array_slice($argv, 2, count($argv));
+$options = array_slice($argv, 3, count($argv));
 new MrClip($command, implode(' ', $options));
