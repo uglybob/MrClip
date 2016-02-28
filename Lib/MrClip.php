@@ -7,10 +7,10 @@ class MrClip
     public function __construct($command, $options)
     {
         $this->prm = null;
-        $options = str_replace(' : ', ':', $options);
+        $options = str_replace(' : ', ':', $options); // @todo hack
 
         if ($command == 'comp') {
-            $options = preg_replace('/^prm /', '', $options);
+            $options = preg_replace('/^prm /', '', $options); // @todo hack
             $cm = new Command($options);
             error_log($command . '|' . $options . '|' . $cm->at() . '|' . $cm->getHint() . "\n", 3, 'debug.log');
 
@@ -42,7 +42,15 @@ class MrClip
         } elseif ($command == 'record') {
             $cm = new Command($options);
 
-            $this->getPrm()->editRecord(null, $cm->getStart(), $cm->getEnd(), $cm->getActivity(), $cm->getCategory(), $cm->getTags(), $cm->getText());
+            $this->getPrm()->editRecord(
+                null,
+                $cm->getStart(),
+                $cm->getEnd(),
+                $cm->getActivity(),
+                $cm->getCategory(),
+                $cm->getTags(),
+                $cm->getText()
+            );
         } else {
 
         }
@@ -63,9 +71,3 @@ class MrClip
         return $this->prm;
     }
 }
-
-require_once('vendor/autoload.php');
-
-$command = isset($argv[1]) ? $argv[1] : null;
-$options = array_slice($argv, 2, count($argv));
-new MrClip($command, implode(' ', $options));
