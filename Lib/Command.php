@@ -33,7 +33,7 @@ class Command
         } elseif (preg_match("/^\s*record\s*{$this->rTimes}({$this->rString})?$/", $this->string, $matches)) {
             $at = 'actigory';
             $this->hint = (isset($matches[1])) ? $matches[1] : '';
-        } elseif (preg_match("/^\s*record\s*{$this->rTimes}({$this->rString}@{$this->rString})?$/", $this->string, $matches)) {
+        } elseif (preg_match("/^\s*record\s*{$this->rTimes}({$this->rString}@(?:{$this->rString})?)?$/", $this->string, $matches)) {
             $at = 'actigory';
             $this->hint = (isset($matches[1])) ? $matches[1] : '';
         } elseif (preg_match("/^\s*record\s*{$this->rTimes}{$this->rString}@{$this->rString}{$this->rTags}\s+\+({$this->rString})?$/", $this->string, $matches)) {

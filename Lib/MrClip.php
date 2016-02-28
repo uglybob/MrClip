@@ -10,7 +10,7 @@ class MrClip
         $options = str_replace(' : ', ':', $options);
 
         if ($command == 'comp') {
-            $options = str_replace('prm', '', $options);
+            $options = preg_replace('/^prm /', '', $options);
             $cm = new Command($options);
             error_log($command . '|' . $options . '|' . $cm->at() . '|' . $cm->getHint() . "\n", 3, 'debug.log');
 
