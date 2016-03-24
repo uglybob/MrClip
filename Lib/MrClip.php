@@ -7,13 +7,9 @@ class MrClip
     public function __construct($command, $options)
     {
         $this->prm = null;
-        $options = str_replace(' : ', ':', $options); // @todo hack
 
         if ($command == 'comp') {
-            $options = preg_replace('/^prm /', '', $options); // @todo hack
             $cm = new Command($options);
-            error_log($command . '|' . $options . '|' . $cm->at() . '|' . $cm->getHint() . "\n", 3, 'debug.log');
-
             $at = $cm->at();
 
             if ($at == 'start') {

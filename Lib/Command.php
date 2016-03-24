@@ -10,6 +10,7 @@ class Command
         $this->parsed = false;
         $this->string = $string;
 
+        $this->rCommand = '(record|list)';
         $this->rTime = '\d{1,2}:\d{2}';
         $this->rTimes = "(?:{$this->rTime}\s+){0,2}";
         $this->rString = '[a-zA-Z0-9 ]+';
@@ -26,17 +27,17 @@ class Command
         $at = false;
         $this->hint = '';
 
-        if (preg_match("/^\s*record\s*$/", $this->string)) {
+        if (preg_match("/^\s*{$this->rCommand}\s*$/", $this->string)) {
             $at = 'start';
-        } elseif (preg_match("/^\s*record\s*{$this->rTime}$/", $this->string)) {
+        } elseif (preg_match("/^\s*{$this->rCommand}\s*{$this->rTime}$/", $this->string)) {
             $at = 'actigory';
-        } elseif (preg_match("/^\s*record\s*{$this->rTimes}({$this->rString})?$/", $this->string, $matches)) {
-            $at = 'actigory';
-            $this->hint = (isset($matches[1])) ? $matches[1] : '';
-        } elseif (preg_match("/^\s*record\s*{$this->rTimes}({$this->rString}@(?:{$this->rString})?)?$/", $this->string, $matches)) {
+        } elseif (preg_match("/^\s*{$this->rCommand}\s*{$this->rTimes}({$this->rString})?$/", $this->string, $matches)) {
             $at = 'actigory';
             $this->hint = (isset($matches[1])) ? $matches[1] : '';
-        } elseif (preg_match("/^\s*record\s*{$this->rTimes}{$this->rString}@{$this->rString}{$this->rTags}\s+\+({$this->rString})?$/", $this->string, $matches)) {
+        } elseif (preg_match("/^\s*{$this->rCommand}\s*{$this->rTimes}({$this->rString}@(?:{$this->rString})?)?$/", $this->string, $matches)) {
+            $at = 'actigory';
+            $this->hint = (isset($matches[1])) ? $matches[1] : '';
+        } elseif (preg_match("/^\s*{$this->rCommand}\s*{$this->rTimes}{$this->rString}@{$this->rString}{$this->rTags}\s+\+({$this->rString})?$/", $this->string, $matches)) {
             $at = 'tag';
             $this->hint = (isset($matches[1])) ? $matches[1] : '';
         }

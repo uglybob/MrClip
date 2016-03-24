@@ -1,7 +1,7 @@
-
 _prmcomp() 
 {
-    COMPREPLY=( $(./prm comp ${COMP_WORDS[*]}) )
+    options=("${COMP_WORDS[@]:1}") #
+    COMPREPLY=( $(./prm comp ${options[*]}) )
     return 0
 }
 complete -F _prmcomp prm

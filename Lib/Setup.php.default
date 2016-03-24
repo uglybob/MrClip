@@ -14,4 +14,9 @@ class Setup
     {
         return self::$settings;
     }
+
+    public static function get($setting)
+    {
+        return self::$settings[$setting];
+    }
 }
