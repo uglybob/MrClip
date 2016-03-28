@@ -4,10 +4,14 @@ namespace Uglybob\MrClip\Lib;
 
 class MrClip
 {
+    // {{{ variables
+    protected $prm = null;
+    protected $options = [];
+    protected $tags = [];
+    // }}}
     // {{{ constructor
     public function __construct($command, $options)
     {
-        $this->prm = null;
         $this->options = $this->cleanColons($options);
 
         if (!empty(substr(array_shift($this->options), 1, -1))) {
