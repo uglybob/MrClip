@@ -7,7 +7,6 @@ class MrClip
     // {{{ constructor
     public function __construct($command, $options)
     {
-        //error_log(implode('|', $options) . "\n", 3, 'debug.log');
         $this->prm = null;
         $this->options = $this->cleanColons($options);
 
@@ -54,12 +53,9 @@ class MrClip
                 if ($this->parseStart()) {
                     $this->parseEnd();
                     if ($this->parseActigory()) {
-                        if ($this->parseTags()) {
-
-                        } else {
-                            $tags = $this->getPrm()->getTags();
-                            $this->echoMultiComplete($this->current, $tags, '+');
-                        }
+                        $this->parseTags();
+                        $tags = array_diff($this->getPrm()->getTags(), $this->tags);
+                        $this->echoMultiComplete($this->current, $tags, '+');
                     } else {
                         $activities = $this->getPrm()->getActivities();
                         $categories = $this->getPrm()->getCategories();
@@ -183,7 +179,7 @@ class MrClip
         $tag = $this->consume('\+[a-zA-Z0-9]+');
 
         if ($tag) {
-            $this->tags[] = $tag;
+            $this->tags[] = substr($tag, 1);
         }
 
         return $tag;
