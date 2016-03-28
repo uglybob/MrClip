@@ -22,13 +22,35 @@ class MrClip
 
         $this->commands = ['record', 'list'];
 
-        if ($command == 'comp') {
-            $this->completion();
-        } elseif ($command == 'record') {
-            $this->record();
-        } elseif ($command == 'list') {
-            $this->list();
+        if (
+            $command == 'completion'
+            || in_array($command, $this->commands)
+        ) {
+            $this->$command();
         }
+    }
+    // }}}
+
+    // {{{ cleanColons
+    public static function cleanColons($options)
+    {
+        $newOptions = [];
+
+        for ($i = 0; $i < count($options); $i++) {
+            if (
+                (
+                    isset($options[$i - 1])
+                    && $options[$i - 1] == ':'
+                )
+                || $options[$i] == ':'
+            ) {
+                $newOptions[count($newOptions) - 1] .= $options[$i];
+            } else if ($options[$i] !== ':') {
+                $newOptions[] = $options[$i];
+            }
+        }
+
+        return $newOptions;
     }
     // }}}
 
@@ -96,29 +118,6 @@ class MrClip
             $cm->getText()
         );
         */
-    }
-    // }}}
-
-    // {{{ cleanColons
-    public static function cleanColons($options)
-    {
-        $newOptions = [];
-
-        for ($i = 0; $i < count($options); $i++) {
-            if (
-                (
-                    isset($options[$i - 1])
-                    && $options[$i - 1] == ':'
-                )
-                || $options[$i] == ':'
-            ) {
-                $newOptions[count($newOptions) - 1] .= $options[$i];
-            } else if ($options[$i] !== ':') {
-                $newOptions[] = $options[$i];
-            }
-        }
-
-        return $newOptions;
     }
     // }}}
 

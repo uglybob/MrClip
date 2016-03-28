@@ -4,7 +4,7 @@ _prmcomp()
 
     cur=${COMP_WORDS[COMP_CWORD]}
     options=("${COMP_WORDS[@]:1}")
-    COMPREPLY=( $(./prm comp "'"$cur"'" ${options[*]} ))
+    COMPREPLY=( $(./prm completion "'"$cur"'" ${options[*]} ))
     return 0
 }
 complete -F _prmcomp prm
