@@ -110,7 +110,7 @@ class MrClip
                 $this->parseTags();
                 $this->parseText();
 
-                $this->getPrm()->editRecord(
+                $success = $this->getPrm()->editRecord(
                     null,
                     $this->start,
                     $this->end,
@@ -119,6 +119,22 @@ class MrClip
                     $this->tags,
                     $this->text
                 );
+
+                if ($success) {
+                    echo "Record added\n\n";
+                    echo 'Start     ' .  date('Y-m-d H:i', $this->start) . "\n";
+                    echo 'End       ';
+                    if ($this->end) {
+                        echo date('Y-m-d H:i', $this->end);
+                    }
+                    echo "\n";
+                    echo 'Activity  ' .  $this->activity . "\n";
+                    echo 'Category  ' .  $this->category . "\n";
+                    echo 'Tags      ' .  implode(', ', $this->tags) . "\n";
+                    echo 'Text      ' .  $this->text . "\n";
+                } else {
+                    echo "Failed to add record";
+                }
             }
         }
     }
