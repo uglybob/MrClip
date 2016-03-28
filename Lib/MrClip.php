@@ -13,13 +13,6 @@ class MrClip
     public function __construct($command, $options)
     {
         $this->options = $this->cleanColons($options);
-
-        if (!empty(substr(array_shift($this->options), 1, -1))) {
-            $this->current = array_pop($this->options);
-        } else {
-            $this->current = '';
-        }
-
         $this->commands = ['record', 'list'];
 
         if (
@@ -74,6 +67,12 @@ class MrClip
     // {{{ completion
     protected function completion()
     {
+        if (!empty(substr(array_shift($this->options), 1, -1))) {
+            $this->current = array_pop($this->options);
+        } else {
+            $this->current = '';
+        }
+
         if ($this->parseCommand()) {
             if ($this->command == 'record') {
                 if ($this->parseStart()) {
@@ -105,19 +104,23 @@ class MrClip
     // {{{ record
     protected function record()
     {
-        /*
-        $cm = new Command($options);
+        if ($this->parseStart()) {
+            $this->parseEnd();
+            if ($this->parseActigory()) {
+                $this->parseTags();
+                $this->parseText();
 
-        $this->getPrm()->editRecord(
-            null,
-            $cm->getStart(),
-            $cm->getEnd(),
-            $cm->getActivity(),
-            $cm->getCategory(),
-            $cm->getTags(),
-            $cm->getText()
-        );
-        */
+                $this->getPrm()->editRecord(
+                    null,
+                    $this->start,
+                    $this->end,
+                    $this->activity,
+                    $this->category,
+                    $this->tags,
+                    $this->text
+                );
+            }
+        }
     }
     // }}}
 
@@ -149,31 +152,39 @@ class MrClip
     }
     // }}}
     // {{{ parseTime
-    protected function parseTime($time)
+    protected function parseTime()
     {
-        $this->$time = $this->consume('\d{1,2}:\d{2}');
-
-        return $this->$time;
+        return $this->consume('\d{1,2}:\d{2}');
     }
     // }}}
     // {{{ parseStart
     protected function parseStart()
     {
-        return $this->parseTime('start');
+        $this->start = $this->timeToTimestamp($this->parseTime());
+
+        return $this->start;
     }
     // }}}
     // {{{ parseEnd
     protected function parseEnd()
     {
-        return $this->parseTime('end');
+        $this->end = $this->timeToTimestamp($this->parseTime());
+
+        return $this->end;
     }
     // }}}
     // {{{ parseActigory
     protected function parseActigory()
     {
-        $this->actigory = $this->consume('[a-zA-Z0-9]+@[a-zA-Z0-9]+');
+        $actigory = $this->consume('[a-zA-Z0-9]+@[a-zA-Z0-9]+');
 
-        return $this->actigory;
+        if ($actigory) {
+            $actigoryArray = explode('@', $actigory);
+            $this->activity = $actigoryArray[0];
+            $this->category = $actigoryArray[1];
+        }
+
+        return $actigory;
     }
     // }}}
     // {{{ parseTag
@@ -196,6 +207,32 @@ class MrClip
         while ($tag) {
             $tag = $this->parseTag();
         }
+    }
+    // }}}
+    // {{{ parseText
+    protected function parseText()
+    {
+        $this->text = implode(' ', $this->options);
+        $this->options = [];
+
+        return $this->text;
+    }
+    // }}}
+
+    // {{{ timeToTimestamp
+    protected function timeToTimestamp($time)
+    {
+        $timestamp = null;
+
+        if ($time) {
+            $split = explode(':', $time);
+            $dt = new \DateTime();
+            $dt->setTime($split[0], $split[1]);
+
+            $timestamp = $dt->getTimestamp();
+        }
+
+        return $timestamp;
     }
     // }}}
 
