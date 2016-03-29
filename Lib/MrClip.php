@@ -157,7 +157,30 @@ class MrClip
     {
         $record = $this->getPrm()->getCurrentRecord();
 
-        $this->echoRecord($record);
+        if ($record) {
+            $this->echoRecord($record);
+        } else {
+            echo "No running record\n";
+        }
+    }
+    // }}}
+    // {{{ recordStop
+    protected function recordStop()
+    {
+        $record = $this->getPrm()->getCurrentRecord();
+
+        if ($record) {
+            $stopped = $this->getPrm()->stopRecord($record->id);
+
+            if ($stopped) {
+                echo "Record stopped\n\n";
+                $this->echoRecord($stopped);
+            } else {
+                echo "Failed to stop record\n";
+            }
+        } else {
+            echo "No running record\n";
+        }
     }
     // }}}
 
@@ -300,11 +323,11 @@ class MrClip
     }
     // }}}
 
-    // {{{ echoeRecord
+    // {{{ echoRecord
     protected function echoRecord($record)
     {
         echo 'Record    ' . $record->activity . '@' . $record->category . "\n";
-        echo 'Start     ' .  date('Y-m-d H:i', $record->start) . "\n";
+        echo 'Start     ' . date('Y-m-d H:i', $record->start) . "\n";
         echo 'End       ';
         if ($record->end) {
             echo date('Y-m-d H:i', $record->end);
