@@ -98,7 +98,7 @@ class MrClip
                             if ($this->parseActigory()) {
                                 $this->parseTags();
                                 $tags = array_diff($this->getPrm()->getTags(), $this->tags);
-                                $this->echoMultiComplete($this->current, $tags, '+');
+                                $this->suggest($this->current, $tags, '+');
                             } else {
                                 $activities = $this->getPrm()->getActivities();
                                 $categories = $this->getPrm()->getCategories();
@@ -108,18 +108,18 @@ class MrClip
                                         $actigories[] = "$activity@$category";
                                     }
                                 }
-                                $this->echoMultiComplete($this->current, $actigories);
+                                $this->suggest($this->current, $actigories);
                             }
                         } else {
-                            $this->echoMultiComplete($this->current, [(new \Datetime())->format('H:i')]);
+                            $this->suggest($this->current, [(new \Datetime())->format('H:i')]);
                         }
                     }
                 } else {
-                    $this->echoMultiComplete($this->current, $this->commands[$this->domain]);
+                    $this->suggest($this->current, $this->commands[$this->domain]);
                 }
             }
         } else {
-            $this->echoMultiComplete($this->current, array_keys($this->commands));
+            $this->suggest($this->current, array_keys($this->commands));
         }
     }
     // }}}
@@ -132,7 +132,7 @@ class MrClip
                 $this->parseTags();
                 $this->parseText();
 
-                $success = $this->getPrm()->editRecord(
+                $record = $this->getPrm()->editRecord(
                     null,
                     $this->start,
                     $this->end,
@@ -142,23 +142,22 @@ class MrClip
                     $this->text
                 );
 
-                if ($success) {
+                if ($record) {
                     echo "Record added\n\n";
-                    echo 'Start     ' .  date('Y-m-d H:i', $this->start) . "\n";
-                    echo 'End       ';
-                    if ($this->end) {
-                        echo date('Y-m-d H:i', $this->end);
-                    }
-                    echo "\n";
-                    echo 'Activity  ' .  $this->activity . "\n";
-                    echo 'Category  ' .  $this->category . "\n";
-                    echo 'Tags      ' .  implode(', ', $this->tags) . "\n";
-                    echo 'Text      ' .  $this->text . "\n";
+                    $this->echoRecord($record);
                 } else {
                     echo "Failed to add record";
                 }
             }
         }
+    }
+    // }}}
+    // {{{ recordCurrent
+    protected function recordCurrent()
+    {
+        $record = $this->getPrm()->getCurrentRecord();
+
+        $this->echoRecord($record);
     }
     // }}}
 
@@ -292,12 +291,27 @@ class MrClip
         }
     }
     // }}}
-    // {{{ echoMultiComplete
-    protected function echoMultiComplete($hint, $candidates, $prefix = '')
+    // {{{ suggest
+    protected function suggest($hint, $candidates, $prefix = '')
     {
         foreach($candidates as $candidate) {
             $this->echoComplete($hint, $candidate, $prefix);
         }
+    }
+    // }}}
+
+    // {{{ echoeRecord
+    protected function echoRecord($record)
+    {
+        echo 'Record    ' . $record->activity . '@' . $record->category . "\n";
+        echo 'Start     ' .  date('Y-m-d H:i', $record->start) . "\n";
+        echo 'End       ';
+        if ($record->end) {
+            echo date('Y-m-d H:i', $record->end);
+        }
+        echo "\n";
+        echo 'Tags      ' .  implode(', ', $record->tags) . "\n";
+        echo 'Text      ' .  $record->text . "\n";
     }
     // }}}
 }
