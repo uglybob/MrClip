@@ -183,6 +183,33 @@ class MrClip
         }
     }
     // }}}
+    // {{{ recordContinue
+    protected function recordContinue()
+    {
+        $last = $this->getPrm()->getLastRecord();
+
+        if ($last) {
+            $record = $this->getPrm()->editRecord(
+                null,
+                time(),
+                null,
+                $last->activity,
+                $last->category,
+                $last->tags,
+                $last->text
+            );
+
+            if ($record) {
+                echo "Record added\n\n";
+                $this->echoRecord($record);
+            } else {
+                echo "Failed to add record";
+            }
+        } else {
+            echo "No previous record to continue";
+        }
+    }
+    // }}}
 
     // {{{ consume
     protected function consume($regex)
