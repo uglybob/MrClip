@@ -10,16 +10,32 @@ class MrClip
     protected $tags = [];
     // }}}
     // {{{ constructor
-    public function __construct($command, $options)
+    public function __construct($domain, $options)
     {
+        $this->domain = $domain;
         $this->options = $this->cleanColons($options);
-        $this->commands = ['record', 'list'];
+        $this->commands = [
+            'record' => [
+                'add',
+                'delete',
+                'current',
+                'list',
+                'stop',
+                'continue',
+            ],
+            'todo' => [],
+        ];
 
-        if (
-            $command == 'completion'
-            || in_array($command, $this->commands)
-        ) {
-            $this->$command();
+        if ($domain == 'completion') {
+            $this->completion();
+        } else if (array_key_exists($domain, $this->commands)) {
+            if (
+                $this->parseCommand()
+                && in_array($this->command, $this->commands[$domain])
+            ) {
+                $call = $domain . ucfirst($this->command);
+                $this->$call();
+            }
         }
     }
     // }}}
@@ -73,36 +89,42 @@ class MrClip
             $this->current = '';
         }
 
-        if ($this->parseCommand()) {
-            if ($this->command == 'record') {
-                if ($this->parseStart()) {
-                    $this->parseEnd();
-                    if ($this->parseActigory()) {
-                        $this->parseTags();
-                        $tags = array_diff($this->getPrm()->getTags(), $this->tags);
-                        $this->echoMultiComplete($this->current, $tags, '+');
-                    } else {
-                        $activities = $this->getPrm()->getActivities();
-                        $categories = $this->getPrm()->getCategories();
+        if ($this->parseDomain()) {
+            if ($this->domain == 'record') {
+                if ($this->parseCommand()) {
+                    if ($this->command == 'add') {
+                        if ($this->parseStart()) {
+                            $this->parseEnd();
+                            if ($this->parseActigory()) {
+                                $this->parseTags();
+                                $tags = array_diff($this->getPrm()->getTags(), $this->tags);
+                                $this->echoMultiComplete($this->current, $tags, '+');
+                            } else {
+                                $activities = $this->getPrm()->getActivities();
+                                $categories = $this->getPrm()->getCategories();
 
-                        foreach($activities as $activity) {
-                            foreach($categories as $category) {
-                                $actigories[] = "$activity@$category";
+                                foreach($activities as $activity) {
+                                    foreach($categories as $category) {
+                                        $actigories[] = "$activity@$category";
+                                    }
+                                }
+                                $this->echoMultiComplete($this->current, $actigories);
                             }
+                        } else {
+                            $this->echoMultiComplete($this->current, [(new \Datetime())->format('H:i')]);
                         }
-                        $this->echoMultiComplete($this->current, $actigories);
                     }
                 } else {
-                    $this->echoMultiComplete($this->current, [(new \Datetime())->format('H:i')]);
+                    $this->echoMultiComplete($this->current, $this->commands[$this->domain]);
                 }
             }
         } else {
-            $this->echoMultiComplete($this->current, $this->commands);
+            $this->echoMultiComplete($this->current, array_keys($this->commands));
         }
     }
     // }}}
-    // {{{ record
-    protected function record()
+    // {{{ recordAdd
+    protected function recordAdd()
     {
         if ($this->parseStart()) {
             $this->parseEnd();
@@ -159,10 +181,18 @@ class MrClip
         return $match;
     }
     // }}}
+    // {{{ parseDomain
+    protected function parseDomain()
+    {
+        $this->domain = $this->consume('(' . implode('|', array_keys($this->commands)) . ')');
+
+        return $this->domain;
+    }
+    // }}}
     // {{{ parseCommand
     protected function parseCommand()
     {
-        $this->command = $this->consume('(' . implode('|', $this->commands) . ')');
+        $this->command = $this->consume('(' . implode('|', $this->commands[$this->domain]) . ')');
 
         return $this->command;
     }
