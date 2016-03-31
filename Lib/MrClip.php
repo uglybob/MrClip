@@ -116,7 +116,10 @@ class MrClip
                 }
             } else if ($this->domain == 'todo') {
                 if ($this->parseCommand()) {
-                    if ($this->command == 'list') {
+                    if (
+                        $this->command == 'list'
+                        || $this->command == 'edit'
+                    ) {
                             $this->completionActigoryTags(true);
                     }
                 } else {
@@ -240,12 +243,44 @@ class MrClip
     // {{{ todoList
     protected function todoList()
     {
+        echo $this->getTodoList();
+    }
+    // }}}
+    // {{{ todoEdit
+    protected function todoEdit()
+    {
+        $temp = tempnam(sys_get_temp_dir(), 'MrClip');
+        $list = $this->getTodoList();
+        file_put_contents($temp, $list);
+
+        $pipes = array();
+
+        $editRes = proc_open(
+                "vim $temp",
+                array(
+                    0 => STDIN,
+                    1 => STDOUT,
+                    2 => STDERR
+                    ),
+                $pipes
+                );
+
+        proc_close($editRes);
+
+        echo file_get_contents($temp);
+        unlink($temp);
+    }
+    // }}}
+
+    // {{{ getTodoList
+    protected function getTodoList()
+    {
         $this->parseActigory(true);
         $this->parseTags();
 
         $todos = $this->getPrm()->getTodos($this->activity, $this->category, $this->tags);
 
-        $this->echoTodos($todos);
+        return $this->formatTodos($todos);
     }
     // }}}
 
@@ -407,32 +442,36 @@ class MrClip
         echo 'Text      ' .  $record->text . "\n";
     }
     // }}}
-    // {{{ echoTodos
-    protected function echoTodos($todos)
+    // {{{ formatTodos
+    protected function formatTodos($todos)
     {
+        $list = '';
+
         foreach($todos as $todo) {
             if (!$this->activity) {
-                echo $todo->activity;
+                $list .= $todo->activity;
             }
             if (!$this->activity || !$this->category) {
-                echo '@';
+                $list .= '@';
             }
             if (!$this->category) {
-                echo $todo->category;
+                $list .= $todo->category;
             }
             if (!$this->activity || !$this->category) {
-                echo ' ';
+                $list .= ' ';
             }
 
             $otherTags = array_diff($todo->tags, $this->tags);
-            echo implode(' ', $this->formatTags($otherTags));
+            $list .= implode(' ', $this->formatTags($otherTags));
 
             if (!empty($otherTags)) {
-                echo ' ';
+                $list .= ' ';
             }
 
-            echo $todo->text . "\n";
+            $list .= $todo->text . "\n";
         }
+
+        return $list;
     }
     // }}}
     // {{{ formatTags
