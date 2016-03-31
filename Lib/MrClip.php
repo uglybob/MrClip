@@ -256,14 +256,14 @@ class MrClip
         $pipes = array();
 
         $editRes = proc_open(
-                "vim $temp",
-                array(
-                    0 => STDIN,
-                    1 => STDOUT,
-                    2 => STDERR
-                    ),
-                $pipes
-                );
+            "vim $temp",
+            [
+                0 => STDIN,
+                1 => STDOUT,
+                2 => STDERR,
+            ],
+            $pipes
+        );
 
         proc_close($editRes);
 
