@@ -7,6 +7,8 @@ class MrClip
     // {{{ variables
     protected $prm = null;
     protected $options = [];
+    protected $category = null;
+    protected $activity = null;
     protected $tags = [];
     // }}}
     // {{{ constructor
@@ -17,13 +19,16 @@ class MrClip
         $this->commands = [
             'record' => [
                 'add',
-                'delete',
                 'current',
                 'list',
                 'stop',
                 'continue',
             ],
-            'todo' => [],
+            'todo' => [
+                'add',
+                'list',
+                'edit',
+            ],
         ];
 
         if ($domain == 'completion') {
@@ -95,21 +100,7 @@ class MrClip
                     if ($this->command == 'add') {
                         if ($this->parseStart()) {
                             $this->parseEnd();
-                            if ($this->parseActigory()) {
-                                $this->parseTags();
-                                $tags = array_diff($this->getPrm()->getTags(), $this->tags);
-                                $this->suggest($this->current, $tags, '+');
-                            } else {
-                                $activities = $this->getPrm()->getActivities();
-                                $categories = $this->getPrm()->getCategories();
-
-                                foreach($activities as $activity) {
-                                    foreach($categories as $category) {
-                                        $actigories[] = "$activity@$category";
-                                    }
-                                }
-                                $this->suggest($this->current, $actigories);
-                            }
+                            $this->completionActigoryTags();
                         } else {
                             $times = [date('H:i')];
 
@@ -123,9 +114,39 @@ class MrClip
                 } else {
                     $this->suggest($this->current, $this->commands[$this->domain]);
                 }
+            } else if ($this->domain == 'todo') {
+                if ($this->parseCommand()) {
+                    if ($this->command == 'list') {
+                            $this->completionActigoryTags(true);
+                    }
+                } else {
+                    $this->suggest($this->current, $this->commands[$this->domain]);
+                }
             }
         } else {
             $this->suggest($this->current, array_keys($this->commands));
+        }
+    }
+    // }}}
+    // {{{ completionActigoryTags
+    protected function completionActigoryTags($filter = false)
+    {
+        if ($this->parseActigory($filter)) {
+            $this->parseTags();
+            $tags = array_diff($this->getPrm()->getTags(), $this->tags);
+            $this->suggest($this->current, $tags, '+');
+        } else {
+            $activities = $this->getPrm()->getActivities();
+            $activities[] = ''; // categories without activities
+            $categories = $this->getPrm()->getCategories();
+
+            foreach($activities as $activity) {
+                foreach($categories as $category) {
+                    $actigories[] = "$activity@$category";
+                }
+            }
+
+            $this->suggest($this->current, $actigories);
         }
     }
     // }}}
@@ -216,6 +237,18 @@ class MrClip
     }
     // }}}
 
+    // {{{ todoList
+    protected function todoList()
+    {
+        $this->parseActigory(true);
+        $this->parseTags();
+
+        $todos = $this->getPrm()->getTodos($this->activity, $this->category, $this->tags);
+
+        $this->echoTodos($todos);
+    }
+    // }}}
+
     // {{{ shift
     protected function shift($regex)
     {
@@ -275,14 +308,18 @@ class MrClip
     }
     // }}}
     // {{{ parseActigory
-    protected function parseActigory()
+    protected function parseActigory($filter = false)
     {
-        $actigory = $this->shift('[a-zA-Z0-9]+@[a-zA-Z0-9]+');
+        if ($filter) {
+            $actigory = $this->shift('[a-zA-Z0-9]*@[a-zA-Z0-9]*');
+        } else {
+            $actigory = $this->shift('[a-zA-Z0-9]*@[a-zA-Z0-9]+');
+        }
 
         if ($actigory) {
             $actigoryArray = explode('@', $actigory);
-            $this->activity = $actigoryArray[0];
-            $this->category = $actigoryArray[1];
+            $this->activity = ($actigoryArray[0]) ? ($actigoryArray[0]) : null;
+            $this->category = ($actigoryArray[1]) ? ($actigoryArray[1]) : null;
         }
 
         return $actigory;
@@ -368,6 +405,12 @@ class MrClip
         echo "\n";
         echo 'Tags      ' .  implode(', ', $record->tags) . "\n";
         echo 'Text      ' .  $record->text . "\n";
+    }
+    // }}}
+    // {{{ echoTodos
+    protected function echoTodos($todos)
+    {
+        echo $this->activity . '@' . $this->category . ' ' . implode(' ', $this->tags) . "\n";
     }
     // }}}
 }
