@@ -156,12 +156,16 @@ class MrClip
     // {{{ recordCurrent
     protected function recordCurrent()
     {
-        $record = $this->getPrm()->getCurrentRecord();
-
-        if ($record) {
+        if ($record = $this->getPrm()->getCurrentRecord()) {
+            echo "Running record\n\n";
             $this->echoRecord($record);
         } else {
-            echo "No running record\n";
+            if ($last = $this->getPrm()->getLastRecord()) {
+                echo "Last record\n\n";
+                $this->echoRecord($last);
+            } else {
+                echo "Failed to fetch record\n";
+            }
         }
     }
     // }}}
