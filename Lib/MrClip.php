@@ -410,7 +410,41 @@ class MrClip
     // {{{ echoTodos
     protected function echoTodos($todos)
     {
-        echo $this->activity . '@' . $this->category . ' ' . implode(' ', $this->tags) . "\n";
+        foreach($todos as $todo) {
+            if (!$this->activity) {
+                echo $todo->activity;
+            }
+            if (!$this->activity || !$this->category) {
+                echo '@';
+            }
+            if (!$this->category) {
+                echo $todo->category;
+            }
+            if (!$this->activity || !$this->category) {
+                echo ' ';
+            }
+
+            $otherTags = array_diff($todo->tags, $this->tags);
+            echo implode(' ', $this->formatTags($otherTags));
+
+            if (!empty($otherTags)) {
+                echo ' ';
+            }
+
+            echo $todo->text . "\n";
+        }
+    }
+    // }}}
+    // {{{ formatTags
+    protected function formatTags($tags)
+    {
+        $formatted = [];
+
+        foreach($tags as $tag) {
+            $formatted[] = "+$tag";
+        }
+
+        return $formatted;
     }
     // }}}
 }
