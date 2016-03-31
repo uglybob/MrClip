@@ -123,6 +123,7 @@ class MrClip
         }
     }
     // }}}
+
     // {{{ recordAdd
     protected function recordAdd()
     {
@@ -167,19 +168,13 @@ class MrClip
     // {{{ recordStop
     protected function recordStop()
     {
-        $record = $this->getPrm()->getCurrentRecord();
+        $stopped = $this->getPrm()->stopRecord();
 
-        if ($record) {
-            $stopped = $this->getPrm()->stopRecord($record->id);
-
-            if ($stopped) {
-                echo "Record stopped\n\n";
-                $this->echoRecord($stopped);
-            } else {
-                echo "Failed to stop record\n";
-            }
+        if ($stopped) {
+            echo "Record stopped\n\n";
+            $this->echoRecord($stopped);
         } else {
-            echo "No running record\n";
+            echo "Failed to stop record\n";
         }
     }
     // }}}
@@ -211,8 +206,8 @@ class MrClip
     }
     // }}}
 
-    // {{{ consume
-    protected function consume($regex)
+    // {{{ shift
+    protected function shift($regex)
     {
         $match = null;
 
@@ -230,10 +225,11 @@ class MrClip
         return $match;
     }
     // }}}
+
     // {{{ parseDomain
     protected function parseDomain()
     {
-        $this->domain = $this->consume('(' . implode('|', array_keys($this->commands)) . ')');
+        $this->domain = $this->shift('(' . implode('|', array_keys($this->commands)) . ')');
 
         return $this->domain;
     }
@@ -241,7 +237,7 @@ class MrClip
     // {{{ parseCommand
     protected function parseCommand()
     {
-        $this->command = $this->consume('(' . implode('|', $this->commands[$this->domain]) . ')');
+        $this->command = $this->shift('(' . implode('|', $this->commands[$this->domain]) . ')');
 
         return $this->command;
     }
@@ -249,7 +245,7 @@ class MrClip
     // {{{ parseTime
     protected function parseTime()
     {
-        return $this->consume('\d{1,2}:\d{2}');
+        return $this->shift('\d{1,2}:\d{2}');
     }
     // }}}
     // {{{ parseStart
@@ -271,7 +267,7 @@ class MrClip
     // {{{ parseActigory
     protected function parseActigory()
     {
-        $actigory = $this->consume('[a-zA-Z0-9]+@[a-zA-Z0-9]+');
+        $actigory = $this->shift('[a-zA-Z0-9]+@[a-zA-Z0-9]+');
 
         if ($actigory) {
             $actigoryArray = explode('@', $actigory);
@@ -285,7 +281,7 @@ class MrClip
     // {{{ parseTag
     protected function parseTag()
     {
-        $tag = $this->consume('\+[a-zA-Z0-9]+');
+        $tag = $this->shift('\+[a-zA-Z0-9]+');
 
         if ($tag) {
             $this->tags[] = substr($tag, 1);
