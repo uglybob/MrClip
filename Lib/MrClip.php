@@ -111,7 +111,13 @@ class MrClip
                                 $this->suggest($this->current, $actigories);
                             }
                         } else {
-                            $this->suggest($this->current, [(new \Datetime())->format('H:i')]);
+                            $times = [date('H:i')];
+
+                            if ($last = $this->getPrm()->getLastRecord()) {
+                                $times[] = date('H:i', $last->end);
+                            }
+
+                            $this->suggest($this->current, $times);
                         }
                     }
                 } else {

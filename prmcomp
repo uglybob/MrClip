@@ -4,7 +4,10 @@ _prmcomp()
 
     cur=${COMP_WORDS[COMP_CWORD]}
     options=("${COMP_WORDS[@]:1}")
+    __ltrim_colon_completions "$cur"
+
     COMPREPLY=( $(./prm completion "'"$cur"'" ${options[*]} ))
+
     return 0
 }
 complete -F _prmcomp prm
