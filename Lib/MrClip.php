@@ -120,7 +120,7 @@ class MrClip
                         $this->command == 'list'
                         || $this->command == 'edit'
                     ) {
-                            $this->completionActigoryTags(true);
+                        $this->completionActigoryTags(true);
                     }
                 } else {
                     $this->suggest($this->current, $this->commands[$this->domain]);
@@ -445,33 +445,58 @@ class MrClip
     // {{{ formatTodos
     protected function formatTodos($todos)
     {
+        foreach ($todos as $todo) {
+            $todo->children = [];
+            $numbered[$todo->id] = $todo;
+        }
+        foreach ($numbered as $todo) {
+            if (!is_null($todo->parent)) {
+                $numbered[$todo->parent]->children[] = $todo;
+            }
+        }
+
         $list = '';
-
-        foreach($todos as $todo) {
-            if (!$this->activity) {
-                $list .= $todo->activity;
+        foreach ($numbered as $todo) {
+            if (is_null($todo->parent)) {
+                $list .= $this->order($todo, 0);
             }
-            if (!$this->activity || !$this->category) {
-                $list .= '@';
-            }
-            if (!$this->category) {
-                $list .= $todo->category;
-            }
-            if (!$this->activity || !$this->category) {
-                $list .= ' ';
-            }
-
-            $otherTags = array_diff($todo->tags, $this->tags);
-            $list .= implode(' ', $this->formatTags($otherTags));
-
-            if (!empty($otherTags)) {
-                $list .= ' ';
-            }
-
-            $list .= $todo->text . "\n";
         }
 
         return $list;
+    }
+    // }}}
+    // {{{ order
+    protected function order($todo, $level)
+    {
+        $string = str_repeat('    ', $level);
+
+        if (!$this->activity) {
+            $string .= $todo->activity;
+        }
+        if (!$this->activity || !$this->category) {
+            $string .= '@';
+        }
+        if (!$this->category) {
+            $string .= $todo->category;
+        }
+        if (!$this->activity || !$this->category) {
+            $string .= ' ';
+        }
+
+        $otherTags = array_diff($todo->tags, $this->tags);
+        $string .= implode(' ', $this->formatTags($otherTags));
+
+        if (!empty($otherTags)) {
+            $string .= ' ';
+        }
+
+        $string .= $todo->text . "\n";
+
+        foreach ($todo->children as $child) {
+            $string .= $this->order($child, $level + 1);
+        }
+
+        return $string;
     }
     // }}}
     // {{{ formatTags
