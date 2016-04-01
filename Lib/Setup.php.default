@@ -8,6 +8,7 @@ class Setup
         'url' => 'https://prmurl.com',
         'user' => 'user',
         'pass' => 'pass',
+        'editor' => 'vim',
     ];
 
     public static function getSettings()

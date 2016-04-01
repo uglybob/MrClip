@@ -256,7 +256,7 @@ class MrClip
         $pipes = array();
 
         $editRes = proc_open(
-            "vim $temp",
+            Setup::get('editor') . ' ' . $temp,
             [
                 0 => STDIN,
                 1 => STDOUT,
