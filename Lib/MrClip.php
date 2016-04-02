@@ -440,8 +440,8 @@ class MrClip
     // {{{ formatTodo
     protected function formatTodo($todo)
     {
-        $activity = ($this->activity) ? $todo->activity : '';
-        $category = ($this->category) ? $todo->category : '';
+        $activity = ($this->activity) ? '' : $todo->activity;
+        $category = ($this->category) ? '' : $todo->category;
         $tags = array_diff($todo->tags, $this->tags);
         $text = $todo->text;
 
