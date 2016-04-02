@@ -449,8 +449,9 @@ class MrClip
             $todo->children = [];
             $numbered[$todo->id] = $todo;
         }
+
         foreach ($numbered as $todo) {
-            if (!is_null($todo->parent)) {
+            if (!is_null($todo->parent) && array_key_exists($todo->parent, $numbered)) {
                 $numbered[$todo->parent]->children[] = $todo;
             }
         }
