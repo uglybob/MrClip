@@ -6,16 +6,12 @@ class MrClip
 {
     // {{{ variables
     protected $prm = null;
-    protected $options = [];
-    protected $category = null;
-    protected $activity = null;
-    protected $tags = [];
     // }}}
     // {{{ constructor
     public function __construct($domain, $options)
     {
-        $this->domain = $domain;
-        $this->options = $this->cleanColons($options);
+        $options = $this->cleanColons($options);
+
         $this->commands = [
             'record' => [
                 'add',
@@ -32,13 +28,16 @@ class MrClip
         ];
 
         if ($domain == 'completion') {
-            $this->completion();
-        } else if (array_key_exists($domain, $this->commands)) {
+            $this->completion($domain, $options);
+        } else {
+            $this->parser = new Parser($domain, $options, $this->commands);
+
             if (
-                $this->parseCommand()
-                && in_array($this->command, $this->commands[$domain])
+                array_key_exists($domain, $this->commands)
+                && $this->parser->parseCommand()
+                && in_array($this->parser->getCommand(), $this->commands[$domain])
             ) {
-                $call = $domain . ucfirst($this->command);
+                $call = $domain . ucfirst($this->parser->getCommand());
                 $this->$call();
             }
         }
@@ -86,21 +85,23 @@ class MrClip
     // }}}
 
     // {{{ completion
-    protected function completion()
+    protected function completion($domain, $options)
     {
-        if (!empty(substr(array_shift($this->options), 1, -1))) {
-            $this->current = array_pop($this->options);
+        if (!empty(substr(array_shift($options), 1, -1))) {
+            $current = array_pop($options);
         } else {
-            $this->current = '';
+            $current = '';
         }
 
-        if ($this->parseDomain()) {
-            if ($this->domain == 'record') {
-                if ($this->parseCommand()) {
-                    if ($this->command == 'add') {
-                        if ($this->parseStart()) {
-                            $this->parseEnd();
-                            $this->completionActigoryTags();
+        $parser = new Parser($domain, $options, $this->commands);
+
+        if ($parser->parseDomain()) {
+            if ($parser->getDomain() == 'record') {
+                if ($parser->parseCommand()) {
+                    if ($parser->getCommand() == 'add') {
+                        if ($parser->parseStart()) {
+                            $parser->parseEnd();
+                            $this->completionActigoryTags($parser, $current);
                         } else {
                             $times = [date('H:i')];
 
@@ -108,36 +109,36 @@ class MrClip
                                 $times[] = date('H:i', $last->end);
                             }
 
-                            $this->suggest($this->current, $times);
+                            $this->suggest($current, $times);
                         }
                     }
                 } else {
-                    $this->suggest($this->current, $this->commands[$this->domain]);
+                    $this->suggest($current, $this->commands[$parser->getDomain()]);
                 }
-            } else if ($this->domain == 'todo') {
-                if ($this->parseCommand()) {
+            } else if ($parser->getDomain() == 'todo') {
+                if ($parser->parseCommand()) {
                     if (
-                        $this->command == 'list'
-                        || $this->command == 'edit'
+                        $parser->getCommand() == 'list'
+                        || $parser->getCommand() == 'edit'
                     ) {
-                        $this->completionActigoryTags(true);
+                        $this->completionActigoryTags($parser, $current, true);
                     }
                 } else {
-                    $this->suggest($this->current, $this->commands[$this->domain]);
+                    $this->suggest($current, $this->commands[$parser->getDomain()]);
                 }
             }
         } else {
-            $this->suggest($this->current, array_keys($this->commands));
+            $this->suggest($current, array_keys($this->commands));
         }
     }
     // }}}
     // {{{ completionActigoryTags
-    protected function completionActigoryTags($filter = false)
+    protected function completionActigoryTags($parser, $current, $filter = false)
     {
-        if ($this->parseActigory($filter)) {
-            $this->parseTags();
-            $tags = array_diff($this->getPrm()->getTags(), $this->tags);
-            $this->suggest($this->current, $tags, '+');
+        if ($parser->parseActigory($filter)) {
+            $parser->parseTags();
+            $tags = array_diff($this->getPrm()->getTags(), $parser->getTags());
+            $this->suggest($current, $tags, '+');
         } else {
             $activities = $this->getPrm()->getActivities();
             $activities[] = ''; // categories without activities
@@ -149,7 +150,7 @@ class MrClip
                 }
             }
 
-            $this->suggest($this->current, $actigories);
+            $this->suggest($current, $actigories);
         }
     }
     // }}}
@@ -157,20 +158,22 @@ class MrClip
     // {{{ recordAdd
     protected function recordAdd()
     {
-        if ($this->parseStart()) {
-            $this->parseEnd();
-            if ($this->parseActigory()) {
-                $this->parseTags();
-                $this->parseText();
+        $parser = $this->parser;
+
+        if ($parser->parseStart()) {
+            $parser->parseEnd();
+            if ($parser->parseActigory()) {
+                $parser->parseTags();
+                $parser->parseText();
 
                 $record = $this->getPrm()->editRecord(
                     null,
-                    $this->start,
-                    $this->end,
-                    $this->activity,
-                    $this->category,
-                    $this->tags,
-                    $this->text
+                    $parser->getStart(),
+                    $parser->getEnd(),
+                    $parser->getActivity(),
+                    $parser->getCategory(),
+                    $parser->getTags(),
+                    $parser->getText()
                 );
 
                 if ($record) {
@@ -270,137 +273,14 @@ class MrClip
     // {{{ getTodoList
     protected function getTodoList()
     {
-        $this->parseActigory(true);
-        $this->parseTags();
+        $parser = $this->parser;
 
-        $todos = $this->getPrm()->getTodos($this->activity, $this->category, $this->tags);
+        $parser->parseActigory(true);
+        $parser->parseTags();
+
+        $todos = $this->getPrm()->getTodos($parser->getActivity(), $parser->getCategory(), $parser->getTags());
 
         return $this->formatTodos($todos);
-    }
-    // }}}
-
-    // {{{ shift
-    protected function shift($regex)
-    {
-        $match = null;
-
-        if (isset($this->options[0])) {
-            $string = $this->options[0];
-
-            preg_match("/^$regex$/", $string, $matches);
-
-            if (isset($matches[0])) {
-                $match = $matches[0];
-                array_shift($this->options);
-            }
-        }
-
-        return $match;
-    }
-    // }}}
-
-    // {{{ parseDomain
-    protected function parseDomain()
-    {
-        $this->domain = $this->shift('(' . implode('|', array_keys($this->commands)) . ')');
-
-        return $this->domain;
-    }
-    // }}}
-    // {{{ parseCommand
-    protected function parseCommand()
-    {
-        $this->command = $this->shift('(' . implode('|', $this->commands[$this->domain]) . ')');
-
-        return $this->command;
-    }
-    // }}}
-    // {{{ parseTime
-    protected function parseTime()
-    {
-        return $this->shift('\d{1,2}:\d{2}');
-    }
-    // }}}
-    // {{{ parseStart
-    protected function parseStart()
-    {
-        $this->start = $this->timeToTimestamp($this->parseTime());
-
-        return $this->start;
-    }
-    // }}}
-    // {{{ parseEnd
-    protected function parseEnd()
-    {
-        $this->end = $this->timeToTimestamp($this->parseTime());
-
-        return $this->end;
-    }
-    // }}}
-    // {{{ parseActigory
-    protected function parseActigory($filter = false)
-    {
-        if ($filter) {
-            $actigory = $this->shift('[a-zA-Z0-9]*@[a-zA-Z0-9]*');
-        } else {
-            $actigory = $this->shift('[a-zA-Z0-9]*@[a-zA-Z0-9]+');
-        }
-
-        if ($actigory) {
-            $actigoryArray = explode('@', $actigory);
-            $this->activity = ($actigoryArray[0]) ? ($actigoryArray[0]) : null;
-            $this->category = ($actigoryArray[1]) ? ($actigoryArray[1]) : null;
-        }
-
-        return $actigory;
-    }
-    // }}}
-    // {{{ parseTag
-    protected function parseTag()
-    {
-        $tag = $this->shift('\+[a-zA-Z0-9]+');
-
-        if ($tag) {
-            $this->tags[] = substr($tag, 1);
-        }
-
-        return $tag;
-    }
-    // }}}
-    // {{{ parseTags
-    protected function parseTags()
-    {
-        $tag = true;
-
-        while ($tag) {
-            $tag = $this->parseTag();
-        }
-    }
-    // }}}
-    // {{{ parseText
-    protected function parseText()
-    {
-        $this->text = implode(' ', $this->options);
-        $this->options = [];
-
-        return $this->text;
-    }
-    // }}}
-
-    // {{{ timeToTimestamp
-    protected function timeToTimestamp($time)
-    {
-        $timestamp = null;
-
-        if ($time) {
-            $split = explode(':', $time);
-            $dt = new \DateTime();
-            $dt->setTime($split[0], $split[1]);
-
-            $timestamp = $dt->getTimestamp();
-        }
-
-        return $timestamp;
     }
     // }}}
 
@@ -440,9 +320,11 @@ class MrClip
     // {{{ formatTodo
     protected function formatTodo($todo)
     {
-        $activity = ($this->activity) ? '' : $todo->activity;
-        $category = ($this->category) ? '' : $todo->category;
-        $tags = array_diff($todo->tags, $this->tags);
+        $parser = $this->parser;
+
+        $activity = ($parser->getActivity()) ? '' : $todo->activity;
+        $category = ($parser->getCategory()) ? '' : $todo->category;
+        $tags = array_diff($todo->tags, $parser->getTags());
         $text = $todo->text;
 
         return $this->formatAttributes($activity, $category, $tags, $text);
