@@ -175,7 +175,7 @@ class MrClip
 
                 if ($record) {
                     echo "Record added\n\n";
-                    $this->echoRecord($record);
+                    echo $this->formatRecord($record);
                 } else {
                     echo "Failed to add record";
                 }
@@ -188,11 +188,11 @@ class MrClip
     {
         if ($record = $this->getPrm()->getCurrentRecord()) {
             echo "Running record\n\n";
-            $this->echoRecord($record);
+            echo $this->formatRecord($record);
         } else {
             if ($last = $this->getPrm()->getLastRecord()) {
                 echo "Last record\n\n";
-                $this->echoRecord($last);
+                echo $this->formatRecord($last);
             } else {
                 echo "Failed to fetch record\n";
             }
@@ -206,7 +206,7 @@ class MrClip
 
         if ($stopped) {
             echo "Record stopped\n\n";
-            $this->echoRecord($stopped);
+            echo $this->formatRecord($stopped);
         } else {
             echo "Failed to stop record\n";
         }
@@ -230,7 +230,7 @@ class MrClip
 
             if ($record) {
                 echo "Record added\n\n";
-                $this->echoRecord($record);
+                echo $this->formatRecord($record);
             } else {
                 echo "Failed to add record";
             }
@@ -428,18 +428,22 @@ class MrClip
     }
     // }}}
 
-    // {{{ echoRecord
-    protected function echoRecord($record)
+    // {{{ formatRecord
+    protected function formatRecord($record)
     {
-        echo 'Record    ' . $record->activity . '@' . $record->category . "\n";
-        echo 'Start     ' . date('Y-m-d H:i', $record->start) . "\n";
-        echo 'End       ';
+        $string = 'Record    ' . $record->activity . '@' . $record->category . "\n" .
+            'Start     ' . date('Y-m-d H:i', $record->start) . "\n" .
+            'End       ';
+
         if ($record->end) {
-            echo date('Y-m-d H:i', $record->end);
+            $string .= date('Y-m-d H:i', $record->end);
         }
-        echo "\n";
-        echo 'Tags      ' .  implode(', ', $record->tags) . "\n";
-        echo 'Text      ' .  $record->text . "\n";
+
+        $string .= "\n" .
+            'Tags      ' .  implode(', ', $record->tags) . "\n" .
+            'Text      ' .  $record->text . "\n";
+
+        return $string;
     }
     // }}}
     // {{{ formatTodo
@@ -496,13 +500,13 @@ class MrClip
         return $list;
     }
     // }}}
-    // {{{ tree
-    protected function tree($todo, $level)
+    // {{{ todoTree
+    protected function todoTree($todo, $level)
     {
         $string = str_repeat('    ', $level) . $this->formatTodo($todo);
 
         foreach ($todo->children as $child) {
-            $string .= $this->tree($child, $level + 1);
+            $string .= $this->todoTree($child, $level + 1);
         }
 
         return $string;
