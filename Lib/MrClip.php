@@ -174,8 +174,7 @@ class MrClip
                 );
 
                 if ($record) {
-                    echo "Record added\n\n";
-                    echo $this->formatRecord($record);
+                    echo '(added) ' . $this->formatRecord($record) . "\n";
                 } else {
                     echo "Failed to add record";
                 }
@@ -187,12 +186,10 @@ class MrClip
     protected function recordCurrent()
     {
         if ($record = $this->getPrm()->getCurrentRecord()) {
-            echo "Running record\n\n";
-            echo $this->formatRecord($record);
+            echo '(running) ' . $this->formatRecord($record) . "\n";
         } else {
             if ($last = $this->getPrm()->getLastRecord()) {
-                echo "Last record\n\n";
-                echo $this->formatRecord($last);
+                echo '(last) ' . $this->formatRecord($last) . "\n";
             } else {
                 echo "Failed to fetch record\n";
             }
@@ -205,8 +202,7 @@ class MrClip
         $stopped = $this->getPrm()->stopRecord();
 
         if ($stopped) {
-            echo "Record stopped\n\n";
-            echo $this->formatRecord($stopped);
+            echo '(stopped) ' . $this->formatRecord($stopped) . "\n";
         } else {
             echo "Failed to stop record\n";
         }
@@ -229,8 +225,7 @@ class MrClip
             );
 
             if ($record) {
-                echo "Record added\n\n";
-                echo $this->formatRecord($record);
+                echo '(added) ' . $this->formatRecord($stopped) . "\n";
             } else {
                 echo "Failed to add record";
             }
@@ -431,19 +426,17 @@ class MrClip
     // {{{ formatRecord
     protected function formatRecord($record)
     {
-        $string = 'Record    ' . $record->activity . '@' . $record->category . "\n" .
-            'Start     ' . date('Y-m-d H:i', $record->start) . "\n" .
-            'End       ';
+        $output[] = date('Y-m-d H:i', $record->start);
 
         if ($record->end) {
-            $string .= date('Y-m-d H:i', $record->end);
+            $output[] = '- ' . date('Y-m-d H:i', $record->end);
         }
 
-        $string .= "\n" .
-            'Tags      ' .  implode(', ', $record->tags) . "\n" .
-            'Text      ' .  $record->text . "\n";
+        $output[] = $record->activity . '@' . $record->category;
+        $output[] = implode(' ', $this->formatTags($record->tags));
+        $output[] = $record->text;
 
-        return $string;
+        return implode(' ', $output);
     }
     // }}}
     // {{{ formatTodo
