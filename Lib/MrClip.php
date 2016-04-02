@@ -442,34 +442,10 @@ class MrClip
         echo 'Text      ' .  $record->text . "\n";
     }
     // }}}
-    // {{{ formatTodos
-    protected function formatTodos($todos)
+    // {{{ formatTodo
+    protected function formatTodo($todo)
     {
-        foreach ($todos as $todo) {
-            $todo->children = [];
-            $numbered[$todo->id] = $todo;
-        }
-
-        foreach ($numbered as $todo) {
-            if (!is_null($todo->parent) && array_key_exists($todo->parent, $numbered)) {
-                $numbered[$todo->parent]->children[] = $todo;
-            }
-        }
-
-        $list = '';
-        foreach ($numbered as $todo) {
-            if (is_null($todo->parent)) {
-                $list .= $this->order($todo, 0);
-            }
-        }
-
-        return $list;
-    }
-    // }}}
-    // {{{ order
-    protected function order($todo, $level)
-    {
-        $string = str_repeat('    ', $level);
+        $string = '';
 
         if (!$this->activity) {
             $string .= $todo->activity;
@@ -493,8 +469,40 @@ class MrClip
 
         $string .= $todo->text . "\n";
 
+        return $string;
+    }
+    // }}}
+    // {{{ formatTodos
+    protected function formatTodos($todos)
+    {
+        foreach ($todos as $todo) {
+            $todo->children = [];
+            $numbered[$todo->id] = $todo;
+        }
+
+        foreach ($numbered as $todo) {
+            if (!is_null($todo->parent) && array_key_exists($todo->parent, $numbered)) {
+                $numbered[$todo->parent]->children[] = $todo;
+            }
+        }
+
+        $list = '';
+        foreach ($numbered as $todo) {
+            if (is_null($todo->parent)) {
+                $list .= $this->tree($todo, 0);
+            }
+        }
+
+        return $list;
+    }
+    // }}}
+    // {{{ tree
+    protected function tree($todo, $level)
+    {
+        $string = str_repeat('    ', $level) . $this->formatTodo($todo);
+
         foreach ($todo->children as $child) {
-            $string .= $this->order($child, $level + 1);
+            $string .= $this->tree($child, $level + 1);
         }
 
         return $string;
