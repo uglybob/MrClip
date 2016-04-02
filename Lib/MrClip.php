@@ -432,9 +432,7 @@ class MrClip
             $output[] = '- ' . date('Y-m-d H:i', $record->end);
         }
 
-        $output[] = $record->activity . '@' . $record->category;
-        $output[] = implode(' ', $this->formatTags($record->tags));
-        $output[] = $record->text;
+        $output[] = $this->formatAttributes($record->activity, $record->category, $record->tags, $record->text);
 
         return implode(' ', $output);
     }
@@ -442,31 +440,12 @@ class MrClip
     // {{{ formatTodo
     protected function formatTodo($todo)
     {
-        $string = '';
+        $activity = ($this->activity) ? $todo->activity : '';
+        $category = ($this->category) ? $todo->category : '';
+        $tags = array_diff($todo->tags, $this->tags);
+        $text = $todo->text;
 
-        if (!$this->activity) {
-            $string .= $todo->activity;
-        }
-        if (!$this->activity || !$this->category) {
-            $string .= '@';
-        }
-        if (!$this->category) {
-            $string .= $todo->category;
-        }
-        if (!$this->activity || !$this->category) {
-            $string .= ' ';
-        }
-
-        $otherTags = array_diff($todo->tags, $this->tags);
-        $string .= implode(' ', $this->formatTags($otherTags));
-
-        if (!empty($otherTags)) {
-            $string .= ' ';
-        }
-
-        $string .= $todo->text . "\n";
-
-        return $string;
+        return $this->formatAttributes($activity, $category, $tags, $text);
     }
     // }}}
     // {{{ formatTodos
@@ -486,23 +465,27 @@ class MrClip
         $list = '';
         foreach ($numbered as $todo) {
             if (is_null($todo->parent)) {
-                $list .= $this->tree($todo, 0);
+                $list .= $this->todoTree($todo, 0);
             }
         }
 
         return $list;
     }
     // }}}
-    // {{{ todoTree
-    protected function todoTree($todo, $level)
+    // {{{ formatAttributes
+    protected function formatAttributes($activity, $category, $tags, $text)
     {
-        $string = str_repeat('    ', $level) . $this->formatTodo($todo);
+        $actigory = '';
 
-        foreach ($todo->children as $child) {
-            $string .= $this->todoTree($child, $level + 1);
-        }
+        if ($activity)              $actigory .= $activity;
+        if ($activity || $category) $actigory .= '@';
+        if ($category)              $actigory .= $category;
 
-        return $string;
+        if ($actigory)      $output[] = $actigory;
+        if (!empty($tags))  $output[] = implode(' ', $this->formatTags($tags));
+        if ($text)          $output[] = $text;
+
+        return implode(' ', $output);
     }
     // }}}
     // {{{ formatTags
@@ -515,6 +498,18 @@ class MrClip
         }
 
         return $formatted;
+    }
+    // }}}
+    // {{{ todoTree
+    protected function todoTree($todo, $level)
+    {
+        $string = str_repeat('    ', $level) . $this->formatTodo($todo) . "\n";
+
+        foreach ($todo->children as $child) {
+            $string .= $this->todoTree($child, $level + 1);
+        }
+
+        return $string;
     }
     // }}}
 }
