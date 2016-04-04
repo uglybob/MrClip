@@ -11,7 +11,7 @@ class Parser
     protected $tags = [];
     // }}}
     // {{{ constructor
-    public function __construct($domain, $options, $commands)
+    public function __construct($domain = null, $options = null, $commands = null)
     {
         $this->domain = $domain;
         $this->options = $options;

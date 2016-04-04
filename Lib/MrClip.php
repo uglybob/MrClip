@@ -241,7 +241,8 @@ class MrClip
     // {{{ todoList
     protected function todoList()
     {
-        echo $this->getTodoList();
+        $todos = $this->getTodoList();
+        echo $this->formatTodos($todos);
     }
     // }}}
     // {{{ todoEdit
@@ -249,7 +250,8 @@ class MrClip
     {
         $temp = tempnam(sys_get_temp_dir(), 'MrClip');
         $list = $this->getTodoList();
-        file_put_contents($temp, $list);
+        $formatted = $this->formatTodos($list);
+        file_put_contents($temp, $formatted);
 
         $pipes = array();
 
@@ -265,8 +267,61 @@ class MrClip
 
         proc_close($editRes);
 
-        echo file_get_contents($temp);
+        $newList = file($temp);
         unlink($temp);
+
+        $parents = [];
+
+        foreach($newList as $todoString) {
+            preg_match('/^[ ]*/', $todoString, $matches);
+            $level = strlen($matches[0]) / 4;
+            $todoArray = explode(' ', ltrim($todoString));
+            $parser = new Parser('todo', $todoArray);
+
+            if ($this->parser->getActivity()) {
+                $activity = $this->parser->getActivity();
+            } else {
+                $parser->parseActigory();
+                $activity = $parser->getActivity();
+            }
+
+            if ($this->parser->getCategory()) {
+                $category = $this->parser->getCategory();
+            } else if ($parser->getCategory()) {
+                $category = $parser->getCategory();
+            } else {
+                $activity = $parser->parseActigory();
+                $category = $parser->getCategory();
+            }
+
+            $parser->parseTags();
+            $listTags = $parser->getTags();
+
+            $optionTags = $this->parser->getTags();
+            $tags = array_unique(array_merge($listTags, $optionTags));
+            $text = trim($parser->parseText());
+
+            $matches = $this->matchTodo($activity, $category, $tags, $text, $level, $list);
+
+
+            echo "$activity@$category " . implode(' ', $this->formatTags($tags)) . " $text\n";
+
+            foreach ($matches as $match) {
+                echo $match[0] . ': ' . $match[1]->activity . 
+                    '@' . $match[1]->category . ' ' . 
+                    implode(' ', $this->formatTags($match[1]->tags)) . ' ' . 
+                    $match[1]->text . "\n";
+            }
+            /*
+
+            if (empty($parents)) {
+                $parents[] = $
+            }
+            var_dump($level, $activity, $category, $tags, $text);
+
+            //$this->getPrm()->editTodo();
+            */
+        }
     }
     // }}}
 
@@ -280,7 +335,38 @@ class MrClip
 
         $todos = $this->getPrm()->getTodos($parser->getActivity(), $parser->getCategory(), $parser->getTags());
 
-        return $this->formatTodos($todos);
+        return $todos;
+    }
+    // }}}
+    // {{{ matchTodo
+    protected function matchTodo($activity, $category, $tags, $text, $level, $todos)
+    {
+        $confidences = [];
+
+        foreach($todos as $todo) {
+            $confidence = 0;
+
+            if ($activity == $todo->activity) $confidence += 10;
+            if ($category == $todo->category) $confidence += 20;
+
+            $diffs = count(array_diff($tags, $todo->tags)) + count(array_diff($todo->tags, $tags));
+            $tagConfidence = 30 - 10 * $diffs;
+            if ($tagConfidence > 0) $confidence += $tagConfidence;
+
+            $textConfidence = 40 - abs(strcmp($text, $todo->text));
+            $confidence += $textConfidence;
+
+            $confidences[] = $confidence;
+        }
+
+        array_multisort($confidences, SORT_DESC, $todos);
+
+        $result = [];
+        foreach ($todos as $key => $todo) {
+            $result[] = [$confidences[$key], $todo];
+        }
+
+        return $result;
     }
     // }}}
 
