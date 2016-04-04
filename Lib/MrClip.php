@@ -270,7 +270,9 @@ class MrClip
         $newList = file($temp);
         unlink($temp);
 
-        $parents = [];
+        $parents = [null];
+        $matched = [];
+        $last = null;
 
         foreach($newList as $todoString) {
             preg_match('/^[ ]*/', $todoString, $matches);
@@ -301,26 +303,30 @@ class MrClip
             $tags = array_unique(array_merge($listTags, $optionTags));
             $text = trim($parser->parseText());
 
-            $matches = $this->matchTodo($activity, $category, $tags, $text, $level, $list);
-
-
-            echo "$activity@$category " . implode(' ', $this->formatTags($tags)) . " $text\n";
-
-            foreach ($matches as $match) {
-                echo $match[0] . ': ' . $match[1]->activity . 
-                    '@' . $match[1]->category . ' ' . 
-                    implode(' ', $this->formatTags($match[1]->tags)) . ' ' . 
-                    $match[1]->text . "\n";
+            if (count($parents) < $level + 1) {
+                array_push($parents, $last);
+            } else if (count($parents) > $level + 1) {
+                array_pop($parents);
             }
-            /*
 
-            if (empty($parents)) {
-                $parents[] = $
+            $rest = array_udiff($list, $matched,
+                function ($obj_a, $obj_b) {
+                    return $obj_a->id - $obj_b->id;
+                }
+            );
+
+            $candidates = $this->matchTodo($activity, $category, $tags, $text, $parents[$level], $rest);
+
+            if ($candidates[0][0] == 100) {
+                $matched[] = $candidates[0][1];
+                $id = $candidates[0][1]->id;
+            } else {
+                $id = null;
             }
-            var_dump($level, $activity, $category, $tags, $text);
 
-            //$this->getPrm()->editTodo();
-            */
+            $result = $this->getPrm()->editTodo($id, $activity, $category, $tags, $text, $parents[$level]);
+
+            $last = $result->id;
         }
     }
     // }}}
@@ -339,7 +345,7 @@ class MrClip
     }
     // }}}
     // {{{ matchTodo
-    protected function matchTodo($activity, $category, $tags, $text, $level, $todos)
+    protected function matchTodo($activity, $category, $tags, $text, $parent, $todos)
     {
         $confidences = [];
 
@@ -347,7 +353,7 @@ class MrClip
             $confidence = 0;
 
             if ($activity == $todo->activity) $confidence += 10;
-            if ($category == $todo->category) $confidence += 20;
+            if ($category == $todo->category) $confidence += 10;
 
             $diffs = count(array_diff($tags, $todo->tags)) + count(array_diff($todo->tags, $tags));
             $tagConfidence = 30 - 10 * $diffs;
@@ -355,6 +361,8 @@ class MrClip
 
             $textConfidence = 40 - abs(strcmp($text, $todo->text));
             $confidence += $textConfidence;
+
+            if ($parent == $todo->parent) $confidence += 10;
 
             $confidences[] = $confidence;
         }
