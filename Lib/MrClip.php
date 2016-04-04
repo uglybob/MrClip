@@ -309,10 +309,12 @@ class MrClip
                 array_pop($parents);
             }
 
-            $rest = array_udiff($list, $matched,
-                function ($obj_a, $obj_b) {
-                    return $obj_a->id - $obj_b->id;
-                }
+            $rest = array_values(
+                array_udiff($list, $matched,
+                    function ($obj_a, $obj_b) {
+                        return $obj_a->id - $obj_b->id;
+                    }
+                )
             );
 
             $candidates = $this->matchTodo($activity, $category, $tags, $text, $parents[$level], $rest);
@@ -321,7 +323,20 @@ class MrClip
                 $matched[] = $candidates[0][1];
                 $id = $candidates[0][1]->id;
             } else {
-                $id = null;
+                echo "No exact match for $activity@$category " . implode(' ', $this->formatTags($tags)) . ' ' . $text . "\n";
+
+                foreach($rest as $key => $candidate) {
+                    echo "[$key] " . $candidate->activity . '@' . $candidate->category . ' ' . implode(' ', $this->formatTags($candidate->tags)) . ' ' . $candidate->text . "\n";
+                }
+                echo '[' . ($key + 1) . "] add as new todo\n\n";
+
+                $answer = readline();
+
+                if (array_key_exists($answer, $rest)) {
+                    $id = $rest[$answer]->id;
+                } else {
+                    $id = null;
+                }
             }
 
             $result = $this->getPrm()->editTodo($id, $activity, $category, $tags, $text, $parents[$level]);
