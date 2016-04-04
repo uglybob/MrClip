@@ -273,6 +273,7 @@ class MrClip
         $parents = [null];
         $matched = [];
         $last = null;
+        $rest = [];
 
         foreach($newList as $todoString) {
             preg_match('/^[ ]*/', $todoString, $matches);
@@ -328,12 +329,13 @@ class MrClip
                 foreach($rest as $key => $candidate) {
                     echo "[$key] " . $candidate->activity . '@' . $candidate->category . ' ' . implode(' ', $this->formatTags($candidate->tags)) . ' ' . $candidate->text . "\n";
                 }
-                echo '[' . ($key + 1) . "] add as new todo\n\n";
+                echo '[' . ($key + 1) . "] add as new todo\n";
 
                 $answer = readline();
 
                 if (array_key_exists($answer, $rest)) {
                     $id = $rest[$answer]->id;
+                    $matched[] = $rest[$answer];
                 } else {
                     $id = null;
                 }
@@ -342,6 +344,19 @@ class MrClip
             $result = $this->getPrm()->editTodo($id, $activity, $category, $tags, $text, $parents[$level]);
 
             $last = $result->id;
+        }
+
+        $rest = array_values(
+            array_udiff($list, $matched,
+                function ($obj_a, $obj_b) {
+                    return $obj_a->id - $obj_b->id;
+                }
+            )
+        );
+
+
+        foreach ($rest as $todo) {
+            $this->getPrm()->deleteTodo($todo->id);
         }
     }
     // }}}
