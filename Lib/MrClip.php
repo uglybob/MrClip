@@ -241,8 +241,7 @@ class MrClip
     // {{{ todoList
     protected function todoList()
     {
-        $todos = $this->getTodoList();
-        echo $this->formatTodos($todos);
+        echo $this->formatTodos($this->getTodoList());
     }
     // }}}
     // {{{ todoEdit
@@ -278,37 +277,16 @@ class MrClip
         foreach($newList as $todoString) {
             preg_match('/^[ ]*/', $todoString, $matches);
             $level = strlen($matches[0]) / 4;
-            $todoArray = explode(' ', ltrim($todoString));
-            $parser = new Parser('todo', $todoArray);
 
-            if ($this->parser->getActivity()) {
-                $activity = $this->parser->getActivity();
-            } else {
-                $parser->parseActigory();
-                $activity = $parser->getActivity();
-            }
-
-            if ($this->parser->getCategory()) {
-                $category = $this->parser->getCategory();
-            } else if ($parser->getCategory()) {
-                $category = $parser->getCategory();
-            } else {
-                $activity = $parser->parseActigory();
-                $category = $parser->getCategory();
-            }
-
-            $parser->parseTags();
-            $listTags = $parser->getTags();
-
-            $optionTags = $this->parser->getTags();
-            $tags = array_unique(array_merge($listTags, $optionTags));
-            $text = trim($parser->parseText());
+            $todo = $this->stringToTodo($todoString);
 
             if (count($parents) < $level + 1) {
                 array_push($parents, $last);
             } else if (count($parents) > $level + 1) {
                 array_pop($parents);
             }
+
+            $todo->parent = $parents[$level];
 
             $rest = array_values(
                 array_udiff($list, $matched,
@@ -319,36 +297,44 @@ class MrClip
             );
 
             if (empty($rest)) {
-                $id = null;
+                $todo->id = null;
             } else {
-                $candidates = $this->matchTodo($activity, $category, $tags, $text, $parents[$level], $rest);
+                $candidates = $this->matchTodo($todo, $rest);
 
                 if (
                     isset($candidates[0][0])
                     && $candidates[0][0] == 100
                 ) {
                     $matched[] = $candidates[0][1];
-                    $id = $candidates[0][1]->id;
+                    $todo->id = $candidates[0][1]->id;
                 } else {
-                    echo "No exact match for $activity@$category " . implode(' ', $this->formatTags($tags)) . ' ' . $text . "\n";
+                    echo 'No exact match for ' . $this->formatTodo($todo) . "\n";
 
                     foreach($rest as $key => $candidate) {
-                        echo "[$key] " . $candidate->activity . '@' . $candidate->category . ' ' . implode(' ', $this->formatTags($candidate->tags)) . ' ' . $candidate->text . "\n";
+                        echo "[$key] " . $this->formatTodo($candidate) . "\n";
                     }
                     echo '[' . ($key + 1) . "] add as new todo\n";
 
                     $answer = readline();
 
                     if (array_key_exists($answer, $rest)) {
-                        $id = $rest[$answer]->id;
+                        $todo->id = $rest[$answer]->id;
                         $matched[] = $rest[$answer];
                     } else {
-                        $id = null;
+                        $todo->id = null;
                     }
                 }
             }
 
-            $result = $this->getPrm()->editTodo($id, $activity, $category, $tags, $text, $parents[$level]);
+            $result = $this->getPrm()->editTodo(
+                $todo->id,
+                $todo->activity,
+                $todo->category,
+                $todo->tags,
+                $todo->text,
+                $todo->parent
+            );
+
             $last = $result->id;
         }
 
@@ -380,33 +366,33 @@ class MrClip
     }
     // }}}
     // {{{ matchTodo
-    protected function matchTodo($activity, $category, $tags, $text, $parent, $todos)
+    protected function matchTodo($needle, $haystack)
     {
         $confidences = [];
 
-        foreach($todos as $todo) {
+        foreach($haystack as $candidate) {
             $confidence = 0;
 
-            if ($activity == $todo->activity) $confidence += 10;
-            if ($category == $todo->category) $confidence += 10;
+            if ($needle->activity == $candidate->activity) $confidence += 10;
+            if ($needle->category == $candidate->category) $confidence += 10;
 
-            $diffs = count(array_diff($tags, $todo->tags)) + count(array_diff($todo->tags, $tags));
+            $diffs = count(array_diff($needle->tags, $candidate->tags)) + count(array_diff($candidate->tags, $needle->tags));
             $tagConfidence = 30 - 10 * $diffs;
             if ($tagConfidence > 0) $confidence += $tagConfidence;
 
-            $textConfidence = 40 - abs(strcmp($text, $todo->text));
+            $textConfidence = 40 - abs(strcmp($needle->text, $candidate->text));
             $confidence += $textConfidence;
 
-            if ($parent == $todo->parent) $confidence += 10;
+            if ($needle->parent == $candidate->parent) $confidence += 10;
 
             $confidences[] = $confidence;
         }
 
-        array_multisort($confidences, SORT_DESC, $todos);
+        array_multisort($confidences, SORT_DESC, $haystack);
 
         $result = [];
-        foreach ($todos as $key => $todo) {
-            $result[] = [$confidences[$key], $todo];
+        foreach ($haystack as $key => $candidate) {
+            $result[] = [$confidences[$key], $candidate];
         }
 
         return $result;
@@ -447,13 +433,11 @@ class MrClip
     }
     // }}}
     // {{{ formatTodo
-    protected function formatTodo($todo)
+    protected function formatTodo($todo, $hideActivity = false, $hideCategory = false, $hiddenTags = [])
     {
-        $parser = $this->parser;
-
-        $activity = ($parser->getActivity()) ? '' : $todo->activity;
-        $category = ($parser->getCategory()) ? '' : $todo->category;
-        $tags = array_diff($todo->tags, $parser->getTags());
+        $activity = ($hideActivity) ? '' : $todo->activity;
+        $category = ($hideCategory) ? '' : $todo->category;
+        $tags = array_diff($todo->tags, $hiddenTags);
         $text = $todo->text;
 
         return $this->formatAttributes($activity, $category, $tags, $text);
@@ -516,13 +500,52 @@ class MrClip
     // {{{ todoTree
     protected function todoTree($todo, $level)
     {
-        $string = str_repeat('    ', $level) . $this->formatTodo($todo) . "\n";
+        $parser = $this->parser;
+        $hideActivity = (bool) $parser->getActivity();
+        $hideCategory = (bool) $parser->getCategory();
+        $hiddenTags = $parser->getTags();
+
+        $string = str_repeat('    ', $level) . $this->formatTodo($todo, $hideActivity, $hideCategory, $hiddenTags) . "\n";
 
         foreach ($todo->children as $child) {
             $string .= $this->todoTree($child, $level + 1);
         }
 
         return $string;
+    }
+    // }}}
+
+    // {{{ stringToTodo
+    protected function stringToTodo($todoString)
+    {
+        $todoArray = explode(' ', trim($todoString));
+        $parser = new Parser('todo', $todoArray);
+        $todo = new \stdclass();
+
+        if ($this->parser->getActivity()) {
+            $todo->activity = $this->parser->getActivity();
+        } else {
+            $parser->parseActigory();
+            $todo->activity = $parser->getActivity();
+        }
+
+        if ($this->parser->getCategory()) {
+            $todo->category = $this->parser->getCategory();
+        } else if ($parser->getCategory()) {
+            $todo->category = $parser->getCategory();
+        } else {
+            $todo->activity = $parser->parseActigory();
+            $todo->category = $parser->getCategory();
+        }
+
+        $parser->parseTags();
+        $listTags = $parser->getTags();
+
+        $optionTags = $this->parser->getTags();
+        $todo->tags = array_unique(array_merge($listTags, $optionTags));
+        $todo->text = trim($parser->parseText());
+
+        return $todo;
     }
     // }}}
 }
