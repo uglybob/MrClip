@@ -228,7 +228,7 @@ class MrClip
             );
 
             if ($record) {
-                echo '(added) ' . $this->formatRecord($stopped) . "\n";
+                echo '(added) ' . $this->formatRecord($record) . "\n";
             } else {
                 echo "Failed to add record";
             }
@@ -320,7 +320,10 @@ class MrClip
 
             $candidates = $this->matchTodo($activity, $category, $tags, $text, $parents[$level], $rest);
 
-            if ($candidates[0][0] == 100) {
+            if (
+                isset($candidates[0][0])
+                && $candidates[0][0] == 100
+            ) {
                 $matched[] = $candidates[0][1];
                 $id = $candidates[0][1]->id;
             } else {
@@ -457,6 +460,8 @@ class MrClip
     // {{{ formatTodos
     protected function formatTodos($todos)
     {
+        $numbered = [];
+
         foreach ($todos as $todo) {
             $todo->children = [];
             $numbered[$todo->id] = $todo;
