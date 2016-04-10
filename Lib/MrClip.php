@@ -318,34 +318,37 @@ class MrClip
                 )
             );
 
-            $candidates = $this->matchTodo($activity, $category, $tags, $text, $parents[$level], $rest);
-
-            if (
-                isset($candidates[0][0])
-                && $candidates[0][0] == 100
-            ) {
-                $matched[] = $candidates[0][1];
-                $id = $candidates[0][1]->id;
+            if (empty($rest)) {
+                $id = null;
             } else {
-                echo "No exact match for $activity@$category " . implode(' ', $this->formatTags($tags)) . ' ' . $text . "\n";
+                $candidates = $this->matchTodo($activity, $category, $tags, $text, $parents[$level], $rest);
 
-                foreach($rest as $key => $candidate) {
-                    echo "[$key] " . $candidate->activity . '@' . $candidate->category . ' ' . implode(' ', $this->formatTags($candidate->tags)) . ' ' . $candidate->text . "\n";
-                }
-                echo '[' . ($key + 1) . "] add as new todo\n";
-
-                $answer = readline();
-
-                if (array_key_exists($answer, $rest)) {
-                    $id = $rest[$answer]->id;
-                    $matched[] = $rest[$answer];
+                if (
+                    isset($candidates[0][0])
+                    && $candidates[0][0] == 100
+                ) {
+                    $matched[] = $candidates[0][1];
+                    $id = $candidates[0][1]->id;
                 } else {
-                    $id = null;
+                    echo "No exact match for $activity@$category " . implode(' ', $this->formatTags($tags)) . ' ' . $text . "\n";
+
+                    foreach($rest as $key => $candidate) {
+                        echo "[$key] " . $candidate->activity . '@' . $candidate->category . ' ' . implode(' ', $this->formatTags($candidate->tags)) . ' ' . $candidate->text . "\n";
+                    }
+                    echo '[' . ($key + 1) . "] add as new todo\n";
+
+                    $answer = readline();
+
+                    if (array_key_exists($answer, $rest)) {
+                        $id = $rest[$answer]->id;
+                        $matched[] = $rest[$answer];
+                    } else {
+                        $id = null;
+                    }
                 }
             }
 
             $result = $this->getPrm()->editTodo($id, $activity, $category, $tags, $text, $parents[$level]);
-
             $last = $result->id;
         }
 
@@ -356,7 +359,6 @@ class MrClip
                 }
             )
         );
-
 
         foreach ($rest as $todo) {
             $this->getPrm()->deleteTodo($todo->id);
