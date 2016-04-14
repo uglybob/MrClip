@@ -247,27 +247,9 @@ class MrClip
     // {{{ todoEdit
     protected function todoEdit()
     {
-        $temp = tempnam(sys_get_temp_dir(), 'MrClip');
         $list = $this->getTodoList();
         $formatted = $this->formatTodos($list);
-        file_put_contents($temp, $formatted);
-
-        $pipes = array();
-
-        $editRes = proc_open(
-            Setup::get('editor') . ' ' . $temp,
-            [
-                0 => STDIN,
-                1 => STDOUT,
-                2 => STDERR,
-            ],
-            $pipes
-        );
-
-        proc_close($editRes);
-
-        $newList = file($temp);
-        unlink($temp);
+        $newList = $this->userEditString($formatted);
 
         $parents = [null];
         $matched = [];
@@ -278,14 +260,13 @@ class MrClip
             preg_match('/^[ ]*/', $todoString, $matches);
             $level = strlen($matches[0]) / 4;
 
-            $todo = $this->stringToTodo($todoString);
-
             if (count($parents) < $level + 1) {
                 array_push($parents, $last);
             } else if (count($parents) > $level + 1) {
                 array_pop($parents);
             }
 
+            $todo = $this->stringToTodo($todoString);
             $todo->parent = $parents[$level];
 
             $rest = array_values(
@@ -349,6 +330,32 @@ class MrClip
         foreach ($rest as $todo) {
             $this->getPrm()->deleteTodo($todo->id);
         }
+    }
+    // }}}
+    // {{{ userEditString
+    protected function userEditString($string)
+    {
+        $temp = tempnam(sys_get_temp_dir(), 'MrClip');
+        file_put_contents($temp, $string);
+
+        $pipes = array();
+
+        $editRes = proc_open(
+            Setup::get('editor') . ' ' . $temp,
+            [
+                0 => STDIN,
+                1 => STDOUT,
+                2 => STDERR,
+            ],
+            $pipes
+        );
+
+        proc_close($editRes);
+
+        $newString = file($temp);
+        unlink($temp);
+
+        return $newString;
     }
     // }}}
 
