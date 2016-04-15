@@ -257,8 +257,7 @@ class MrClip
         $rest = [];
 
         foreach($newList as $todoString) {
-            preg_match('/^[ ]*/', $todoString, $matches);
-            $level = strlen($matches[0]) / 4;
+            $level = $this->parseLevel($todoString);
 
             if (count($parents) < $level + 1) {
                 array_push($parents, $last);
@@ -330,6 +329,14 @@ class MrClip
         foreach ($rest as $todo) {
             $this->getPrm()->deleteTodo($todo->id);
         }
+    }
+    // }}}
+    // {{{ parseLevel
+    protected function parseLevel($string)
+    {
+        preg_match('/^[ ]*/', $string, $matches);
+
+        return strlen($matches[0]) / 4;
     }
     // }}}
     // {{{ userEditString
