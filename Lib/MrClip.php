@@ -341,15 +341,9 @@ class MrClip
 
         $answer = readline('accept (y/N)');
         if ($answer === 'y') {
-            foreach($new as $todo) {
-                $this->saveTodo($todo);
-            }
-            foreach($exact as $todo) {
-                $this->saveTodo($todo);
-            }
-            foreach($guess as $todo) {
-                $this->saveTodo($todo);
-            }
+            $this->saveTodos($new);
+            $this->saveTodos($exact);
+            $this->saveTodos($guess);
             foreach ($rest as $todo) {
                 $this->getPrm()->deleteTodo($todo->id);
             }
@@ -444,20 +438,20 @@ class MrClip
     }
     // }}}
     // {{{ saveTodo
-    protected function saveTodo($todo)
+    protected function saveTodos($todos)
     {
-        $parentId = ($todo->parent) ? $todo->parent->id : null;
+        foreach ($todos as $todo) {
+            $parentId = ($todo->parent) ? $todo->parent->id : null;
 
-        $result = $this->getPrm()->editTodo(
-            $todo->id,
-            $todo->activity,
-            $todo->category,
-            $todo->tags,
-            $todo->text,
-            $parentId
-        );
-
-        return $result;
+            $result = $this->getPrm()->editTodo(
+                $todo->id,
+                $todo->activity,
+                $todo->category,
+                $todo->tags,
+                $todo->text,
+                $parentId
+            );
+        }
     }
     // }}}
 
