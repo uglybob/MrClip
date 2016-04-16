@@ -247,16 +247,20 @@ class MrClip
     // {{{ todoEdit
     protected function todoEdit()
     {
-        $list = $this->getTodoList();
-        $formatted = $this->formatTodos($list);
+        $todos = $this->getTodoList();
+        $formatted = $this->formatTodos($todos);
         $newList = $this->userEditString($formatted);
 
+        $newTodos = new \SplObjectStorage();
+        $rest = new \SplObjectStorage();
+        $rest->addAll($todos);
+        $exact = new \SplObjectStorage();
+
         $parents = [null];
-        $matched = [];
         $last = null;
-        $rest = [];
 
         foreach($newList as $todoString) {
+            $newTodo = $this->stringToTodo($todoString);
             $level = $this->parseLevel($todoString);
 
             if (count($parents) < $level + 1) {
@@ -265,69 +269,90 @@ class MrClip
                 array_pop($parents);
             }
 
-            $todo = $this->stringToTodo($todoString);
-            $todo->parent = $parents[$level];
+            $last = $newTodo;
+            $newTodo->parent = $parents[$level];
+            $candidates = $this->matchTodo($newTodo, $rest);
 
-            $rest = array_values(
-                array_udiff($list, $matched,
-                    function ($obj_a, $obj_b) {
-                        return $obj_a->id - $obj_b->id;
-                    }
-                )
-            );
-
-            if (empty($rest)) {
-                $todo->id = null;
+            if (
+                isset($candidates[0][0])
+                && $candidates[0][0] == 100
+            ) {
+                $exact->attach($newTodo);
+                $newTodo->guess = $candidates[0][1];
+                $rest->detach($candidates[0][1]);
+                $newTodo->id = $candidates[0][1]->id;
             } else {
-                $candidates = $this->matchTodo($todo, $rest);
-
-                if (
-                    isset($candidates[0][0])
-                    && $candidates[0][0] == 100
-                ) {
-                    $matched[] = $candidates[0][1];
-                    $todo->id = $candidates[0][1]->id;
-                } else {
-                    echo 'No exact match for ' . $this->formatTodo($todo) . "\n";
-
-                    foreach($rest as $key => $candidate) {
-                        echo "[$key] " . $this->formatTodo($candidate) . "\n";
-                    }
-                    echo '[' . ($key + 1) . "] add as new todo\n";
-
-                    $answer = readline();
-
-                    if (array_key_exists($answer, $rest)) {
-                        $todo->id = $rest[$answer]->id;
-                        $matched[] = $rest[$answer];
-                    } else {
-                        $todo->id = null;
-                    }
-                }
+                $newTodos->attach($newTodo);
             }
-
-            $result = $this->getPrm()->editTodo(
-                $todo->id,
-                $todo->activity,
-                $todo->category,
-                $todo->tags,
-                $todo->text,
-                $todo->parent
-            );
-
-            $last = $result->id;
         }
 
-        $rest = array_values(
-            array_udiff($list, $matched,
-                function ($obj_a, $obj_b) {
-                    return $obj_a->id - $obj_b->id;
-                }
-            )
-        );
+        $guess = new \SplObjectStorage();
+        $new = new \SplObjectStorage();
 
+        foreach($newTodos as $newTodo) {
+            $candidates = $this->matchTodo($newTodo, $rest);
+
+            if (
+                isset($candidates[0][0])
+                && $candidates[0][0] > 80
+            ) {
+                $guess->attach($newTodo);
+                $newTodo->guess = $candidates[0][1];
+                $rest->detach($candidates[0][1]);
+                $newTodo->id = $candidates[0][1]->id;
+            } else {
+                $new->attach($newTodo);
+            }
+        }
+
+        foreach($guess as $todo) {
+            $todo->parentId = ($todo->parent) ? $todo->parent->id  : null;
+        }
+
+        $exactWithParent = new \SplObjectStorage();
+        $exactMoved = new \SplObjectStorage();
+
+        foreach($exact as $todo) {
+            $todo->parentId = ($todo->parent) ? $todo->parent->id  : null;
+
+            if (
+                ($todo->parent && $todo->parent->id === $todo->guess->parentId)
+                || (is_null($todo->guess->parentId) && is_null($todo->parent))
+            ) {
+                $exactWithParent->attach($todo);
+            } else {
+                $exactMoved->attach($todo);
+            }
+        }
+
+        echo count($todos) . ' old, ' . count($newList) . " new\n\n";
+        foreach ($exactMoved as $todo) {
+            echo '(moved)   ' . $this->formatTodo($todo) . "\n";
+        }
+        foreach ($guess as $todo) {
+            echo '(edited) ' . $this->formatTodo($todo->guess) . ' -> ' . $this->formatTodo($todo) . "\n";
+        }
         foreach ($rest as $todo) {
-            $this->getPrm()->deleteTodo($todo->id);
+            echo '(deleted) ' . $this->formatTodo($todo) . "\n";
+        }
+        foreach ($new as $todo) {
+            echo '(new)     ' . $this->formatTodo($todo) . "\n";
+        }
+
+        $answer = readline('accept (y/N)');
+        if ($answer === 'y') {
+            foreach($new as $todo) {
+                $this->saveTodo($todo);
+            }
+            foreach($exact as $todo) {
+                $this->saveTodo($todo);
+            }
+            foreach($guess as $todo) {
+                $this->saveTodo($todo);
+            }
+            foreach ($rest as $todo) {
+                $this->getPrm()->deleteTodo($todo->id);
+            }
         }
     }
     // }}}
@@ -374,7 +399,13 @@ class MrClip
         $parser->parseActigory(true);
         $parser->parseTags();
 
-        $todos = $this->getPrm()->getTodos($parser->getActivity(), $parser->getCategory(), $parser->getTags());
+        $todoArray = $this->getPrm()->getTodos($parser->getActivity(), $parser->getCategory(), $parser->getTags());
+
+        $todos = new \SplObjectStorage();
+
+        foreach($todoArray as $todo) {
+            $todos->attach($todo);
+        }
 
         return $todos;
     }
@@ -383,6 +414,7 @@ class MrClip
     protected function matchTodo($needle, $haystack)
     {
         $confidences = [];
+        $candidates = [];
 
         foreach($haystack as $candidate) {
             $confidence = 0;
@@ -394,20 +426,36 @@ class MrClip
             $tagConfidence = 30 - 10 * $diffs;
             if ($tagConfidence > 0) $confidence += $tagConfidence;
 
-            $textConfidence = 40 - abs(strcmp($needle->text, $candidate->text));
+            $textConfidence = 50 - abs(strcmp($needle->text, $candidate->text));
             $confidence += $textConfidence;
 
-            if ($needle->parent == $candidate->parent) $confidence += 10;
-
             $confidences[] = $confidence;
+            $candidates[] = $candidate;
         }
 
-        array_multisort($confidences, SORT_DESC, $haystack);
+        array_multisort($confidences, SORT_DESC, $candidates);
 
         $result = [];
-        foreach ($haystack as $key => $candidate) {
+        foreach ($candidates as $key => $candidate) {
             $result[] = [$confidences[$key], $candidate];
         }
+
+        return $result;
+    }
+    // }}}
+    // {{{ saveTodo
+    protected function saveTodo($todo)
+    {
+        $parentId = ($todo->parent) ? $todo->parent->id : null;
+
+        $result = $this->getPrm()->editTodo(
+            $todo->id,
+            $todo->activity,
+            $todo->category,
+            $todo->tags,
+            $todo->text,
+            $parentId
+        );
 
         return $result;
     }
@@ -468,14 +516,14 @@ class MrClip
         }
 
         foreach ($numbered as $todo) {
-            if (!is_null($todo->parent) && array_key_exists($todo->parent, $numbered)) {
-                $numbered[$todo->parent]->children[] = $todo;
+            if (!is_null($todo->parentId) && array_key_exists($todo->parentId, $numbered)) {
+                $numbered[$todo->parentId]->children[] = $todo;
             }
         }
 
         $list = '';
         foreach ($numbered as $todo) {
-            if (is_null($todo->parent)) {
+            if (is_null($todo->parentId)) {
                 $list .= $this->todoTree($todo, 0);
             }
         }
@@ -558,6 +606,7 @@ class MrClip
         $optionTags = $this->parser->getTags();
         $todo->tags = array_unique(array_merge($listTags, $optionTags));
         $todo->text = trim($parser->parseText());
+        $todo->id = null;
 
         return $todo;
     }
