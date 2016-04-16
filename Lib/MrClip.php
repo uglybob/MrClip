@@ -305,19 +305,13 @@ class MrClip
             }
         }
 
-        foreach($guess as $todo) {
-            $todo->parentId = ($todo->parent) ? $todo->parent->id  : null;
-        }
-
         $exactWithParent = new \SplObjectStorage();
         $exactMoved = new \SplObjectStorage();
 
         foreach($exact as $todo) {
-            $todo->parentId = ($todo->parent) ? $todo->parent->id  : null;
-
             if (
-                ($todo->parent && $todo->parent->id === $todo->guess->parentId)
-                || (is_null($todo->guess->parentId) && is_null($todo->parent))
+                (is_null($todo->guess->parentId) && is_null($todo->parent))
+                || ($todo->parent->id === $todo->guess->parentId)
             ) {
                 $exactWithParent->attach($todo);
             } else {
@@ -437,7 +431,7 @@ class MrClip
         return $result;
     }
     // }}}
-    // {{{ saveTodo
+    // {{{ saveTodos
     protected function saveTodos($todos)
     {
         foreach ($todos as $todo) {
