@@ -252,14 +252,10 @@ class MrClip
         $newList = $this->userEditString($formatted);
 
         $newTodos = new \SplObjectStorage();
-        $rest = new \SplObjectStorage();
-        $rest->addAll($todos);
-        $exact = new \SplObjectStorage();
-
         $parents = [null];
         $last = null;
 
-        foreach($newList as $todoString) {
+        foreach ($newList as $todoString) {
             $newTodo = $this->stringToTodo($todoString);
             $level = $this->parseLevel($todoString);
 
@@ -271,42 +267,18 @@ class MrClip
 
             $last = $newTodo;
             $newTodo->parent = $parents[$level];
-            $candidates = $this->matchTodo($newTodo, $rest);
-
-            if (
-                isset($candidates[0][0])
-                && $candidates[0][0] == 100
-            ) {
-                $exact->attach($newTodo);
-                $newTodo->guess = $candidates[0][1];
-                $rest->detach($candidates[0][1]);
-                $newTodo->id = $candidates[0][1]->id;
-            } else {
-                $newTodos->attach($newTodo);
-            }
+            $newTodos->attach($newTodo);
         }
 
+        $exact = new \SplObjectStorage();
+        $unsure = new \SplObjectStorage();
         $guess = new \SplObjectStorage();
         $new = new \SplObjectStorage();
-
-        foreach($newTodos as $newTodo) {
-            $candidates = $this->matchTodo($newTodo, $rest);
-
-            if (
-                isset($candidates[0][0])
-                && $candidates[0][0] > 80
-            ) {
-                $guess->attach($newTodo);
-                $newTodo->guess = $candidates[0][1];
-                $rest->detach($candidates[0][1]);
-                $newTodo->id = $candidates[0][1]->id;
-            } else {
-                $new->attach($newTodo);
-            }
-        }
-
         $exactWithParent = new \SplObjectStorage();
         $exactMoved = new \SplObjectStorage();
+
+        $rest = $this->matchTodos($newTodos, $todos, $exact, $unsure, 100);
+        $rest = $this->matchTodos($unsure, $rest, $guess, $new, 80);
 
         foreach($exact as $todo) {
             if (
@@ -429,6 +401,31 @@ class MrClip
         }
 
         return $result;
+    }
+    // }}}
+    // {{{ matchTodos
+    protected function matchTodos($todos, $candidates, &$above, &$under, $threshold)
+    {
+        $rest = new \SplObjectStorage();
+        $rest->addAll($candidates);
+
+        foreach ($todos as $todo) {
+            $matches = $this->matchTodo($todo, $rest);
+
+            if (
+                isset($matches[0][0])
+                && $matches[0][0] >= $threshold
+            ) {
+                $above->attach($todo);
+                $todo->guess = $matches[0][1];
+                $todo->id = $matches[0][1]->id;
+                $rest->detach($matches[0][1]);
+            } else {
+                $under->attach($todo);
+            }
+        }
+
+        return $rest;
     }
     // }}}
     // {{{ saveTodos
