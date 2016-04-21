@@ -493,23 +493,33 @@ class MrClip
     // {{{ formatTodos
     protected function formatTodos($todos)
     {
-        $numbered = [];
+        $sorted = [];
 
         foreach ($todos as $todo) {
-            $todo->children = [];
-            $numbered[$todo->id] = $todo;
-        }
-
-        foreach ($numbered as $todo) {
-            if (!is_null($todo->parentId) && array_key_exists($todo->parentId, $numbered)) {
-                $numbered[$todo->parentId]->children[] = $todo;
-            }
+            $sorted[$todo->activity . '@' . $todo->category][] = $todo;
         }
 
         $list = '';
-        foreach ($numbered as $todo) {
-            if (is_null($todo->parentId)) {
-                $list .= $this->todoTree($todo, 0);
+
+        foreach ($sorted as $actigory => $todos) {
+            $list .= "$actigory\n\n";
+
+            $numbered = [];
+            foreach ($todos as $todo) {
+                $todo->children = [];
+                $numbered[$todo->id] = $todo;
+            }
+
+            foreach ($numbered as $todo) {
+                if (!is_null($todo->parentId) && array_key_exists($todo->parentId, $numbered)) {
+                    $numbered[$todo->parentId]->children[] = $todo;
+                }
+            }
+
+            foreach ($numbered as $todo) {
+                if (is_null($todo->parentId)) {
+                    $list .= $this->todoTree($todo, 0);
+                }
             }
         }
 
@@ -548,11 +558,9 @@ class MrClip
     protected function todoTree($todo, $level)
     {
         $parser = $this->parser;
-        $hideActivity = (bool) $parser->getActivity();
-        $hideCategory = (bool) $parser->getCategory();
         $hiddenTags = $parser->getTags();
 
-        $string = str_repeat('    ', $level) . $this->formatTodo($todo, $hideActivity, $hideCategory, $hiddenTags) . "\n";
+        $string = str_repeat('    ', $level) . $this->formatTodo($todo, true, true, $hiddenTags) . "\n";
 
         foreach ($todo->children as $child) {
             $string .= $this->todoTree($child, $level + 1);
