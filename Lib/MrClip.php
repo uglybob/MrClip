@@ -248,8 +248,40 @@ class MrClip
     protected function todoEdit()
     {
         $todos = $this->getTodoList();
-        $formatted = $this->formatTodos($todos);
-        $newList = $this->userEditString($formatted);
+        $todosString = $this->formatTodos($todos);
+        $answer = null;
+
+        while (
+            $answer !== 'y' && $answer !== 'yes'
+            && $answer !== 'c' && $answer !== 'cancel'
+        ) {
+            $parsed = $this->editAndParse($todosString, $todos);
+            $todosString = $parsed->text;
+            $answer = readline('accept (y/N/c)');
+        }
+
+        if ($answer === 'y' || $answer === 'yes') {
+            $this->saveTodos($parsed->new);
+            $this->saveTodos($parsed->exact);
+            $this->saveTodos($parsed->guess);
+            foreach ($parsed->delete as $todo) {
+                $this->getPrm()->deleteTodo($todo->id);
+            }
+        }
+    }
+    // }}}
+    // {{{ parseLevel
+    protected function parseLevel($string)
+    {
+        preg_match('/^[ ]*/', $string, $matches);
+
+        return strlen($matches[0]) / 4;
+    }
+    // }}}
+    // {{{ editAndParse
+    protected function editAndParse($string, $todos)
+    {
+        $newList = $this->userEditString($string);
         $newTodos = new \SplObjectStorage();
         $lastHeader = null;
         $parents = [null];
@@ -265,7 +297,6 @@ class MrClip
                 && $activity && $category
             ) {
                 $level = $this->parseLevel($todoString);
-                $newTodo = $todo;
 
                 if (count($parents) < $level + 1) {
                     array_push($parents, $last);
@@ -273,11 +304,11 @@ class MrClip
                     array_pop($parents);
                 }
 
-                $newTodo->activity = $activity;
-                $newTodo->category = $category;
-                $newTodo->parent = $parents[$level];
-                $newTodos->attach($newTodo);
-                $last = $newTodo;
+                $todo->activity = $activity;
+                $todo->category = $category;
+                $todo->parent = $parents[$level];
+                $newTodos->attach($todo);
+                $last = $todo;
             } else if ($lastHeader) {
                 $activity = $lastHeader->activity;
                 $category = $lastHeader->category;
@@ -298,7 +329,7 @@ class MrClip
         $rest = $this->matchTodos($newTodos, $todos, $exact, $unsure, 100);
         $rest = $this->matchTodos($unsure, $rest, $guess, $new, 80);
 
-        foreach($exact as $todo) {
+        foreach ($exact as $todo) {
             if (
                 (is_null($todo->guess->parentId) && is_null($todo->parent))
                 || ($todo->parent->id === $todo->guess->parentId)
@@ -323,23 +354,14 @@ class MrClip
             echo '(new)     ' . $this->formatTodo($todo) . "\n";
         }
 
-        $answer = readline('accept (y/N)');
-        if ($answer === 'y') {
-            $this->saveTodos($new);
-            $this->saveTodos($exact);
-            $this->saveTodos($guess);
-            foreach ($rest as $todo) {
-                $this->getPrm()->deleteTodo($todo->id);
-            }
-        }
-    }
-    // }}}
-    // {{{ parseLevel
-    protected function parseLevel($string)
-    {
-        preg_match('/^[ ]*/', $string, $matches);
+        $parsed = new \stdclass();
+        $parsed->new = $new;
+        $parsed->exact = $exact;
+        $parsed->guess = $guess;
+        $parsed->delete = $rest;
+        $parsed->text = implode('', $newList);
 
-        return strlen($matches[0]) / 4;
+        return $parsed;
     }
     // }}}
     // {{{ userEditString
