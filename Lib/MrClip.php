@@ -250,24 +250,42 @@ class MrClip
         $todos = $this->getTodoList();
         $formatted = $this->formatTodos($todos);
         $newList = $this->userEditString($formatted);
-
         $newTodos = new \SplObjectStorage();
+        $lastHeader = null;
         $parents = [null];
         $last = null;
 
         foreach ($newList as $todoString) {
-            $newTodo = $this->stringToTodo($todoString);
-            $level = $this->parseLevel($todoString);
+            $header = $this->stringToHeader($todoString);
+            $todo = $this->stringToTodo($todoString);
 
-            if (count($parents) < $level + 1) {
-                array_push($parents, $last);
-            } else if (count($parents) > $level + 1) {
-                array_pop($parents);
+            if (
+                !empty(trim($todoString))
+                && !$header
+                && $activity && $category
+            ) {
+                $level = $this->parseLevel($todoString);
+                $newTodo = $todo;
+
+                if (count($parents) < $level + 1) {
+                    array_push($parents, $last);
+                } else if (count($parents) > $level + 1) {
+                    array_pop($parents);
+                }
+
+                $newTodo->activity = $activity;
+                $newTodo->category = $category;
+                $newTodo->parent = $parents[$level];
+                $newTodos->attach($newTodo);
+                $last = $newTodo;
+            } else if ($lastHeader) {
+                $activity = $lastHeader->activity;
+                $category = $lastHeader->category;
+                $parents = [null];
+                $last = null;
             }
 
-            $last = $newTodo;
-            $newTodo->parent = $parents[$level];
-            $newTodos->attach($newTodo);
+            $lastHeader = $header;
         }
 
         $exact = new \SplObjectStorage();
@@ -291,7 +309,7 @@ class MrClip
             }
         }
 
-        echo count($todos) . ' old, ' . count($newList) . " new\n\n";
+        echo count($todos) . ' old, ' . count($newTodos) . " new\n\n";
         foreach ($exactMoved as $todo) {
             echo '(moved)   ' . $this->formatTodo($todo) . "\n";
         }
@@ -494,17 +512,16 @@ class MrClip
     protected function formatTodos($todos)
     {
         $sorted = [];
+        $list = '';
 
         foreach ($todos as $todo) {
             $sorted[$todo->activity . '@' . $todo->category][] = $todo;
         }
 
-        $list = '';
-
         foreach ($sorted as $actigory => $todos) {
             $list .= "$actigory\n\n";
-
             $numbered = [];
+
             foreach ($todos as $todo) {
                 $todo->children = [];
                 $numbered[$todo->id] = $todo;
@@ -521,6 +538,8 @@ class MrClip
                     $list .= $this->todoTree($todo, 0);
                 }
             }
+
+            $list .= "\n";
         }
 
         return $list;
@@ -577,22 +596,6 @@ class MrClip
         $parser = new Parser('todo', $todoArray);
         $todo = new \stdclass();
 
-        if ($this->parser->getActivity()) {
-            $todo->activity = $this->parser->getActivity();
-        } else {
-            $parser->parseActigory();
-            $todo->activity = $parser->getActivity();
-        }
-
-        if ($this->parser->getCategory()) {
-            $todo->category = $this->parser->getCategory();
-        } else if ($parser->getCategory()) {
-            $todo->category = $parser->getCategory();
-        } else {
-            $todo->activity = $parser->parseActigory();
-            $todo->category = $parser->getCategory();
-        }
-
         $parser->parseTags();
         $listTags = $parser->getTags();
 
@@ -600,6 +603,23 @@ class MrClip
         $todo->tags = array_unique(array_merge($listTags, $optionTags));
         $todo->text = trim($parser->parseText());
         $todo->id = null;
+
+        return $todo;
+    }
+    // }}}
+    // {{{ stringToHeader
+    protected function stringToHeader($headerString)
+    {
+        $todoArray = explode(' ', trim($headerString));
+        $parser = new Parser('todo', $todoArray);
+        $todo = null;
+
+        if ($parser->parseActigory()) {
+            $todo = new \stdclass();
+
+            $todo->activity = $parser->getActivity();
+            $todo->category = $parser->getCategory();
+        }
 
         return $todo;
     }
