@@ -533,6 +533,7 @@ class MrClip
     // {{{ formatTodos
     protected function formatTodos($todos)
     {
+        $hiddenTags = $this->parser->getTags();
         $sorted = [];
         $list = '';
 
@@ -543,10 +544,20 @@ class MrClip
         foreach ($sorted as $actigory => $todos) {
             $list .= "$actigory\n\n";
             $numbered = [];
+            $doneBreak = false;
 
             foreach ($todos as $todo) {
                 $todo->children = [];
                 $numbered[$todo->id] = $todo;
+
+                if ($todo->done) {
+                    $list .= '# ' . $this->formatTodo($todo, true, true, $hiddenTags) . "\n";
+                    $doneBreak = true;
+                }
+            }
+
+            if ($doneBreak) {
+                $list .= "\n";
             }
 
             foreach ($numbered as $todo) {
@@ -598,13 +609,16 @@ class MrClip
     // {{{ todoTree
     protected function todoTree($todo, $level)
     {
-        $parser = $this->parser;
-        $hiddenTags = $parser->getTags();
+        $string = '';
 
-        $string = str_repeat('    ', $level) . $this->formatTodo($todo, true, true, $hiddenTags) . "\n";
+        if (!$todo->done) {
+            $hiddenTags = $this->parser->getTags();
 
-        foreach ($todo->children as $child) {
-            $string .= $this->todoTree($child, $level + 1);
+            $string = str_repeat('    ', $level) . $this->formatTodo($todo, true, true, $hiddenTags) . "\n";
+
+            foreach ($todo->children as $child) {
+                $string .= $this->todoTree($child, $level + 1);
+            }
         }
 
         return $string;
@@ -618,8 +632,8 @@ class MrClip
         $parser = new Parser('todo', $todoArray);
         $todo = new \stdclass();
 
-        $parser->parseTags();
-        $listTags = $parser->getTags();
+        $todo->done = $parser->parseDone();
+        $listTags = $parser->parseTags();
 
         $optionTags = $this->parser->getTags();
         $todo->tags = array_unique(array_merge($listTags, $optionTags));

@@ -77,6 +77,29 @@ class Parser
         return $this->end;
     }
     // }}}
+    // {{{ parseDone
+    public function parseDone()
+    {
+        $done = false;
+        $checkedString = '#';
+
+        if (isset($this->options[0])) {
+            preg_match("/^$checkedString/", $this->options[0], $matches);
+
+            if (isset($matches[0])) {
+                $done = true;
+
+                if ($this->options[0] == $checkedString) {
+                    array_shift($this->options);
+                }
+            }
+        }
+
+        $this->done = $done;
+
+        return $done;
+    }
+    // }}}
     // {{{ parseActigory
     public function parseActigory($filter = false)
     {
