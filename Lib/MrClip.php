@@ -525,7 +525,7 @@ class MrClip
         $activity = ($hideActivity) ? '' : $todo->activity;
         $category = ($hideCategory) ? '' : $todo->category;
         $tags = array_diff($todo->tags, $hiddenTags);
-        $text = $todo->text;
+        $text = isset($todo->text) ? $todo->text : null;
 
         return $this->formatAttributes($activity, $category, $tags, $text);
     }
@@ -542,7 +542,12 @@ class MrClip
         }
 
         foreach ($sorted as $actigory => $todos) {
-            $list .= "$actigory\n\n";
+            $headerTodo = new \stdclass();
+            $headerTodo->activity = reset($todos)->activity;
+            $headerTodo->category = reset($todos)->category;
+            $headerTodo->tags = $hiddenTags;
+            $list .= $this->formatTodo($headerTodo) . "\n\n";
+
             $numbered = [];
             $doneBreak = false;
 
