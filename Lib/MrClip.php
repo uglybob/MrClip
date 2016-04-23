@@ -487,7 +487,8 @@ class MrClip
                 $todo->category,
                 $todo->tags,
                 $todo->text,
-                $parentId
+                $parentId,
+                $todo->done
             );
         }
     }
