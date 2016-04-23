@@ -138,6 +138,8 @@ class Parser
         while ($tag) {
             $tag = $this->parseTag();
         }
+
+        return $this->tags;
     }
     // }}}
     // {{{ parseText

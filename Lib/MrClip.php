@@ -472,7 +472,11 @@ class MrClip
     protected function saveTodos($todos)
     {
         foreach ($todos as $todo) {
-            $parentId = ($todo->parent) ? $todo->parent->id : null;
+            if ($todo->done) {
+                $parentId = ($todo->guess->parentId);
+            } else {
+                $parentId = ($todo->parent) ? $todo->parent->id : null;
+            }
 
             $result = $this->getPrm()->editTodo(
                 $todo->id,
