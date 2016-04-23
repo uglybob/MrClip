@@ -427,8 +427,10 @@ class MrClip
             $tagConfidence = 30 - 10 * $diffs;
             if ($tagConfidence > 0) $confidence += $tagConfidence;
 
-            $textConfidence = 50 - abs(strcmp($needle->text, $candidate->text));
+            $textConfidence = 45 - abs(strcmp($needle->text, $candidate->text));
             $confidence += $textConfidence;
+
+            if ($needle->done == $candidate->done) $confidence += 5;
 
             $confidences[] = $confidence;
             $candidates[] = $candidate;
@@ -527,12 +529,13 @@ class MrClip
     // {{{ formatTodo
     protected function formatTodo($todo, $hideActivity = false, $hideCategory = false, $hiddenTags = [])
     {
+        $checked = (isset($todo->done) && $todo->done) ? '# ' : '';
         $activity = ($hideActivity) ? '' : $todo->activity;
         $category = ($hideCategory) ? '' : $todo->category;
         $tags = array_diff($todo->tags, $hiddenTags);
         $text = isset($todo->text) ? $todo->text : null;
 
-        return $this->formatAttributes($activity, $category, $tags, $text);
+        return $checked . $this->formatAttributes($activity, $category, $tags, $text);
     }
     // }}}
     // {{{ formatTodos
@@ -561,7 +564,7 @@ class MrClip
                 $numbered[$todo->id] = $todo;
 
                 if ($todo->done) {
-                    $list .= '# ' . $this->formatTodo($todo, true, true, $hiddenTags) . "\n";
+                    $list .= $this->formatTodo($todo, true, true, $hiddenTags) . "\n";
                     $doneBreak = true;
                 }
             }
