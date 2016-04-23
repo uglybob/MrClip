@@ -331,7 +331,8 @@ class MrClip
 
         foreach ($exact as $todo) {
             if (
-                (is_null($todo->guess->parentId) && is_null($todo->parent))
+                ($todo->done)
+                || (is_null($todo->guess->parentId) && is_null($todo->parent))
                 || ($todo->parent->id === $todo->guess->parentId)
             ) {
                 $exactWithParent->attach($todo);

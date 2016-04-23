@@ -84,14 +84,16 @@ class Parser
         $checkedString = '#';
 
         if (isset($this->options[0])) {
+            if ($this->options[0] == $checkedString) {
+                $done = true;
+                array_shift($this->options);
+            }
+
             preg_match("/^$checkedString/", $this->options[0], $matches);
 
             if (isset($matches[0])) {
+                $this->options[0] = substr($this->options[0], count($checkedString));
                 $done = true;
-
-                if ($this->options[0] == $checkedString) {
-                    array_shift($this->options);
-                }
             }
         }
 
