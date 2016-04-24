@@ -405,7 +405,27 @@ class MrClip
         $todos = new \SplObjectStorage();
 
         foreach($todoArray as $todo) {
-            $todos->attach($todo);
+            $newTodo = new Todo(
+                $todo->id,
+                $todo->activity,
+                $todo->category,
+                $todo->tags,
+                $todo->text,
+                $todo->parentId,
+                $todo->done
+            );
+
+            $numbered[$todo->id] = $newTodo;
+            $todos->attach($newTodo);
+        }
+
+        foreach($todos as $todo) {
+            $id = $todo->getParentId();
+
+            if ($id) {
+                $todo->setParent($numbered[$id]);
+                $numbered[$id]->addChild($todo);
+            }
         }
 
         return $todos;
@@ -418,21 +438,7 @@ class MrClip
         $candidates = [];
 
         foreach($haystack as $candidate) {
-            $confidence = 0;
-
-            if ($needle->activity == $candidate->activity) $confidence += 10;
-            if ($needle->category == $candidate->category) $confidence += 10;
-
-            $diffs = count(array_diff($needle->tags, $candidate->tags)) + count(array_diff($candidate->tags, $needle->tags));
-            $tagConfidence = 30 - 10 * $diffs;
-            if ($tagConfidence > 0) $confidence += $tagConfidence;
-
-            $textConfidence = 45 - abs(strcmp($needle->text, $candidate->text));
-            $confidence += $textConfidence;
-
-            if ($needle->done == $candidate->done) $confidence += 5;
-
-            $confidences[] = $confidence;
+            $confidences[] = $needle->match($candidate);
             $candidates[] = $candidate;
         }
 
@@ -527,18 +533,6 @@ class MrClip
         return implode(' ', $output);
     }
     // }}}
-    // {{{ formatTodo
-    protected function formatTodo($todo, $hideActivity = false, $hideCategory = false, $hiddenTags = [])
-    {
-        $checked = (isset($todo->done) && $todo->done) ? '# ' : '';
-        $activity = ($hideActivity) ? '' : $todo->activity;
-        $category = ($hideCategory) ? '' : $todo->category;
-        $tags = array_diff($todo->tags, $hiddenTags);
-        $text = isset($todo->text) ? $todo->text : null;
-
-        return $checked . $this->formatAttributes($activity, $category, $tags, $text);
-    }
-    // }}}
     // {{{ formatTodos
     protected function formatTodos($todos)
     {
@@ -547,25 +541,21 @@ class MrClip
         $list = '';
 
         foreach ($todos as $todo) {
-            $sorted[$todo->activity . '@' . $todo->category][] = $todo;
+            $sorted[$todo->getActigory()][] = $todo;
         }
 
         foreach ($sorted as $actigory => $todos) {
-            $headerTodo = new \stdclass();
-            $headerTodo->activity = reset($todos)->activity;
-            $headerTodo->category = reset($todos)->category;
-            $headerTodo->tags = $hiddenTags;
-            $list .= $this->formatTodo($headerTodo) . "\n\n";
+            $headerTodo = new Todo(null, reset($todos)->getActivity(), reset($todos)->getCategory(), $hiddenTags);
+            $list .= $headerTodo->format() . "\n\n";
 
             $numbered = [];
             $doneBreak = false;
 
             foreach ($todos as $todo) {
-                $todo->children = [];
-                $numbered[$todo->id] = $todo;
+                $numbered[$todo->getId()] = $todo;
 
-                if ($todo->done) {
-                    $list .= $this->formatTodo($todo, true, true, $hiddenTags) . "\n";
+                if ($todo->isDone()) {
+                    $list .= $todo->formatFiltered($hiddenTags) . "\n";
                     $doneBreak = true;
                 }
             }
@@ -575,13 +565,13 @@ class MrClip
             }
 
             foreach ($numbered as $todo) {
-                if (!is_null($todo->parentId) && array_key_exists($todo->parentId, $numbered)) {
-                    $numbered[$todo->parentId]->children[] = $todo;
+                if (!is_null($todo->getParentId()) && array_key_exists($todo->getParentId(), $numbered)) {
+                    $numbered[$todo->getParentId()]->addChild($todo);
                 }
             }
 
             foreach ($numbered as $todo) {
-                if (is_null($todo->parentId)) {
+                if (is_null($todo->getParentId())) {
                     $list .= $this->todoTree($todo, 0);
                 }
             }
@@ -592,45 +582,17 @@ class MrClip
         return $list;
     }
     // }}}
-    // {{{ formatAttributes
-    protected function formatAttributes($activity, $category, $tags, $text)
-    {
-        $actigory = '';
-
-        if ($activity)              $actigory .= $activity;
-        if ($activity || $category) $actigory .= '@';
-        if ($category)              $actigory .= $category;
-
-        if ($actigory)      $output[] = $actigory;
-        if (!empty($tags))  $output[] = implode(' ', $this->formatTags($tags));
-        if ($text)          $output[] = $text;
-
-        return implode(' ', $output);
-    }
-    // }}}
-    // {{{ formatTags
-    protected function formatTags($tags)
-    {
-        $formatted = [];
-
-        foreach($tags as $tag) {
-            $formatted[] = "+$tag";
-        }
-
-        return $formatted;
-    }
-    // }}}
     // {{{ todoTree
     protected function todoTree($todo, $level)
     {
         $string = '';
 
-        if (!$todo->done) {
+        if (!$todo->isDone()) {
             $hiddenTags = $this->parser->getTags();
 
-            $string = str_repeat('    ', $level) . $this->formatTodo($todo, true, true, $hiddenTags) . "\n";
+            $string = str_repeat('    ', $level) . $todo->formatFiltered($hiddenTags) . "\n";
 
-            foreach ($todo->children as $child) {
+            foreach ($todo->getChildren() as $child) {
                 $string .= $this->todoTree($child, $level + 1);
             }
         }
