@@ -245,51 +245,11 @@ class MrClip
         }
     }
     // }}}
-    // {{{ parseLevel
-    protected function parseLevel($string)
-    {
-        preg_match('/^[ ]*/', $string, $matches);
-
-        return strlen($matches[0]) / 4;
-    }
-    // }}}
     // {{{ editAndParse
     protected function editAndParse($string, $todos)
     {
         $newList = $this->userEditString($string);
-        $newTodos = new \SplObjectStorage();
-        $lastHeader = null;
-        $parents = [null];
-        $last = null;
-
-        foreach ($newList as $todoString) {
-            $header = $this->stringToHeader($todoString);
-
-            if (
-                !empty(trim($todoString))
-                && !$header
-                && $activity && $category
-            ) {
-                $level = $this->parseLevel($todoString);
-                if (count($parents) < $level + 1) {
-                    array_push($parents, $last);
-                } else if (count($parents) > $level + 1) {
-                    array_pop($parents);
-                }
-
-                $todo = $this->stringToTodo($activity, $category, $parents[$level], $todoString);
-
-                $newTodos->attach($todo);
-                $last = $todo;
-            } else if ($lastHeader) {
-                $activity = $lastHeader->getActivity();
-                $category = $lastHeader->getCategory();
-                $parents = [null];
-                $last = null;
-            }
-
-            $lastHeader = $header;
-        }
+        $newTodos = $this->parseTodoList($newList);
 
         $exact = new \SplObjectStorage();
         $unsure = new \SplObjectStorage();
@@ -331,6 +291,54 @@ class MrClip
         $parsed->text = implode('', $newList);
 
         return $parsed;
+    }
+    // }}}
+    // {{{ parseLevel
+    protected function parseLevel($string)
+    {
+        preg_match('/^[ ]*/', $string, $matches);
+
+        return strlen($matches[0]) / 4;
+    }
+    // }}}
+    // {{{ parseTodoList
+    protected function parseTodoList($list)
+    {
+        $newTodos = new \SplObjectStorage();
+        $lastHeader = null;
+        $parents = [null];
+        $last = null;
+
+        foreach ($list as $todoString) {
+            $header = $this->stringToHeader($todoString);
+
+            if (
+                !empty(trim($todoString))
+                && !$header
+                && $activity && $category
+            ) {
+                $level = $this->parseLevel($todoString);
+                if (count($parents) < $level + 1) {
+                    array_push($parents, $last);
+                } else if (count($parents) > $level + 1) {
+                    array_pop($parents);
+                }
+
+                $todo = $this->stringToTodo($activity, $category, $parents[$level], $todoString);
+
+                $newTodos->attach($todo);
+                $last = $todo;
+            } else if ($lastHeader) {
+                $activity = $lastHeader->getActivity();
+                $category = $lastHeader->getCategory();
+                $parents = [null];
+                $last = null;
+            }
+
+            $lastHeader = $header;
+        }
+
+        return $newTodos;
     }
     // }}}
     // {{{ userEditString
@@ -399,7 +407,7 @@ class MrClip
     {
         foreach ($todos as $todo) {
             if ($todo->isDone()) {
-                $todo->setParent($todo->getGuess->getParent());
+                $todo->setParent($todo->getGuess()->getParent());
             }
 
             $result = $this->prm->saveTodo($todo);
