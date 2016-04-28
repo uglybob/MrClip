@@ -55,53 +55,6 @@ class Parser
         return $this->command;
     }
     // }}}
-    // {{{ parseTime
-    public function parseTime()
-    {
-        return $this->shift('\d{1,2}:\d{2}');
-    }
-    // }}}
-    // {{{ parseStart
-    public function parseStart()
-    {
-        $this->start = $this->timeToTimestamp($this->parseTime());
-
-        return $this->start;
-    }
-    // }}}
-    // {{{ parseEnd
-    public function parseEnd()
-    {
-        $this->end = $this->timeToTimestamp($this->parseTime());
-
-        return $this->end;
-    }
-    // }}}
-    // {{{ parseDone
-    public function parseDone()
-    {
-        $done = false;
-        $checkedString = '#';
-
-        if (isset($this->options[0])) {
-            if ($this->options[0] == $checkedString) {
-                $done = true;
-                array_shift($this->options);
-            }
-
-            preg_match("/^$checkedString/", $this->options[0], $matches);
-
-            if (isset($matches[0])) {
-                $this->options[0] = substr($this->options[0], count($checkedString));
-                $done = true;
-            }
-        }
-
-        $this->done = $done;
-
-        return $done;
-    }
-    // }}}
     // {{{ parseActigory
     public function parseActigory($filter = false)
     {
@@ -154,6 +107,55 @@ class Parser
     }
     // }}}
 
+    // {{{ parseTime
+    public function parseTime()
+    {
+        return $this->shift('\d{1,2}:\d{2}');
+    }
+    // }}}
+    // {{{ parseStart
+    public function parseStart()
+    {
+        $this->start = $this->parseTime();
+
+        return $this->start;
+    }
+    // }}}
+    // {{{ parseEnd
+    public function parseEnd()
+    {
+        $this->end = $this->parseTime();
+
+        return $this->end;
+    }
+    // }}}
+
+    // {{{ parseDone
+    public function parseDone()
+    {
+        $done = false;
+        $checkedString = '#';
+
+        if (isset($this->options[0])) {
+            if ($this->options[0] == $checkedString) {
+                $done = true;
+                array_shift($this->options);
+            }
+
+            preg_match("/^$checkedString/", $this->options[0], $matches);
+
+            if (isset($matches[0])) {
+                $this->options[0] = substr($this->options[0], count($checkedString));
+                $done = true;
+            }
+        }
+
+        $this->done = $done;
+
+        return $done;
+    }
+    // }}}
+
     // {{{ getDomain
     public function getDomain()
     {
@@ -164,18 +166,6 @@ class Parser
     public function getCommand()
     {
         return $this->command;
-    }
-    // }}}
-    // {{{ getStart
-    public function getStart()
-    {
-        return $this->start;
-    }
-    // }}}
-    // {{{ getEnd
-    public function getEnd()
-    {
-        return $this->end;
     }
     // }}}
     // {{{ getActivity
@@ -203,20 +193,16 @@ class Parser
     }
     // }}}
 
-    // {{{ timeToTimestamp
-    protected function timeToTimestamp($time)
+    // {{{ getStart
+    public function getStart()
     {
-        $timestamp = null;
-
-        if ($time) {
-            $split = explode(':', $time);
-            $dt = new \DateTime();
-            $dt->setTime($split[0], $split[1]);
-
-            $timestamp = $dt->getTimestamp();
-        }
-
-        return $timestamp;
+        return $this->start;
+    }
+    // }}}
+    // {{{ getEnd
+    public function getEnd()
+    {
+        return $this->end;
     }
     // }}}
 }

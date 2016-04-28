@@ -11,6 +11,7 @@ class MrClip
     public function __construct($domain, $options)
     {
         $options = $this->cleanColons($options);
+        $this->prm = new PRM();
 
         $this->commands = [
             'record' => [
@@ -67,23 +68,6 @@ class MrClip
     }
     // }}}
 
-    // {{{ getPrm
-    protected function getPrm()
-    {
-        if (!$this->prm) {
-            $soapOptions = [
-                'location' => Setup::get('url') . '/soap.php',
-                'uri' => 'http://localhost/',
-            ];
-
-            $this->prm = new \SoapClient(null, $soapOptions);
-            $this->prm->login(Setup::get('user'), Setup::get('pass'));
-        }
-
-        return $this->prm;
-    }
-    // }}}
-
     // {{{ completion
     protected function completion($domain, $options)
     {
@@ -105,8 +89,11 @@ class MrClip
                         } else {
                             $times = [date('H:i')];
 
-                            if ($last = $this->getPrm()->getLastRecord()) {
-                                $times[] = date('H:i', $last->end);
+                            if (
+                                ($last = $this->prm->getLastRecord())
+                                && ($end = $last->getEnd())
+                            ) {
+                                $times[] = $end->format('H:i');
                             }
 
                             $this->suggest($current, $times);
@@ -137,20 +124,10 @@ class MrClip
     {
         if ($parser->parseActigory($filter)) {
             $parser->parseTags();
-            $tags = array_diff($this->getPrm()->getTags(), $parser->getTags());
+            $tags = array_diff($this->prm->getTags(), $parser->getTags());
             $this->suggest($current, $tags, '+');
         } else {
-            $activities = $this->getPrm()->getActivities();
-            $activities[] = ''; // categories without activities
-            $categories = $this->getPrm()->getCategories();
-
-            foreach($activities as $activity) {
-                foreach($categories as $category) {
-                    $actigories[] = "$activity@$category";
-                }
-            }
-
-            $this->suggest($current, $actigories);
+            $this->suggest($current, $this->prm->getActigories());
         }
     }
     // }}}
@@ -166,18 +143,20 @@ class MrClip
                 $parser->parseTags();
                 $parser->parseText();
 
-                $record = $this->getPrm()->editRecord(
+                $record = new Record(
                     null,
-                    $parser->getStart(),
-                    $parser->getEnd(),
                     $parser->getActivity(),
                     $parser->getCategory(),
                     $parser->getTags(),
-                    $parser->getText()
+                    $parser->getText(),
+                    $parser->getStart(),
+                    $parser->getEnd()
                 );
 
-                if ($record) {
-                    echo '(added) ' . $this->formatRecord($record) . "\n";
+                $result = $this->prm->saveRecord($record);
+
+                if ($result) {
+                    echo '(added) ' . $result->format() . "\n";
                 } else {
                     echo "Failed to add record";
                 }
@@ -188,11 +167,11 @@ class MrClip
     // {{{ recordCurrent
     protected function recordCurrent()
     {
-        if ($record = $this->getPrm()->getCurrentRecord()) {
-            echo '(running) ' . $this->formatRecord($record) . "\n";
+        if ($current = $this->prm->getCurrentRecord()) {
+            echo '(running) ' . $current->format() . "\n";
         } else {
-            if ($last = $this->getPrm()->getLastRecord()) {
-                echo '(last) ' . $this->formatRecord($last) . "\n";
+            if ($last = $this->prm->getLastRecord()) {
+                echo '(last) ' . $last->format() . "\n";
             } else {
                 echo "Failed to fetch record\n";
             }
@@ -202,10 +181,10 @@ class MrClip
     // {{{ recordStop
     protected function recordStop()
     {
-        $stopped = $this->getPrm()->stopRecord();
+        $stopped = $this->prm->stopRecord();
 
         if ($stopped) {
-            echo '(stopped) ' . $this->formatRecord($stopped) . "\n";
+            echo '(stopped) ' . $stopped->format() . "\n";
         } else {
             echo "Failed to stop record\n";
         }
@@ -214,21 +193,17 @@ class MrClip
     // {{{ recordContinue
     protected function recordContinue()
     {
-        $last = $this->getPrm()->getLastRecord();
+        $last = $this->prm->getLastRecord();
 
         if ($last) {
-            $record = $this->getPrm()->editRecord(
-                null,
-                time(),
-                null,
-                $last->activity,
-                $last->category,
-                $last->tags,
-                $last->text
-            );
+            $last->setId(null);
+            $last->setStart(time());
+            $last->setEnd(null);
 
-            if ($record) {
-                echo '(added) ' . $this->formatRecord($record) . "\n";
+            $result = $this->prm->saveRecord($last);
+
+            if ($result) {
+                echo '(added) ' . $result->format() . "\n";
             } else {
                 echo "Failed to add record";
             }
@@ -493,20 +468,6 @@ class MrClip
     }
     // }}}
 
-    // {{{ formatRecord
-    protected function formatRecord($record)
-    {
-        $output[] = date('Y-m-d H:i', $record->start);
-
-        if ($record->end) {
-            $output[] = '- ' . date('Y-m-d H:i', $record->end);
-        }
-
-        $output[] = $this->formatAttributes($record->activity, $record->category, $record->tags, $record->text);
-
-        return implode(' ', $output);
-    }
-    // }}}
     // {{{ formatTodos
     protected function formatTodos($todos)
     {
