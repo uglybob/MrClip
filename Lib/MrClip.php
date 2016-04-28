@@ -302,11 +302,7 @@ class MrClip
         $rest = $this->matchTodos($unsure, $rest, $guess, $new, 80);
 
         foreach ($exact as $todo) {
-            if (
-                ($todo->isDone())
-                || (is_null($todo->getGuess()->getParentId()) && is_null($todo->getParent()))
-                || ($todo->getParent()->getId() === $todo->getGuess()->getParentId())
-            ) {
+            if ($todo->getParentId() === $todo->getGuess()->getParentId()) {
                 $exactWithParent->attach($todo);
             } else {
                 $exactMoved->attach($todo);
@@ -372,35 +368,7 @@ class MrClip
         $parser->parseActigory(true);
         $parser->parseTags();
 
-        $todoArray = $this->getPrm()->getTodos($parser->getActivity(), $parser->getCategory(), $parser->getTags());
-
-        $todos = new \SplObjectStorage();
-
-        foreach($todoArray as $todo) {
-            $newTodo = new Todo(
-                $todo->id,
-                $todo->activity,
-                $todo->category,
-                $todo->tags,
-                $todo->text,
-                $todo->parentId,
-                $todo->done
-            );
-
-            $numbered[$todo->id] = $newTodo;
-            $todos->attach($newTodo);
-        }
-
-        foreach($todos as $todo) {
-            $id = $todo->getParentId();
-
-            if ($id && array_key_exists($id, $numbered)) {
-                $todo->setParent($numbered[$id]);
-                $numbered[$id]->addChild($todo);
-            }
-        }
-
-        return $todos;
+        return $this->prm->getTodos($parser->getActivity(), $parser->getCategory(), $parser->getTags());
     }
     // }}}
     // {{{ matchTodos
@@ -431,20 +399,10 @@ class MrClip
     {
         foreach ($todos as $todo) {
             if ($todo->isDone()) {
-                $parentId = ($todo->getGuess()->getParentId());
-            } else {
-                $parentId = $todo->getParentId();
+                $todo->setParent($todo->getGuess->getParent());
             }
 
-            $result = $this->getPrm()->editTodo(
-                $todo->getId(),
-                $todo->getActivity(),
-                $todo->getCategory(),
-                $todo->getTags(),
-                $todo->getText(),
-                $parentId,
-                $todo->isDone()
-            );
+            $result = $this->prm->saveTodo($todo);
         }
     }
     // }}}
@@ -537,10 +495,9 @@ class MrClip
         $tags = array_unique(array_merge($listTags, $filterTags));
         $text = trim($parser->parseText());
 
-        $todo = new Todo(null, $activity, $category, $tags, $text, null, $done);
+        $todo = new Todo(null, $activity, $category, $tags, $text, $parent, $done);
 
         if ($parent) {
-            $todo->setParent($parent);
             $parent->addChild($todo);
         }
 

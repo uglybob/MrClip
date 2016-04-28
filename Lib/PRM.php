@@ -47,7 +47,6 @@ class PRM
         return $this->getConnection()->getTags();
     }
     // }}}
-
     // {{{ getLastRecord
     public function getLastRecord()
     {
@@ -60,7 +59,49 @@ class PRM
         return $this->castRecord($this->getConnection()->getCurrentRecord());
     }
     // }}}
+    // {{{ getTodos
+    public function getTodos($activity, $category, $tags)
+    {
+        $objArray = $this->getConnection()->getTodos($activity, $category, $tags);
+        $todos = new \SplObjectStorage();
+        $numbered = [];
 
+        foreach($objArray as $obj) {
+            $todo = $this->castTodo($obj);
+
+            $numbered[$todo->getId()] = $todo;
+            $todos->attach($todo);
+        }
+
+        foreach($todos as $todo) {
+            $id = $todo->getParentId();
+
+            if ($id && array_key_exists($id, $numbered)) {
+                $todo->setParent($numbered[$id]);
+                $numbered[$id]->addChild($todo);
+            }
+        }
+
+        return $todos;
+    }
+    // }}}
+
+    // {{{ saveTodo
+    public function saveTodo(Todo $todo)
+    {
+        $result = $this->getConnection()->editTodo(
+            $todo->getId(),
+            $todo->getActivity(),
+            $todo->getCategory(),
+            $todo->getTags(),
+            $todo->getText(),
+            $todo->getParentId(),
+            $todo->isDone()
+        );
+
+        return $this->castTodo($result);
+    }
+    // }}}
     // {{{ saveRecord
     public function saveRecord(Record $record)
     {
@@ -106,6 +147,27 @@ class PRM
         }
 
         return $record;
+    }
+    // }}}
+    // {{{ castTodo
+    protected function castTodo($obj)
+    {
+        $todo = null;
+
+        if ($obj) {
+            $todo = new Todo(
+                $obj->id,
+                $obj->activity,
+                $obj->category,
+                $obj->tags,
+                $obj->text,
+                null,
+                $obj->done
+            );
+            $todo->setParentId($obj->parentId);
+        }
+
+        return $todo;
     }
     // }}}
 }
