@@ -289,7 +289,6 @@ class MrClip
 
         foreach ($newList as $todoString) {
             $header = $this->stringToHeader($todoString);
-            $todo = $this->stringToTodo($todoString);
 
             if (
                 !empty(trim($todoString))
@@ -297,21 +296,19 @@ class MrClip
                 && $activity && $category
             ) {
                 $level = $this->parseLevel($todoString);
-
                 if (count($parents) < $level + 1) {
                     array_push($parents, $last);
                 } else if (count($parents) > $level + 1) {
                     array_pop($parents);
                 }
 
-                $todo->activity = $activity;
-                $todo->category = $category;
-                $todo->parent = $parents[$level];
+                $todo = $this->stringToTodo($activity, $category, $parents[$level], $todoString);
+
                 $newTodos->attach($todo);
                 $last = $todo;
             } else if ($lastHeader) {
-                $activity = $lastHeader->activity;
-                $category = $lastHeader->category;
+                $activity = $lastHeader->getActivity();
+                $category = $lastHeader->getCategory();
                 $parents = [null];
                 $last = null;
             }
@@ -331,9 +328,9 @@ class MrClip
 
         foreach ($exact as $todo) {
             if (
-                ($todo->done)
-                || (is_null($todo->guess->parentId) && is_null($todo->parent))
-                || ($todo->parent->id === $todo->guess->parentId)
+                ($todo->isDone())
+                || (is_null($todo->getGuess()->getParentId()) && is_null($todo->getParent()))
+                || ($todo->getParent()->getId() === $todo->getGuess()->getParentId())
             ) {
                 $exactWithParent->attach($todo);
             } else {
@@ -343,16 +340,16 @@ class MrClip
 
         echo count($todos) . ' old, ' . count($newTodos) . " new\n\n";
         foreach ($exactMoved as $todo) {
-            echo '(moved)   ' . $this->formatTodo($todo) . "\n";
+            echo '(moved)   ' . $todo->format() . "\n";
         }
         foreach ($guess as $todo) {
-            echo '(edited) ' . $this->formatTodo($todo->guess) . ' -> ' . $this->formatTodo($todo) . "\n";
+            echo '(edited) ' . $todo->getGuess()->format() . ' -> ' . $todo->format() . "\n";
         }
         foreach ($rest as $todo) {
-            echo '(deleted) ' . $this->formatTodo($todo) . "\n";
+            echo '(deleted) ' . $todo->format() . "\n";
         }
         foreach ($new as $todo) {
-            echo '(new)     ' . $this->formatTodo($todo) . "\n";
+            echo '(new)     ' . $todo->format() . "\n";
         }
 
         $parsed = new \stdclass();
@@ -431,27 +428,6 @@ class MrClip
         return $todos;
     }
     // }}}
-    // {{{ matchTodo
-    protected function matchTodo($needle, $haystack)
-    {
-        $confidences = [];
-        $candidates = [];
-
-        foreach($haystack as $candidate) {
-            $confidences[] = $needle->match($candidate);
-            $candidates[] = $candidate;
-        }
-
-        array_multisort($confidences, SORT_DESC, $candidates);
-
-        $result = [];
-        foreach ($candidates as $key => $candidate) {
-            $result[] = [$confidences[$key], $candidate];
-        }
-
-        return $result;
-    }
-    // }}}
     // {{{ matchTodos
     protected function matchTodos($todos, $candidates, &$above, &$under, $threshold)
     {
@@ -459,16 +435,14 @@ class MrClip
         $rest->addAll($candidates);
 
         foreach ($todos as $todo) {
-            $matches = $this->matchTodo($todo, $rest);
+            foreach($rest as $candidate) {
+                $todo->match($candidate);
+            }
 
-            if (
-                isset($matches[0][0])
-                && $matches[0][0] >= $threshold
-            ) {
+            if ($todo->getConfidence() >= $threshold) {
                 $above->attach($todo);
-                $todo->guess = $matches[0][1];
-                $todo->id = $matches[0][1]->id;
-                $rest->detach($matches[0][1]);
+                $todo->setId($todo->getGuess()->getId());
+                $rest->detach($todo->getGuess());
             } else {
                 $under->attach($todo);
             }
@@ -552,11 +526,11 @@ class MrClip
             $doneBreak = false;
 
             foreach ($todos as $todo) {
-                $numbered[$todo->getId()] = $todo;
-
                 if ($todo->isDone()) {
                     $list .= $todo->formatFiltered($hiddenTags) . "\n";
                     $doneBreak = true;
+                } else {
+                    $undone[] = $todo;
                 }
             }
 
@@ -564,13 +538,7 @@ class MrClip
                 $list .= "\n";
             }
 
-            foreach ($numbered as $todo) {
-                if (!is_null($todo->getParentId()) && array_key_exists($todo->getParentId(), $numbered)) {
-                    $numbered[$todo->getParentId()]->addChild($todo);
-                }
-            }
-
-            foreach ($numbered as $todo) {
+            foreach ($undone as $todo) {
                 if (is_null($todo->getParentId())) {
                     $list .= $this->todoTree($todo, 0);
                 }
@@ -602,19 +570,23 @@ class MrClip
     // }}}
 
     // {{{ stringToTodo
-    protected function stringToTodo($todoString)
+    protected function stringToTodo($activity, $category, $parent, $todoString)
     {
         $todoArray = explode(' ', trim($todoString));
         $parser = new Parser('todo', $todoArray);
-        $todo = new \stdclass();
 
-        $todo->done = $parser->parseDone();
+        $done = $parser->parseDone();
         $listTags = $parser->parseTags();
+        $filterTags = $this->parser->getTags();
+        $tags = array_unique(array_merge($listTags, $filterTags));
+        $text = trim($parser->parseText());
 
-        $optionTags = $this->parser->getTags();
-        $todo->tags = array_unique(array_merge($listTags, $optionTags));
-        $todo->text = trim($parser->parseText());
-        $todo->id = null;
+        $todo = new Todo(null, $activity, $category, $tags, $text, null, $done);
+
+        if ($parent) {
+            $todo->setParent($parent);
+            $parent->addChild($todo);
+        }
 
         return $todo;
     }
@@ -627,10 +599,7 @@ class MrClip
         $todo = null;
 
         if ($parser->parseActigory()) {
-            $todo = new \stdclass();
-
-            $todo->activity = $parser->getActivity();
-            $todo->category = $parser->getCategory();
+            $todo = new Todo(null, $parser->getActivity(), $parser->getCategory());
         }
 
         return $todo;

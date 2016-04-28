@@ -53,6 +53,13 @@ abstract class Entry
     }
     // }}}
 
+    // {{{ setId
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+    // }}}
+
     // {{{ getActigory
     public function getActigory()
     {

@@ -9,6 +9,8 @@ class Todo extends Entry
     protected $parentId;
     protected $done;
     protected $children;
+    protected $guess;
+    protected $confidence;
     // }}}
     // {{{ constructor
     public function __construct($id = null, $activity = null, $category = null, $tags = [], $text = null, $parentId = null, $done = null)
@@ -19,6 +21,7 @@ class Todo extends Entry
         $this->parentId = $parentId;
         $this->done = $done;
         $this->children = [];
+        $this->confidence = null;
     }
     // }}}
 
@@ -50,6 +53,18 @@ class Todo extends Entry
     public function getChildren()
     {
         return $this->children;
+    }
+    // }}}
+    // {{{ getGuess
+    public function getGuess()
+    {
+        return $this->guess;
+    }
+    // }}}
+    // {{{ getConfidence
+    public function getConfidence()
+    {
+        return $this->confidence;
     }
     // }}}
 
@@ -106,6 +121,11 @@ class Todo extends Entry
         $confidence += $textConfidence;
 
         if ($this->isDone() == $candidate->isDone()) $confidence += 1;
+
+        if ($confidence > $this->confidence) {
+            $this->confidence = $confidence;
+            $this->guess = $candidate;
+        }
 
         return $confidence;
     }
