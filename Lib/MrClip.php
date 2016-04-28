@@ -237,10 +237,10 @@ class MrClip
 
         if ($answer === 'y' || $answer === 'yes') {
             $this->saveTodos($parsed->new);
-            $this->saveTodos($parsed->exact);
-            $this->saveTodos($parsed->guess);
+            $this->saveTodos($parsed->moved);
+            $this->saveTodos($parsed->edited);
             foreach ($parsed->delete as $todo) {
-                $this->getPrm()->deleteTodo($todo->id);
+                $this->prm->deleteTodo($todo);
             }
         }
     }
@@ -255,22 +255,22 @@ class MrClip
         $unsure = new \SplObjectStorage();
         $guess = new \SplObjectStorage();
         $new = new \SplObjectStorage();
-        $exactWithParent = new \SplObjectStorage();
-        $exactMoved = new \SplObjectStorage();
+        $moved = new \SplObjectStorage();
 
         $rest = $this->matchTodos($newTodos, $todos, $exact, $unsure, 100);
         $rest = $this->matchTodos($unsure, $rest, $guess, $new, 80);
 
         foreach ($exact as $todo) {
-            if ($todo->getParentId() === $todo->getGuess()->getParentId()) {
-                $exactWithParent->attach($todo);
-            } else {
-                $exactMoved->attach($todo);
+            if ($todo->getParentId() != $todo->getGuess()->getParentId()) {
+                $moved->attach($todo);
             }
         }
 
+        var_dump('e' . count($exact) . ' u' . count($unsure) . ' g' . count($guess) . ' m' . count($moved) . ' n' . count($new));
+
         echo count($todos) . ' old, ' . count($newTodos) . " new\n\n";
-        foreach ($exactMoved as $todo) {
+
+        foreach ($moved as $todo) {
             echo '(moved)   ' . $todo->format() . "\n";
         }
         foreach ($guess as $todo) {
@@ -285,8 +285,8 @@ class MrClip
 
         $parsed = new \stdclass();
         $parsed->new = $new;
-        $parsed->exact = $exact;
-        $parsed->guess = $guess;
+        $parsed->moved = $moved;
+        $parsed->edited = $guess;
         $parsed->delete = $rest;
         $parsed->text = implode('', $newList);
 

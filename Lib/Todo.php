@@ -76,6 +76,7 @@ class Todo extends Entry
     // {{{ setParent
     public function setParent($parent)
     {
+        $this->parentId = null;
         $this->parent = $parent;
     }
     // }}j
@@ -89,7 +90,7 @@ class Todo extends Entry
     // {{{ format
     public function format()
     {
-        if ($this->isDone()) $outout[] = '#';
+        if ($this->isDone()) $output[] = '#';
         $output[] = parent::format();
 
         return implode(' ', $output);
