@@ -419,7 +419,7 @@ class MrClip
         foreach($todos as $todo) {
             $id = $todo->getParentId();
 
-            if ($id) {
+            if ($id && array_key_exists($id, $numbered)) {
                 $todo->setParent($numbered[$id]);
                 $numbered[$id]->addChild($todo);
             }
@@ -520,6 +520,7 @@ class MrClip
 
         foreach ($sorted as $actigory => $todos) {
             $list .= trim($actigory . ' ' . Todo::formatTags($hiddenTags)) . "\n\n";
+            $undone = [];
 
             foreach ($todos as $todo) {
                 if ($todo->isDone()) {
@@ -534,7 +535,7 @@ class MrClip
             }
 
             foreach ($undone as $todo) {
-                if (is_null($todo->getParentId())) {
+                if (is_null($todo->getParent())) {
                     $list .= $this->todoTree($todo, 0);
                 }
             }
