@@ -89,13 +89,12 @@ class PRM
     // {{{ deleteTodo
     public function deleteTodo(Todo $todo)
     {
-        return $this->getConnection()->delteTodo($todo->getId());
+        return $this->getConnection()->deleteTodo($todo->getId());
     }
     // }}}
     // {{{ saveTodo
     public function saveTodo(Todo $todo)
     {
-        var_dump($todo->getParentId() . ' ' . $todo->format());
         $result = $this->getConnection()->editTodo(
             $todo->getId(),
             $todo->getActivity(),

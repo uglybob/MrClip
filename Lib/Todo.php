@@ -24,12 +24,6 @@ class Todo extends Entry
     }
     // }}}
 
-    // {{{ getDone
-    public function getDone()
-    {
-        return $this->done;
-    }
-    // }}}
     // {{{ isDone
     public function isDone()
     {
@@ -79,7 +73,7 @@ class Todo extends Entry
         $this->parentId = null;
         $this->parent = $parent;
     }
-    // }}j
+    // }}}
     // {{{ setParentId
     public function setParentId($id)
     {

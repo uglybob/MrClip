@@ -261,12 +261,13 @@ class MrClip
         $rest = $this->matchTodos($unsure, $rest, $guess, $new, 80);
 
         foreach ($exact as $todo) {
-            if ($todo->getParentId() != $todo->getGuess()->getParentId()) {
+            if (
+                !$todo->isDone()
+                && ($todo->getParentId() != $todo->getGuess()->getParentId())
+            ) {
                 $moved->attach($todo);
             }
         }
-
-        var_dump('e' . count($exact) . ' u' . count($unsure) . ' g' . count($guess) . ' m' . count($moved) . ' n' . count($new));
 
         echo count($todos) . ' old, ' . count($newTodos) . " new\n\n";
 
