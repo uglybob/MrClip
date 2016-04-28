@@ -408,7 +408,8 @@ class MrClip
     {
         foreach ($todos as $todo) {
             if ($todo->isDone()) {
-                $todo->setParent($todo->getGuess()->getParent());
+                $parent = ($todo->getGuess()) ? $todo->getGuess()->getParent() : null;
+                $todo->setParent($parent);
             }
 
             $result = $this->prm->saveTodo($todo);
