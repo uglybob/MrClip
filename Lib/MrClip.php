@@ -429,7 +429,7 @@ class MrClip
     }
     // }}}
     // {{{ matchTodos
-    protected function matchTodos($todos, $candidates, &$above, &$under, $threshold)
+    protected function matchTodos($todos, $candidates, $above, $under, $threshold)
     {
         $rest = new \SplObjectStorage();
         $rest->addAll($candidates);
@@ -519,22 +519,17 @@ class MrClip
         }
 
         foreach ($sorted as $actigory => $todos) {
-            $headerTodo = new Todo(null, reset($todos)->getActivity(), reset($todos)->getCategory(), $hiddenTags);
-            $list .= $headerTodo->format() . "\n\n";
-
-            $numbered = [];
-            $doneBreak = false;
+            $list .= trim($actigory . ' ' . Todo::formatTags($hiddenTags)) . "\n\n";
 
             foreach ($todos as $todo) {
                 if ($todo->isDone()) {
                     $list .= $todo->formatFiltered($hiddenTags) . "\n";
-                    $doneBreak = true;
                 } else {
                     $undone[] = $todo;
                 }
             }
 
-            if ($doneBreak) {
+            if (count($todos) > count($undone)) {
                 $list .= "\n";
             }
 
@@ -554,10 +549,9 @@ class MrClip
     protected function todoTree($todo, $level)
     {
         $string = '';
+        $hiddenTags = $this->parser->getTags();
 
         if (!$todo->isDone()) {
-            $hiddenTags = $this->parser->getTags();
-
             $string = str_repeat('    ', $level) . $todo->formatFiltered($hiddenTags) . "\n";
 
             foreach ($todo->getChildren() as $child) {

@@ -84,7 +84,7 @@ abstract class Entry
     }
     // }}}
     // {{{ formatTags
-    protected function formatTags($tags = [])
+    public static function formatTags($tags = [])
     {
         $formatted = '';
 
