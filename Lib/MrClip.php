@@ -455,20 +455,20 @@ class MrClip
     protected function saveTodos($todos)
     {
         foreach ($todos as $todo) {
-            if ($todo->done) {
-                $parentId = ($todo->guess->parentId);
+            if ($todo->isDone()) {
+                $parentId = ($todo->getGuess()->getParentId());
             } else {
-                $parentId = ($todo->parent) ? $todo->parent->id : null;
+                $parentId = $todo->getParentId();
             }
 
             $result = $this->getPrm()->editTodo(
-                $todo->id,
-                $todo->activity,
-                $todo->category,
-                $todo->tags,
-                $todo->text,
+                $todo->getId(),
+                $todo->getActivity(),
+                $todo->getCategory(),
+                $todo->getTags(),
+                $todo->getText(),
                 $parentId,
-                $todo->done
+                $todo->isDone()
             );
         }
     }
