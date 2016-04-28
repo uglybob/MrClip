@@ -47,15 +47,23 @@ class Record extends Entry
     // {{{ stringToDatetime
     protected function stringToDatetime($timeString)
     {
-        if (is_int($timeString)) {
-            $timeInt = (int) $timeString;
+        $datetime = null;
 
-            if ($timeInt >= 0) {
-                $timeString = '@' . $timeString;
+        if (!is_null($timeString)) {
+
+            if (is_int($timeString)) {
+                $timeInt = (int) $timeString;
+
+                if ($timeInt >= 0) {
+                    $datetime = new \DateTime();
+                    $datetime->setTimestamp($timeInt);
+                }
+            } else {
+                $datetime = new \DateTime($timeString);
             }
         }
 
-        return new \DateTime($timeString);
+        return $datetime;
     }
     // }}}
     // {{{ format
