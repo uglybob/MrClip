@@ -11,80 +11,106 @@ class EntryTest extends \PhpUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $this->entry = new EntryTestClass(42, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText');
+        $this->createTestObjects();
+    }
+    // }}}
+
+    // {{{ createTestObjects
+    protected function createTestObjects()
+    {
+        $this->default = new EntryTestClass();
+        $this->object = new EntryTestClass(42, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText');
     }
     // }}}
 
     // {{{ testGetId
     public function testGetId()
     {
-        $this->assertSame(42, $this->entry->getId());
+        $this->assertSame(42, $this->object->getId());
     }
     // }}}
     // {{{ testGetActivity
     public function testGetActivity()
     {
-        $this->assertSame('testActivity', $this->entry->getActivity());
+        $this->assertSame('testActivity', $this->object->getActivity());
     }
     // }}}
     // {{{ testGetCategory
     public function testGetCategory()
     {
-        $this->assertSame('testCategory', $this->entry->getCategory());
+        $this->assertSame('testCategory', $this->object->getCategory());
     }
     // }}}
     // {{{ testGetTags
     public function testGetTags()
     {
-        $this->assertSame(['testTag1', 'testTag2'], $this->entry->getTags());
+        $this->assertSame(['testTag1', 'testTag2'], $this->object->getTags());
     }
     // }}}
     // {{{ testGetText
     public function testGetText()
     {
-        $this->assertSame('testText', $this->entry->getText());
+        $this->assertSame('testText', $this->object->getText());
     }
     // }}}
 
     // {{{ testSetId
     public function testSetId()
     {
-        $this->assertSame(42, $this->entry->getId());
-        $this->entry->SetId(1);
-        $this->assertSame(1, $this->entry->getId());
+        $this->assertSame(42, $this->object->getId());
+        $this->object->SetId(1);
+        $this->assertSame(1, $this->object->getId());
     }
     // }}}
 
-    // {{{ testGetDefaults
-    public function testGetDefaults()
+    // {{{ testGetIdDefault
+    public function testGetIdDefault()
     {
-        $default = new EntryTestClass();
-
-        $this->assertNull($default->getId());
-        $this->assertNull($default->getActivity());
-        $this->assertNull($default->getCategory());
-        $this->assertEquals([], $default->getTags());
-        $this->assertNull($default->getText());
+        $this->assertNull($this->default->getId());
+    }
+    // }}}
+    // {{{ testGetActivityDefault
+    public function testGetActivityDefault()
+    {
+        $this->assertNull($this->default->getActivity());
+    }
+    // }}}
+    // {{{ testGetCategoryDefault
+    public function testGetCategoryDefault()
+    {
+        $this->assertNull($this->default->getCategory());
+    }
+    // }}}
+    // {{{ testGetTagsDefault
+    public function testGetTagsDefault()
+    {
+        $this->assertEquals([], $this->default->getTags());
+    }
+    // }}}
+    // {{{ testGetTextDefault
+    public function testGetTextDefault()
+    {
+        $this->assertSame('testText', $this->object->getText());
     }
     // }}}
 
     // {{{ testGetActigory
     public function testGetActigory()
     {
-        $this->assertSame('testActivity@testCategory', $this->entry->getActigory());
+        $this->assertSame('testActivity@testCategory', $this->object->getActigory());
     }
     // }}}
     // {{{ testFormat
     public function testFormat()
     {
-        $this->assertSame('testActivity@testCategory +testTag1 +testTag2 testText', $this->entry->format());
+        $this->assertSame('testActivity@testCategory +testTag1 +testTag2 testText', $this->object->format());
     }
     // }}}
 
     // {{{ testGetFormattedTags
     public function testGetFormattedTags()
     {
-        $this->assertSame('+testTag1 +testTag2', $this->entry->getFormattedTags());
+        $this->assertSame('+testTag1 +testTag2', $this->object->getFormattedTags());
     }
     // }}}
 
