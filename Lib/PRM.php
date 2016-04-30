@@ -78,7 +78,6 @@ class PRM
 
             if ($id && array_key_exists($id, $numbered)) {
                 $todo->setParent($numbered[$id]);
-                $numbered[$id]->addChild($todo);
             }
         }
 

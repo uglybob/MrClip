@@ -17,7 +17,7 @@ class Todo extends Entry
     {
         parent::__construct($id, $activity, $category, $tags, $text);
 
-        $this->parent = $parent;
+        $this->setParent($parent);
         $this->done = $done;
         $this->children = [];
         $this->confidence = null;
@@ -72,6 +72,10 @@ class Todo extends Entry
     {
         $this->parentId = null;
         $this->parent = $parent;
+
+        if ($parent) {
+            $parent->addChild($this);
+        }
     }
     // }}}
     // {{{ setParentId

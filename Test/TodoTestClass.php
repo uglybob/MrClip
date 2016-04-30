@@ -2,6 +2,14 @@
 
 namespace Uglybob\MrClip\Test;
 
-class TodoTestClass extends EntryTestClass
+use Uglybob\MrClip\Lib\Todo;
+
+class TodoTestClass extends Todo
 {
+    // {{{ getFormattedTags
+    public function getFormattedTags()
+    {
+        return parent::getFormattedTags();
+    }
+    // }}}
 }

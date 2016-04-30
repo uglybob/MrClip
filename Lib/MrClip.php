@@ -507,10 +507,6 @@ class MrClip
 
         $todo = new Todo(null, $activity, $category, $tags, $text, $parent, $done);
 
-        if ($parent) {
-            $parent->addChild($todo);
-        }
-
         return $todo;
     }
     // }}}
