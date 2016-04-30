@@ -54,18 +54,6 @@ class Todo extends Entry
         return $this->children;
     }
     // }}}
-    // {{{ getGuess
-    public function getGuess()
-    {
-        return $this->guess;
-    }
-    // }}}
-    // {{{ getConfidence
-    public function getConfidence()
-    {
-        return $this->confidence;
-    }
-    // }}}
 
     // {{{ setParent
     public function setParent($parent)
@@ -82,6 +70,12 @@ class Todo extends Entry
     public function setParentId($id)
     {
         $this->parentId = $id;
+    }
+    // }}}
+    // {{{ addChild
+    public function addChild(Todo $child)
+    {
+        $this->children[] = $child;
     }
     // }}}
 
@@ -108,13 +102,6 @@ class Todo extends Entry
     }
     // }}}
 
-    // {{{ addChild
-    public function addChild(Todo $child)
-    {
-        $this->children[] = $child;
-    }
-    // }}}
-
     // {{{ match
     public function match(Todo $candidate)
     {
@@ -138,6 +125,18 @@ class Todo extends Entry
         }
 
         return $confidence;
+    }
+    // }}}
+    // {{{ getGuess
+    public function getGuess()
+    {
+        return $this->guess;
+    }
+    // }}}
+    // {{{ getConfidence
+    public function getConfidence()
+    {
+        return $this->confidence;
     }
     // }}}
 }

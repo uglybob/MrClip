@@ -38,4 +38,41 @@ class TodoTest extends EntryTest
         $this->assertEquals([$this->object], $this->parent->getChildren());
     }
     // }}}
+
+    // {{{ testIsDoneDefault
+    public function testIsDoneDefault()
+    {
+        $this->assertFalse($this->default->isDone());
+    }
+    // }}}
+    // {{{ testGetParentDefault
+    public function testGetParentDefault()
+    {
+        $this->assertNull($this->default->getParent());
+    }
+    // }}}
+    // {{{ testGetParentIdDefault
+    public function testGetParentIdDefault()
+    {
+        $this->assertNull($this->default->getParentId());
+    }
+    // }}}
+    // {{{ testGetChildrenDefault
+    public function testGetChildrenDefault()
+    {
+        $this->assertEquals([], $this->default->getChildren());
+    }
+    // }}}
+
+    // {{{ testSetParent
+    public function testSetParent()
+    {
+        $this->assertNull($this->default->parent);
+
+        $this->default->setParent($this->parent);
+
+        $this->assertSame($this->parent, $this->default->parent);
+        $this->assertEquals([$this->object, $this->default], $this->parent->children);
+    }
+    // }}}
 }
