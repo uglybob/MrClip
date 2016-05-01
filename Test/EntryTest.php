@@ -23,6 +23,19 @@ class EntryTest extends \PhpUnit_Framework_TestCase
     }
     // }}}
 
+    // {{{ testEntryDefaults
+    public function testEntryDefaults()
+    {
+        $default = new EntryTestClass();
+
+        $this->assertNull($default->getId());
+        $this->assertNull($default->getActivity());
+        $this->assertNull($default->getCategory());
+        $this->assertEquals([], $default->getTags());
+        $this->assertNull($default->getText());
+    }
+    // }}}
+
     // {{{ testGetId
     public function testGetId()
     {
@@ -60,37 +73,6 @@ class EntryTest extends \PhpUnit_Framework_TestCase
         $this->assertSame(42, $this->object->getId());
         $this->object->SetId(1);
         $this->assertSame(1, $this->object->getId());
-    }
-    // }}}
-
-    // {{{ testGetIdDefault
-    public function testGetIdDefault()
-    {
-        $this->assertNull($this->default->getId());
-    }
-    // }}}
-    // {{{ testGetActivityDefault
-    public function testGetActivityDefault()
-    {
-        $this->assertNull($this->default->getActivity());
-    }
-    // }}}
-    // {{{ testGetCategoryDefault
-    public function testGetCategoryDefault()
-    {
-        $this->assertNull($this->default->getCategory());
-    }
-    // }}}
-    // {{{ testGetTagsDefault
-    public function testGetTagsDefault()
-    {
-        $this->assertEquals([], $this->default->getTags());
-    }
-    // }}}
-    // {{{ testGetTextDefault
-    public function testGetTextDefault()
-    {
-        $this->assertSame('testText', $this->object->getText());
     }
     // }}}
 
