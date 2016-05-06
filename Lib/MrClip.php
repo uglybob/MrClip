@@ -453,7 +453,7 @@ class MrClip
 
             foreach ($todos as $todo) {
                 if ($todo->isDone()) {
-                    $list .= $todo->formatFiltered($hiddenTags) . "\n";
+                    $list .= $todo->formatTagsText($hiddenTags) . "\n";
                 } else {
                     $undone[] = $todo;
                 }
@@ -482,7 +482,7 @@ class MrClip
         $hiddenTags = $this->parser->getTags();
 
         if (!$todo->isDone()) {
-            $string = str_repeat('    ', $level) . $todo->formatFiltered($hiddenTags) . "\n";
+            $string = str_repeat('    ', $level) . $todo->formatTagsText($hiddenTags) . "\n";
 
             foreach ($todo->getChildren() as $child) {
                 $string .= $this->todoTree($child, $level + 1);
