@@ -7,7 +7,7 @@ class TodoTest extends EntryTest
     // {{{ createTestObjects
     protected function createTestObjects()
     {
-        $this->parent = new TodoTestClass(41, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText');
+        $this->parent = new TodoTestClass(41, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testParentText');
         $this->object = new TodoTestClass(42, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', $this->parent, false);
     }
     // }}}
@@ -137,6 +137,39 @@ class TodoTest extends EntryTest
 
         $filter = ['testTag1', 'testTag2', 'testTag3'];
         $this->assertSame('testText', $this->object->formatTagsText($filter));
+    }
+    // }}}
+
+    // {{{ testMatch
+    public function testMatch()
+    {
+        $this->assertSame(96, $this->object->match($this->parent));
+        $this->assertSame(96, $this->object->confidence);
+        $this->assertSame($this->parent, $this->object->guess);
+
+        $this->assertSame(100, $this->object->match($this->object));
+        $this->assertSame(100, $this->object->confidence);
+        $this->assertSame($this->object, $this->object->guess);
+
+    }
+    // }}}
+
+    // {{{ testGetGuess
+    public function testGetGuess()
+    {
+        $this->assertNull($this->object->getGuess());
+
+        $this->assertSame(96, $this->object->match($this->parent));
+        $this->assertSame($this->parent, $this->object->getGuess());
+    }
+    // }}}
+    // {{{ testGetConfidence
+    public function testGetConfidence()
+    {
+        $this->assertNull($this->object->getConfidence());
+
+        $this->assertSame(96, $this->object->match($this->parent));
+        $this->assertSame(96, $this->object->getConfidence());
     }
     // }}}
 }
