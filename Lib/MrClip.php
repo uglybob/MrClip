@@ -439,7 +439,7 @@ class MrClip
     // {{{ formatTodos
     protected function formatTodos($todos)
     {
-        $hiddenTags = $this->parser->getTags();
+        $tagFilter = $this->parser->getTags();
         $sorted = [];
         $list = '';
 
@@ -448,12 +448,12 @@ class MrClip
         }
 
         foreach ($sorted as $actigory => $todos) {
-            $list .= trim($actigory . ' ' . Todo::formatTags($hiddenTags)) . "\n\n";
+            $list .= trim($actigory . ' ' . Todo::formatTags($tagFilter)) . "\n\n";
             $undone = [];
 
             foreach ($todos as $todo) {
                 if ($todo->isDone()) {
-                    $list .= $todo->formatTagsText($hiddenTags) . "\n";
+                    $list .= $todo->formatTagsText($tagFilter) . "\n";
                 } else {
                     $undone[] = $todo;
                 }
@@ -465,7 +465,7 @@ class MrClip
 
             foreach ($undone as $todo) {
                 if (is_null($todo->getParent())) {
-                    $list .= $this->todoTree($todo, 0);
+                    $list .= $this->todoTree($todo, $tagFilter, 0);
                 }
             }
 
@@ -476,16 +476,15 @@ class MrClip
     }
     // }}}
     // {{{ todoTree
-    protected function todoTree($todo, $level)
+    protected function todoTree($todo, $tagFilter, $level)
     {
         $string = '';
-        $hiddenTags = $this->parser->getTags();
 
         if (!$todo->isDone()) {
-            $string = str_repeat('    ', $level) . $todo->formatTagsText($hiddenTags) . "\n";
+            $string = str_repeat('    ', $level) . $todo->formatTagsText($tagFilter) . "\n";
 
             foreach ($todo->getChildren() as $child) {
-                $string .= $this->todoTree($child, $level + 1);
+                $string .= $this->todoTree($child, $tagFilter, $level + 1);
             }
         }
 
