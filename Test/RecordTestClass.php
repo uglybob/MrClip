@@ -16,4 +16,11 @@ class RecordTestClass extends Record
         return parent::getFormattedTags();
     }
     // }}}
+
+    // {{{ stringToDatetime
+    public function stringToDatetime($timeString)
+    {
+        return parent::stringToDatetime($timeString);
+    }
+    // }}}
 }
