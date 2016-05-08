@@ -8,9 +8,17 @@ class ParserTestClass extends Parser
 {
     // {{{ variables
     public $options;
-    public $category;
-    public $activity;
-    public $tags;
+    public $commands;
     public $position;
+
+    public $domain;
+    public $command;
+    public $activity;
+    public $category;
+    public $tags;
+    public $text;
+    public $start;
+    public $end;
+    public $done;
     // }}}
 }

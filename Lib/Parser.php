@@ -5,20 +5,37 @@ namespace Uglybob\MrClip\Lib;
 class Parser
 {
     // {{{ variables
-    protected $options = [];
-    protected $category = null;
-    protected $activity = null;
-    protected $tags = [];
-    protected $position = null;
+    protected $options;
+    protected $commands;
+    protected $position;
+
+    protected $domain;
+    protected $command;
+    protected $activity;
+    protected $category;
+    protected $tags;
+    protected $text;
+    protected $start;
+    protected $end;
+    protected $done;
     // }}}
     // {{{ constructor
-    public function __construct($domain = null, $options = null, $commands = null)
+    public function __construct($domain = null, $options = [], $commands = [])
     {
         $this->domain = $domain;
         $this->options = $options;
         $this->commands = $commands;
         $this->position = 0;
-      }
+
+        $this->command = null;
+        $this->category = null;
+        $this->activity = null;
+        $this->tags = [];
+        $this->text = null;
+        $this->start = null;
+        $this->end = null;
+        $this->done = null;
+    }
     // }}}
 
     // {{{ process
@@ -99,10 +116,12 @@ class Parser
     // {{{ parseTag
     public function parseTag()
     {
-        $tag = $this->process('\+[a-zA-Z0-9]+');
+        $tag = null;
+        $match = $this->process('\+[a-zA-Z0-9]+');
 
-        if ($tag) {
-            $this->tags[] = substr($tag, 1);
+        if ($match) {
+            $tag = substr($match, 1);
+            $this->tags[] = $tag;
         }
 
         return $tag;
