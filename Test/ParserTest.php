@@ -152,4 +152,65 @@ class ParserTest extends \PhpUnit_Framework_TestCase
         $this->assertSame(1, $this->parser->position);
     }
     // }}}
+    // {{{ testParseTagFail
+    public function testParseTagFail()
+    {
+        $this->parser->options = ['tag'];
+        $this->assertNull($this->parser->parseTag());
+        $this->assertSame([], $this->parser->tags);
+        $this->assertSame(0, $this->parser->position);
+
+        $this->parser->options = ['+'];
+        $this->assertNull($this->parser->parseTag());
+        $this->assertSame([], $this->parser->tags);
+        $this->assertSame(0, $this->parser->position);
+    }
+    // }}}
+    // {{{ testParseTagMultiple
+    public function testParseTagMultiple()
+    {
+        $this->parser->options = ['+tag1', '+tag2'];
+
+        $this->assertSame('tag1', $this->parser->parseTag());
+        $this->assertSame('tag2', $this->parser->parseTag());
+
+        $this->assertSame(['tag1', 'tag2'], $this->parser->tags);
+        $this->assertSame(2, $this->parser->position);
+    }
+    // }}}
+    // {{{ testParseTagDuplicate
+    public function testParseTagDuplicate()
+    {
+        $this->parser->options = ['+tag1', '+tag1'];
+
+        $this->assertSame('tag1', $this->parser->parseTag());
+        $this->assertSame('tag1', $this->parser->parseTag());
+
+        $this->assertSame(['tag1'], $this->parser->tags);
+        $this->assertSame(2, $this->parser->position);
+    }
+    // }}}
+
+    // {{{ testParseTags
+    public function testParseTags()
+    {
+        $this->parser->options = ['+tag1', '+tag2'];
+
+        $this->assertSame(['tag1', 'tag2'], $this->parser->parseTags());
+
+        $this->assertSame(['tag1', 'tag2'], $this->parser->tags);
+        $this->assertSame(2, $this->parser->position);
+    }
+    // }}}
+    // {{{ testParseTagsDuplicate
+    public function testParseTagsDuplicate()
+    {
+        $this->parser->options = ['+tag1', '+tag1'];
+
+        $this->assertSame(['tag1'], $this->parser->parseTags());
+
+        $this->assertSame(['tag1'], $this->parser->tags);
+        $this->assertSame(2, $this->parser->position);
+    }
+    // }}}
 }

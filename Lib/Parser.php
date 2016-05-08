@@ -121,7 +121,10 @@ class Parser
 
         if ($match) {
             $tag = substr($match, 1);
-            $this->tags[] = $tag;
+
+            if (!in_array($tag, $this->tags)) {
+                $this->tags[] = $tag;
+            }
         }
 
         return $tag;
