@@ -9,6 +9,7 @@ class Parser
     protected $category = null;
     protected $activity = null;
     protected $tags = [];
+    protected $position = null;
     // }}}
     // {{{ constructor
     public function __construct($domain = null, $options = null, $commands = null)
@@ -16,33 +17,51 @@ class Parser
         $this->domain = $domain;
         $this->options = $options;
         $this->commands = $commands;
+        $this->position = 0;
       }
     // }}}
 
-    // {{{ shift
-    protected function shift($regex)
+    // {{{ process
+    protected function process($regex)
     {
         $match = null;
+        $current = $this->current();
 
-        if (isset($this->options[0])) {
-            $string = $this->options[0];
-
-            preg_match("/^$regex$/", $string, $matches);
+        if ($current) {
+            preg_match("/^$regex$/", $current, $matches);
 
             if (isset($matches[0])) {
                 $match = $matches[0];
-                array_shift($this->options);
+                $this->advance();
             }
         }
 
         return $match;
     }
     // }}}
+    // {{{ current
+    protected function current()
+    {
+        $result = null;
+
+        if (isset($this->options[$this->position])) {
+            $result = $this->options[$this->position];
+        }
+
+        return $result;
+    }
+    // }}}
+    // {{{ advance
+    protected function advance()
+    {
+        return $this->position++;
+    }
+    // }}}
 
     // {{{ parseDomain
     public function parseDomain()
     {
-        $this->domain = $this->shift('(' . implode('|', array_keys($this->commands)) . ')');
+        $this->domain = $this->process('(' . implode('|', array_keys($this->commands)) . ')');
 
         return $this->domain;
     }
@@ -50,7 +69,11 @@ class Parser
     // {{{ parseCommand
     public function parseCommand()
     {
-        $this->command = $this->shift('(' . implode('|', $this->commands[$this->domain]) . ')');
+        $this->command = null;
+
+        if (isset($this->commands[$this->domain])) {
+            $this->command = $this->process('(' . implode('|', $this->commands[$this->domain]) . ')');
+        }
 
         return $this->command;
     }
@@ -59,9 +82,9 @@ class Parser
     public function parseActigory($filter = false)
     {
         if ($filter) {
-            $actigory = $this->shift('[a-zA-Z0-9]*@[a-zA-Z0-9]*');
+            $actigory = $this->process('[a-zA-Z0-9]*@[a-zA-Z0-9]*');
         } else {
-            $actigory = $this->shift('[a-zA-Z0-9]*@[a-zA-Z0-9]+');
+            $actigory = $this->process('[a-zA-Z0-9]*@[a-zA-Z0-9]+');
         }
 
         if ($actigory) {
@@ -76,7 +99,7 @@ class Parser
     // {{{ parseTag
     public function parseTag()
     {
-        $tag = $this->shift('\+[a-zA-Z0-9]+');
+        $tag = $this->process('\+[a-zA-Z0-9]+');
 
         if ($tag) {
             $this->tags[] = substr($tag, 1);
@@ -110,7 +133,7 @@ class Parser
     // {{{ parseTime
     public function parseTime()
     {
-        return $this->shift('\d{1,2}:\d{2}');
+        return $this->process('\d{1,2}:\d{2}');
     }
     // }}}
     // {{{ parseStart
@@ -135,18 +158,19 @@ class Parser
     {
         $done = false;
         $checkedString = '#';
+        $current = $this->current();
 
-        if (isset($this->options[0])) {
-            if ($this->options[0] == $checkedString) {
+        if ($current) {
+            if ($current == $checkedString) {
                 $done = true;
-                array_shift($this->options);
+                $this->advance();
             }
 
-            preg_match("/^$checkedString/", $this->options[0], $matches);
+            preg_match("/^$checkedString/", $current, $matches);
 
             if (isset($matches[0])) {
-                $this->options[0] = substr($this->options[0], count($checkedString));
                 $done = true;
+                $this->options[$this->position] = substr($current, count($checkedString));
             }
         }
 
