@@ -40,6 +40,17 @@ class ParserTest extends \PhpUnit_Framework_TestCase
         $this->assertSame('domain2', $this->parser->domain);
     }
     // }}}
+    // {{{ testParseDomainEmpty
+    public function testParseDomainEmpty()
+    {
+        $this->parser->commands = ['domain1' => ['command1', 'command2'], 'domain2' => ['command3']];
+        $this->parser->options = [];
+
+        $this->assertNull($this->parser->parseDomain());
+
+        $this->assertSame(0, $this->parser->position);
+    }
+    // }}}
     // {{{ testParseDomainFail
     public function testParseDomainFail()
     {
@@ -62,6 +73,18 @@ class ParserTest extends \PhpUnit_Framework_TestCase
         $this->assertSame('command2', $this->parser->parseCommand());
 
         $this->assertSame(1, $this->parser->position);
+    }
+    // }}}
+    // {{{ testParseCommandEmpty
+    public function testParseCommandEmpty()
+    {
+        $this->parser->domain = 'domain2';
+        $this->parser->commands = ['domain1' => ['command1', 'command2'], 'domain2' => ['command3']];
+        $this->parser->options = [];
+
+        $this->assertNull($this->parser->parseCommand());
+
+        $this->assertSame(0, $this->parser->position);
     }
     // }}}
     // {{{ testParseCommandFail
@@ -124,6 +147,16 @@ class ParserTest extends \PhpUnit_Framework_TestCase
         $this->assertSame('category', $this->parser->category);
     }
     // }}}
+    // {{{ testParseActigoryEmpty
+    public function testParseActigoryEmpty()
+    {
+        $this->parser->options = [];
+        $this->assertNull($this->parser->parseActigory());
+        $this->assertNull($this->parser->activity);
+        $this->assertNull($this->parser->category);
+        $this->assertSame(0, $this->parser->position);
+    }
+    // }}}
     // {{{ testParseActigoryFail
     public function testParseActigoryFail()
     {
@@ -150,6 +183,17 @@ class ParserTest extends \PhpUnit_Framework_TestCase
 
         $this->assertSame(['tag'], $this->parser->tags);
         $this->assertSame(1, $this->parser->position);
+    }
+    // }}}
+    // {{{ testParseTagEmpty
+    public function testParseTagEmpty()
+    {
+        $this->parser->options = [];
+
+        $this->assertNull($this->parser->parseTag());
+
+        $this->assertSame([], $this->parser->tags);
+        $this->assertSame(0, $this->parser->position);
     }
     // }}}
     // {{{ testParseTagFail
@@ -202,6 +246,28 @@ class ParserTest extends \PhpUnit_Framework_TestCase
         $this->assertSame(2, $this->parser->position);
     }
     // }}}
+    // {{{ testParseTagsEmpty
+    public function testParseTagsEmpty()
+    {
+        $this->parser->options = [];
+
+        $this->assertSame([], $this->parser->parseTags());
+
+        $this->assertSame([], $this->parser->tags);
+        $this->assertSame(0, $this->parser->position);
+    }
+    // }}}
+    // {{{ testParseTagsFail
+    public function testParseTagsFail()
+    {
+        $this->parser->options = ['+'];
+
+        $this->assertSame([], $this->parser->parseTags());
+
+        $this->assertSame([], $this->parser->tags);
+        $this->assertSame(0, $this->parser->position);
+    }
+    // }}}
     // {{{ testParseTagsDuplicate
     public function testParseTagsDuplicate()
     {
@@ -211,6 +277,48 @@ class ParserTest extends \PhpUnit_Framework_TestCase
 
         $this->assertSame(['tag1'], $this->parser->tags);
         $this->assertSame(2, $this->parser->position);
+    }
+    // }}}
+    // {{{ testParseTagsText
+    public function testParseTagsText()
+    {
+        $this->parser->options = ['+tag1', '+tag2', 'text'];
+
+        $this->assertSame(['tag1', 'tag2'], $this->parser->parseTags());
+
+        $this->assertSame(['tag1', 'tag2'], $this->parser->tags);
+        $this->assertSame(2, $this->parser->position);
+    }
+    // }}}
+
+    // {{{ testParseText
+    public function testParseText()
+    {
+        $this->parser->options = ['text'];
+
+        $this->assertSame('text', $this->parser->parseText());
+
+        $this->assertSame('text', $this->parser->text);
+    }
+    // }}}
+    // {{{ testParseTextEmpty
+    public function testParseTextEmpty()
+    {
+        $this->parser->options = [];
+
+        $this->assertNull($this->parser->parseText());
+
+        $this->assertNull($this->parser->text);
+    }
+    // }}}
+    // {{{ testParseTextMultiple
+    public function testParseTextMultiple()
+    {
+        $this->parser->options = ['text1', 'text2'];
+
+        $this->assertSame('text1 text2', $this->parser->parseText());
+
+        $this->assertSame('text1 text2', $this->parser->text);
     }
     // }}}
 }

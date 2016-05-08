@@ -145,8 +145,14 @@ class Parser
     // {{{ parseText
     public function parseText()
     {
-        $this->text = implode(' ', $this->options);
-        $this->options = [];
+        $text = null;
+
+        if (!empty($this->options)) {
+            $text = implode(' ', $this->options);
+            $this->options = [];
+        }
+
+        $this->text = $text;
 
         return $this->text;
     }
