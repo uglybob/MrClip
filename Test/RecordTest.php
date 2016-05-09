@@ -7,7 +7,8 @@ class RecordTest extends EntryTest
     // {{{ createTestObjects
     protected function createTestObjects()
     {
-        $this->object = new RecordTestClass(42, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', '10:10', null);
+        $start = new \Datetime('2015-10-21 16:29');
+        $this->object = new RecordTestClass(42, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', $start, null);
     }
     // }}}
 
@@ -37,38 +38,44 @@ class RecordTest extends EntryTest
     // {{{ testSetStart
     public function testSetStart()
     {
-        $this->object->setStart('10:20');
-        $date = date('Y-m-d');
+        $start = new \Datetime();
+        $this->object->setStart($start);
 
-        $this->assertSame("$date 10:20", $this->object->getStart()->format('Y-m-d H:i'));
+        $this->assertSame($start, $this->object->start);
     }
     // }}}
     // {{{ testSetEnd
     public function testSetEnd()
     {
-        $this->object->setEnd('10:20');
-        $date = date('Y-m-d');
+        $end = new \Datetime();
+        $this->object->setEnd($end);
 
-        $this->assertSame("$date 10:20", $this->object->getEnd()->format('Y-m-d H:i'));
-    }
-    // }}}
-
-    // {{{ testStringToDatetime
-    public function testStringToDatetime()
-    {
-        $this->assertNull($this->object->stringToDatetime(null));
-        $this->assertEquals(date('Y-m-d') . ' 10:10', $this->object->stringToDatetime('10:10')->format('Y-m-d H:i'));
-        $this->assertEquals('2015-10-21 16:29', $this->object->stringToDatetime('2015-10-21 16:29')->format('Y-m-d H:i'));
-        $this->assertEquals('2015-10-21 16:29', $this->object->stringToDatetime(1445444940)->format('Y-m-d H:i'));
+        $this->assertSame($end, $this->object->end);
     }
     // }}}
 
     // {{{ testFormat
     public function testFormat()
     {
-        $date = date('Y-m-d');
+        $this->assertSame("2015-10-21 16:29 testActivity@testCategory +testTag1 +testTag2 testText", $this->object->format());
 
-        $this->assertSame("$date 10:10 testActivity@testCategory +testTag1 +testTag2 testText", $this->object->format());
+        $this->object->activity = 'test2Activity';
+        $this->assertSame("2015-10-21 16:29 test2Activity@testCategory +testTag1 +testTag2 testText", $this->object->format());
+
+        $this->object->category = 'test2Category';
+        $this->assertSame("2015-10-21 16:29 test2Activity@test2Category +testTag1 +testTag2 testText", $this->object->format());
+
+        $this->object->tags = ['testTag3'];
+        $this->assertSame("2015-10-21 16:29 test2Activity@test2Category +testTag3 testText", $this->object->format());
+
+        $this->object->text = 'test2Text';
+        $this->assertSame("2015-10-21 16:29 test2Activity@test2Category +testTag3 test2Text", $this->object->format());
+
+        $this->object->tags = [];
+        $this->assertSame("2015-10-21 16:29 test2Activity@test2Category test2Text", $this->object->format());
+
+        $this->object->text = null;
+        $this->assertSame("2015-10-21 16:29 test2Activity@test2Category", $this->object->format());
     }
     // }}}
 }

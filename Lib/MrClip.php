@@ -197,7 +197,7 @@ class MrClip
 
         if ($last) {
             $last->setId(null);
-            $last->setStart(time());
+            $last->setStart(new \Datetime());
             $last->setEnd(null);
 
             $result = $this->prm->saveRecord($last);

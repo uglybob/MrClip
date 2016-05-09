@@ -161,7 +161,20 @@ class Parser
     // {{{ parseTime
     protected function parseTime()
     {
-        return $this->process('\d{1,2}:\d{2}');
+        // @todo catch 99:99
+        return $this->stringToDatetime($this->process('\d{1,2}:\d{2}'));
+    }
+    // }}}
+    // {{{ stringToDatetime
+    protected function stringToDatetime($timeString)
+    {
+        $datetime = null;
+
+        if (!is_null($timeString)) {
+            $datetime = new \DateTime($timeString);
+        }
+
+        return $datetime;
     }
     // }}}
     // {{{ parseStart

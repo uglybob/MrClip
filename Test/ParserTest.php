@@ -322,6 +322,66 @@ class ParserTest extends \PhpUnit_Framework_TestCase
     }
     // }}}
 
+    // {{{ testParseStart
+    public function testParseStart()
+    {
+        $this->parser->options = ['10:10'];
+        $start = date('Y-m-d') . ' 10:10';
+
+        $this->assertSame($start, $this->parser->parseStart()->format('Y-m-d H:i'));
+
+        $this->assertSame($start, $this->parser->start->format('Y-m-d H:i'));
+    }
+    // }}}
+    // {{{ testParseStartEmpty
+    public function testParseStartEmpty()
+    {
+        $this->parser->options = [];
+
+        $this->assertNull($this->parser->parseStart());
+        $this->assertNull($this->parser->start);
+    }
+    // }}}
+    // {{{ testParseStartFail
+    public function testParseStartFail()
+    {
+        $this->parser->options = ['nope'];
+
+        $this->assertNull($this->parser->parseStart());
+        $this->assertNull($this->parser->start);
+    }
+    // }}}
+
+    // {{{ testParseEnd
+    public function testParseEnd()
+    {
+        $this->parser->options = ['10:10'];
+        $end = date('Y-m-d') . ' 10:10';
+
+        $this->assertSame($end, $this->parser->parseEnd()->format('Y-m-d H:i'));
+
+        $this->assertSame($end, $this->parser->end->format('Y-m-d H:i'));
+    }
+    // }}}
+    // {{{ testParseEndEmpty
+    public function testParseEndEmpty()
+    {
+        $this->parser->options = [];
+
+        $this->assertNull($this->parser->parseEnd());
+        $this->assertNull($this->parser->end);
+    }
+    // }}}
+    // {{{ testParseEndFail
+    public function testParseEndFail()
+    {
+        $this->parser->options = ['nope'];
+
+        $this->assertNull($this->parser->parseEnd());
+        $this->assertNull($this->parser->end);
+    }
+    // }}}
+
     // {{{ testParseDone
     public function testParseDone()
     {

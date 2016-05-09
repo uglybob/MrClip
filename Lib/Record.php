@@ -13,8 +13,8 @@ class Record extends Entry
     {
         parent::__construct($id, $activity, $category, $tags, $text);
 
-        $this->setStart($start);
-        $this->setEnd($end);
+        $this->start = $start;
+        $this->end = $end;
     }
     // }}}
 
@@ -32,40 +32,18 @@ class Record extends Entry
     // }}}
 
     // {{{ setStart
-    public function setStart($startString)
+    public function setStart(\Datetime $start)
     {
-        $this->start = $this->stringToDateTime($startString);
+        $this->start = $start;
     }
     // }}}
     // {{{ setEnd
-    public function setEnd($endString)
+    public function setEnd($end)
     {
-        $this->end = $this->stringToDateTime($endString);
+        $this->end = $end;
     }
     // }}}
 
-    // {{{ stringToDatetime
-    protected function stringToDatetime($timeString)
-    {
-        $datetime = null;
-
-        if (!is_null($timeString)) {
-
-            if (is_int($timeString)) {
-                $timeInt = (int) $timeString;
-
-                if ($timeInt >= 0) {
-                    $datetime = new \DateTime();
-                    $datetime->setTimestamp($timeInt);
-                }
-            } else {
-                $datetime = new \DateTime($timeString);
-            }
-        }
-
-        return $datetime;
-    }
-    // }}}
     // {{{ format
     public function format()
     {

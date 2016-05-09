@@ -145,8 +145,8 @@ class PRM
                 $obj->activity,
                 $obj->category,
                 $obj->tags,
-                $obj->text,
-                $obj->start,
+                $this->timestampToDatetime($obj->start),
+                $this->timestampToDatetime($obj->end),
                 $obj->end
             );
         }
@@ -173,6 +173,24 @@ class PRM
         }
 
         return $todo;
+    }
+    // }}}
+
+    // {{{ timestampToDatetime
+    public function timestampToDatetime($timestamp)
+    {
+        $datetime = null;
+
+        if ($timestamp) {
+            $newDatetime = new \Datetime();
+            $result = $newDatetime->setTimestamp($timestamp);
+
+            if ($result) {
+                $datetime = $result;
+            }
+        }
+
+        return $datetime;
     }
     // }}}
 }
