@@ -321,4 +321,38 @@ class ParserTest extends \PhpUnit_Framework_TestCase
         $this->assertSame('text1 text2', $this->parser->text);
     }
     // }}}
+
+    // {{{ testParseDone
+    public function testParseDone()
+    {
+        $this->parser->options = ['#'];
+
+        $this->assertTrue($this->parser->parseDone());
+
+        $this->assertTrue($this->parser->done);
+        $this->assertSame(1, $this->parser->position);
+    }
+    // }}}
+    // {{{ testParseDoneEmpty
+    public function testParseDoneEmpty()
+    {
+        $this->parser->options = [];
+
+        $this->assertFalse($this->parser->parseDone());
+
+        $this->assertFalse($this->parser->done);
+        $this->assertSame(0, $this->parser->position);
+    }
+    // }}}
+    // {{{ testParseDoneFail
+    public function testParseDoneFail()
+    {
+        $this->parser->options = ['+'];
+
+        $this->assertFalse($this->parser->parseDone());
+
+        $this->assertFalse($this->parser->done);
+        $this->assertSame(0, $this->parser->position);
+    }
+    // }}}
 }

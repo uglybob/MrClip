@@ -159,7 +159,7 @@ class Parser
     // }}}
 
     // {{{ parseTime
-    public function parseTime()
+    protected function parseTime()
     {
         return $this->process('\d{1,2}:\d{2}');
     }
