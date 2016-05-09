@@ -100,11 +100,15 @@ class Parser
     // {{{ parseActigory
     public function parseActigory($categoryOptional = false)
     {
+        $regex = '[a-zA-Z0-9]*@[a-zA-Z0-9]';
+
         if ($categoryOptional) {
-            $actigory = $this->process('[a-zA-Z0-9]*@[a-zA-Z0-9]*');
+            $regex .= '*';
         } else {
-            $actigory = $this->process('[a-zA-Z0-9]*@[a-zA-Z0-9]+');
+            $regex .= '+';
         }
+
+        $actigory = $this->process($regex);
 
         if ($actigory) {
             $actigoryArray = explode('@', $actigory);
