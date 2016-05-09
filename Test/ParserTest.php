@@ -282,6 +282,30 @@ class ParserTest extends \PhpUnit_Framework_TestCase
         $this->assertNull($this->parser->category);
     }
     // }}}
+    // {{{ testParseActigoryCategoryOptionalEmpty
+    public function testParseActigoryCategoryOptionalEmpty()
+    {
+        $this->parser->options = [];
+
+        $this->assertNull($this->parser->parseActigory(true));
+
+        $this->assertSame(0, $this->parser->position);
+        $this->assertNull($this->parser->activity);
+        $this->assertNull($this->parser->category);
+    }
+    // }}}
+    // {{{ testParseActigoryCategoryOptionalFail
+    public function testParseActigoryCategoryOptionalFail()
+    {
+        $this->parser->options = ['+'];
+
+        $this->assertNull($this->parser->parseActigory(true));
+
+        $this->assertSame(0, $this->parser->position);
+        $this->assertNull($this->parser->activity);
+        $this->assertNull($this->parser->category);
+    }
+    // }}}
 
     // {{{ testParseTag
     public function testParseTag()
