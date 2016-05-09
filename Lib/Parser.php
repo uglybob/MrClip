@@ -71,7 +71,9 @@ class Parser
     // {{{ advance
     protected function advance()
     {
-        return $this->position++;
+        $this->position++;
+
+        return $this->position;
     }
     // }}}
 

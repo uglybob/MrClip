@@ -21,4 +21,23 @@ class ParserTestClass extends Parser
     public $end;
     public $done;
     // }}}
+
+    // {{{ process
+    public function process($regex)
+    {
+        return parent::process($regex);
+    }
+    // }}}
+    // {{{ current
+    public function current()
+    {
+        return parent::current();
+    }
+    // }}}
+    // {{{ advance
+    public function advance()
+    {
+        return parent::advance();
+    }
+    // }}}
 }

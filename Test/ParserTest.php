@@ -28,6 +28,67 @@ class ParserTest extends \PhpUnit_Framework_TestCase
     }
     // }}}
 
+    // {{{ testProcess
+    public function testProcess()
+    {
+        $this->parser->options = ['item'];
+
+        $this->assertSame('item', $this->parser->process('.*'));
+        $this->assertSame(1, $this->parser->position);
+    }
+    // }}}
+    // {{{ testProcessSpecific
+    public function testProcessSpecific()
+    {
+        $this->parser->options = ['item'];
+
+        $this->assertSame('item', $this->parser->process('item'));
+        $this->assertSame(1, $this->parser->position);
+    }
+    // }}}
+    // {{{ testProcessEmpty
+    public function testProcessEmpty()
+    {
+        $this->parser->options = [];
+
+        $this->assertNull($this->parser->process('.*'));
+        $this->assertSame(0, $this->parser->position);
+    }
+    // }}}
+    // {{{ testProcessFail
+    public function testProcessFail()
+    {
+        $this->parser->options = ['item'];
+
+        $this->assertNull($this->parser->process('I.*'));
+        $this->assertSame(0, $this->parser->position);
+    }
+    // }}}
+
+    // {{{ testCurrent
+    public function testCurrent()
+    {
+        $this->assertNull($this->parser->current());
+
+        $this->parser->options = ['item1', 'item2', 'item3'];
+        $this->assertSame('item1', $this->parser->current());
+
+        $this->parser->position = 1;
+        $this->assertSame('item2', $this->parser->current());
+
+        $this->parser->position = 10;
+        $this->assertNull($this->parser->current());
+    }
+    // }}}
+    // {{{ testAdvance
+    public function testAdvance()
+    {
+        $this->assertSame(1, $this->parser->advance());
+        $this->assertSame(1, $this->parser->position);
+        $this->assertSame(2, $this->parser->advance());
+    }
+    // }}}
+
     // {{{ testParseDomain
     public function testParseDomain()
     {
