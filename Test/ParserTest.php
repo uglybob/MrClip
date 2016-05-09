@@ -497,4 +497,82 @@ class ParserTest extends \PhpUnit_Framework_TestCase
         $this->assertSame('text', $this->parser->text);
     }
     // }}}
+
+    // {{{ testGetDomain
+    public function testGetDomain()
+    {
+        $this->assertNull($this->parser->getDomain());
+
+        $this->parser->domain = 'testDomain';
+        $this->assertSame('testDomain', $this->parser->getDomain());
+    }
+    // }}}
+    // {{{ testGetCommand
+    public function testGetCommand()
+    {
+        $this->assertNull($this->parser->getCommand());
+
+        $this->parser->command = 'testCommand';
+        $this->assertSame('testCommand', $this->parser->getCommand());
+    }
+    // }}}
+    // {{{ testGetActivity
+    public function testGetActivity()
+    {
+        $this->assertNull($this->parser->getActivity());
+
+        $this->parser->activity = 'testActivity';
+        $this->assertSame('testActivity', $this->parser->getActivity());
+    }
+    // }}}
+    // {{{ testGetCategory
+    public function testGetCategory()
+    {
+        $this->assertNull($this->parser->getCategory());
+
+        $this->parser->category = 'testCategory';
+        $this->assertSame('testCategory', $this->parser->getCategory());
+    }
+    // }}}
+    // {{{ testGetTags
+    public function testGetTags()
+    {
+        $this->assertSame([], $this->parser->getTags());
+
+        $this->parser->tags = ['testTag'];
+        $this->assertSame(['testTag'], $this->parser->getTags());
+    }
+    // }}}
+    // {{{ testGetText
+    public function testGetText()
+    {
+        $this->assertNull($this->parser->getText());
+
+        $this->parser->text = 'testText';
+        $this->assertSame('testText', $this->parser->getText());
+    }
+    // }}}
+
+    // {{{ testGetStart
+    public function testGetStart()
+    {
+        $this->assertNull($this->parser->getStart());
+
+        $now = new \Datetime();
+
+        $this->parser->start = $now;
+        $this->assertSame($now, $this->parser->getStart());
+    }
+    // }}}
+    // {{{ testGetEnd
+    public function testGetEnd()
+    {
+        $this->assertNull($this->parser->getEnd());
+
+        $now = new \Datetime();
+
+        $this->parser->end = $now;
+        $this->assertSame($now, $this->parser->getEnd());
+    }
+    // }}}
 }

@@ -145,9 +145,9 @@ class PRM
                 $obj->activity,
                 $obj->category,
                 $obj->tags,
+                $obj->text,
                 $this->timestampToDatetime($obj->start),
-                $this->timestampToDatetime($obj->end),
-                $obj->end
+                $this->timestampToDatetime($obj->end)
             );
         }
 
@@ -186,7 +186,7 @@ class PRM
             $result = $newDatetime->setTimestamp($timestamp);
 
             if ($result) {
-                $datetime = $result;
+                $datetime = $newDatetime;
             }
         }
 
