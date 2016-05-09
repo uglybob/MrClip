@@ -476,4 +476,25 @@ class ParserTest extends \PhpUnit_Framework_TestCase
         $this->assertSame(0, $this->parser->position);
     }
     // }}}
+
+    // {{{ testParseMultiple
+    public function testParseMultiple()
+    {
+        $this->parser->options = ['activity@category', '+tag1', '+tag2', 'text'];
+
+        $this->assertFalse($this->parser->parseDone());
+        $this->assertSame(0, $this->parser->position);
+        $this->assertSame('activity@category', $this->parser->parseActigory());
+        $this->assertSame(1, $this->parser->position);
+        $this->assertSame(['tag1', 'tag2'], $this->parser->parseTags());
+        $this->assertSame(3, $this->parser->position);
+        $this->assertSame('text', $this->parser->parseText());
+
+        $this->assertFalse($this->parser->done);
+        $this->assertSame('activity', $this->parser->activity);
+        $this->assertSame('category', $this->parser->category);
+        $this->assertSame(['tag1', 'tag2'], $this->parser->tags);
+        $this->assertSame('text', $this->parser->text);
+    }
+    // }}}
 }

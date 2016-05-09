@@ -150,13 +150,15 @@ class Parser
         $text = null;
 
         if (!empty($this->options)) {
-            $text = implode(' ', $this->options);
-            $this->options = [];
+            $textArray = array_slice($this->options, $this->position);
+
+            if (!empty($textArray)) {
+                $text = implode(' ', $textArray);
+                $this->text = $text;
+            }
         }
 
-        $this->text = $text;
-
-        return $this->text;
+        return $text;
     }
     // }}}
 
