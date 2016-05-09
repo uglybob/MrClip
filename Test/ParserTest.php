@@ -196,8 +196,8 @@ class ParserTest extends \PhpUnit_Framework_TestCase
         $this->assertSame('category', $this->parser->category);
     }
     // }}}
-    // {{{ testParseActigoryCategory
-    public function testParseActigoryCategory()
+    // {{{ testParseActigoryNoActivity
+    public function testParseActigoryNoActivity()
     {
         $this->parser->options = ['@category'];
 
@@ -232,6 +232,54 @@ class ParserTest extends \PhpUnit_Framework_TestCase
         $this->assertNull($this->parser->activity);
         $this->assertNull($this->parser->category);
         $this->assertSame(0, $this->parser->position);
+    }
+    // }}}
+    // {{{ testParseActigoryCategoryOptional
+    public function testParseActigoryCategoryOptional()
+    {
+        $this->parser->options = ['activity@category'];
+
+        $this->assertSame('activity@category', $this->parser->parseActigory(true));
+
+        $this->assertSame(1, $this->parser->position);
+        $this->assertSame('activity', $this->parser->activity);
+        $this->assertSame('category', $this->parser->category);
+    }
+    // }}}
+    // {{{ testParseActigoryCategoryOptionalNoCategory
+    public function testParseActigoryCategoryOptionalNoCategory()
+    {
+        $this->parser->options = ['activity@'];
+
+        $this->assertSame('activity@', $this->parser->parseActigory(true));
+
+        $this->assertSame(1, $this->parser->position);
+        $this->assertSame('activity', $this->parser->activity);
+        $this->assertNull($this->parser->category);
+    }
+    // }}}
+    // {{{ testParseActigoryCategoryOptionalNoActivity
+    public function testParseActigoryCategoryOptionalNoActivity()
+    {
+        $this->parser->options = ['@category'];
+
+        $this->assertSame('@category', $this->parser->parseActigory(true));
+
+        $this->assertSame(1, $this->parser->position);
+        $this->assertNull($this->parser->activity);
+        $this->assertSame('category', $this->parser->category);
+    }
+    // }}}
+    // {{{ testParseActigoryCategoryOptionalNoActivityNoCategory
+    public function testParseActigoryCategoryOptionalNoActivityNoCategory()
+    {
+        $this->parser->options = ['@'];
+
+        $this->assertSame('@', $this->parser->parseActigory(true));
+
+        $this->assertSame(1, $this->parser->position);
+        $this->assertNull($this->parser->activity);
+        $this->assertNull($this->parser->category);
     }
     // }}}
 

@@ -98,9 +98,9 @@ class Parser
     }
     // }}}
     // {{{ parseActigory
-    public function parseActigory($filter = false)
+    public function parseActigory($categoryOptional = false)
     {
-        if ($filter) {
+        if ($categoryOptional) {
             $actigory = $this->process('[a-zA-Z0-9]*@[a-zA-Z0-9]*');
         } else {
             $actigory = $this->process('[a-zA-Z0-9]*@[a-zA-Z0-9]+');
