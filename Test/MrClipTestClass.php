@@ -17,7 +17,7 @@ class MrClipTestClass extends MrClip
     {
         parent::__construct($options);
 
-        $this->prm = new PrmMock();
+        $this->prm = new PrmTestClass();
     }
     // }}}
 

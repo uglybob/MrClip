@@ -3,8 +3,9 @@
 namespace Uglybob\MrClip\Test;
 
 use Uglybob\MrClip\Lib\Record;
+use Uglybob\MrClip\Lib\PRM;
 
-class PrmMock
+class PrmTestClass extends PRM
 {
     // {{{ variables
     public $records;
@@ -32,23 +33,12 @@ class PrmMock
     }
     // }}}
 
-    // {{{ getLastRecord
-    public function getLastRecord()
+    // {{{ getConnection
+    public function getConnection()
     {
-        $last = null;
-
-        foreach ($this->records as $record) {
-            if (
-                is_null($last)
-                || $last->getEnd()->getTimestamp() < $record->getEnd()->getTimestamp()
-            ) {
-                $last = $record;
-            }
-        }
-
-        return $last;
     }
     // }}}
+
     // {{{ getActivities
     public function getActivities()
     {
@@ -77,22 +67,6 @@ class PrmMock
         return $categories;
     }
     // }}}
-    // {{{ getActigories
-    public function getActigories()
-    {
-        $activities = $this->getActivities();
-        $activities[] = ''; // categories without activities
-        $categories = $this->getCategories();
-
-        foreach($activities as $activity) {
-            foreach($categories as $category) {
-                $actigories[] = "$activity@$category";
-            }
-        }
-
-        return $actigories;
-    }
-    // }}}
     // {{{ getTags
     public function getTags()
     {
@@ -107,6 +81,24 @@ class PrmMock
         }
 
         return $tags;
+    }
+    // }}}
+
+    // {{{ getLastRecord
+    public function getLastRecord()
+    {
+        $last = null;
+
+        foreach ($this->records as $record) {
+            if (
+                is_null($last)
+                || $last->getEnd()->getTimestamp() < $record->getEnd()->getTimestamp()
+            ) {
+                $last = $record;
+            }
+        }
+
+        return $last;
     }
     // }}}
 }
