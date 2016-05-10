@@ -23,7 +23,7 @@ class MrClip
                 'list',
                 'edit',
             ],
-            'completion' => [],
+            'completion' => null,
         ];
 
         $options = $this->cleanColons($options);
@@ -32,6 +32,7 @@ class MrClip
 
         if ($domain = $this->parser->parseDomain()) {
             if ($domain == 'completion') {
+                unset($this->commands['completion']);
                 $this->completion($options);
             } else {
                 if (
@@ -75,7 +76,6 @@ class MrClip
     {
         $parser = $this->parser;
         $current = substr(end($options), 1, -1);
-        unset($this->commands['completion']);
 
         if ($parser->parseDomain()) {
             if ($parser->getDomain() == 'record') {
@@ -83,7 +83,7 @@ class MrClip
                     if ($parser->getCommand() == 'add') {
                         if ($parser->parseStart()) {
                             $parser->parseEnd();
-                            $this->completionActigoryTags($parser, $current);
+                            $this->completionActigoryTags($current);
                         } else {
                             $times = [date('H:i')];
 
@@ -106,7 +106,7 @@ class MrClip
                         $parser->getCommand() == 'list'
                         || $parser->getCommand() == 'edit'
                     ) {
-                        $this->completionActigoryTags($parser, $current, true);
+                        $this->completionActigoryTags($current, true);
                     }
                 } else {
                     $this->suggest($current, $this->commands[$parser->getDomain()]);
@@ -118,11 +118,11 @@ class MrClip
     }
     // }}}
     // {{{ completionActigoryTags
-    protected function completionActigoryTags($parser, $current, $filter = false)
+    protected function completionActigoryTags($current, $filter = false)
     {
-        if ($parser->parseActigory($filter)) {
-            $parser->parseTags();
-            $tags = array_diff($this->prm->getTags(), $parser->getTags());
+        if ($this->parser->parseActigory($filter)) {
+            $this->parser->parseTags();
+            $tags = array_diff($this->prm->getTags(), $this->parser->getTags());
             $this->suggest($current, $tags, '+');
         } else {
             $this->suggest($current, $this->prm->getActigories());
@@ -154,9 +154,9 @@ class MrClip
                 $result = $this->prm->saveRecord($record);
 
                 if ($result) {
-                    echo '(added) ' . $result->format() . "\n";
+                    $this->outputNl('(added) ' . $result->format());
                 } else {
-                    echo "Failed to add record";
+                    $this->outputNl('Failed to add record');
                 }
             }
         }
@@ -166,12 +166,12 @@ class MrClip
     protected function recordCurrent()
     {
         if ($current = $this->prm->getCurrentRecord()) {
-            echo '(running) ' . $current->format() . "\n";
+            $this->outputNl('(running) ' . $current->format());
         } else {
             if ($last = $this->prm->getLastRecord()) {
-                echo '(last) ' . $last->format() . "\n";
+                $this->outputNl('(last) ' . $last->format());
             } else {
-                echo "Failed to fetch record\n";
+                $this->outputNl('Failed to fetch record');
             }
         }
     }
@@ -182,9 +182,9 @@ class MrClip
         $stopped = $this->prm->stopRecord();
 
         if ($stopped) {
-            echo '(stopped) ' . $stopped->format() . "\n";
+            $this->outputNl('(stopped) ' . $stopped->format());
         } else {
-            echo "Failed to stop record\n";
+            $this->outputNl('Failed to stop record');
         }
     }
     // }}}
@@ -201,12 +201,12 @@ class MrClip
             $result = $this->prm->saveRecord($last);
 
             if ($result) {
-                echo '(added) ' . $result->format() . "\n";
+                $this->outputNl('(added) ' . $result->format());
             } else {
-                echo "Failed to add record";
+                $this->outputNl('Failed to add record');
             }
         } else {
-            echo "No previous record to continue";
+            $this->outputNl('No previous record to continue');
         }
     }
     // }}}
@@ -214,7 +214,7 @@ class MrClip
     // {{{ todoList
     protected function todoList()
     {
-        echo $this->formatTodos($this->getTodoList());
+        $this->output($this->formatTodos($this->getTodoList()));
     }
     // }}}
     // {{{ todoEdit
@@ -267,19 +267,20 @@ class MrClip
             }
         }
 
-        echo count($todos) . ' old, ' . count($newTodos) . " new\n\n";
+        $this->outputNl(count($todos) . ' old, ' . count($newTodos) . ' new');
+        $this->outputNl();
 
         foreach ($moved as $todo) {
-            echo '(moved)   ' . $todo->format() . "\n";
+            $this->outputNl('(moved)   ' . $todo->format());
         }
         foreach ($guess as $todo) {
-            echo '(edited) ' . $todo->getGuess()->format() . ' -> ' . $todo->format() . "\n";
+            $this->outputNl('(edited) ' . $todo->getGuess()->format() . ' -> ' . $todo->format());
         }
         foreach ($rest as $todo) {
-            echo '(deleted) ' . $todo->format() . "\n";
+            $this->outputNl('(deleted) ' . $todo->format());
         }
         foreach ($new as $todo) {
-            echo '(new)     ' . $todo->format() . "\n";
+            $this->outputNl('(new)     ' . $todo->format());
         }
 
         $parsed = new \stdclass();
@@ -415,13 +416,25 @@ class MrClip
     }
     // }}}
 
+    // {{{ outputNl
+    protected function outputNl($string)
+    {
+        $this->output($string . "\n");
+    }
+    // }}}
+    // {{{ output
+    protected function output($string)
+    {
+        fwrite(STDOUT, $string);
+    }
+    // }}}
     // {{{ echoComplete
     protected function echoComplete($hint, $candidate, $prefix = '')
     {
         $escapedHint = preg_quote($hint);
 
         if (preg_match("/^$escapedHint/", $prefix . $candidate)) {
-            echo "$prefix$candidate ";
+            $this->output("$prefix$candidate ");
         }
     }
     // }}}
