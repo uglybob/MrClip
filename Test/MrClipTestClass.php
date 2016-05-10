@@ -14,7 +14,7 @@ class MrClipTestClass extends MrClip
     // }}}
 
     // {{{ output
-    public function output($string)
+    public function output($string = '')
     {
         $this->echoed .= $string;
     }

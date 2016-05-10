@@ -15,9 +15,10 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
     }
     // }}}
 
-    // {{{ testTest
-    public function testTest()
+    // {{{ testEmpty
+    public function testEmpty()
     {
+        $this->assertSame('', $this->mrClip->echoed);
     }
     // }}}
 }

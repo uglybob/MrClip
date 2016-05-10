@@ -5,4 +5,6 @@ namespace Uglybob\MrClip;
 require_once('vendor/autoload.php');
 
 array_shift($argv);
-new Lib\MrClip($argv);
+$options = Lib\Cli::cleancolons($argv);
+
+new Lib\MrClip($options);

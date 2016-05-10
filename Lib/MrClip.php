@@ -27,7 +27,6 @@ class MrClip
             'completion' => null,
         ];
 
-        $options = $this->cleanColons($options);
         $this->prm = new PRM();
         $this->parser = new Parser($options, $this->commands);
 
@@ -46,29 +45,6 @@ class MrClip
                 }
             }
         }
-    }
-    // }}}
-
-    // {{{ cleanColons
-    public static function cleanColons($options)
-    {
-        $newOptions = [];
-
-        for ($i = 0; $i < count($options); $i++) {
-            if (
-                (
-                    isset($options[$i - 1])
-                    && $options[$i - 1] == ':'
-                )
-                || $options[$i] == ':'
-            ) {
-                $newOptions[count($newOptions) - 1] .= $options[$i];
-            } else if ($options[$i] !== ':') {
-                $newOptions[] = $options[$i];
-            }
-        }
-
-        return $newOptions;
     }
     // }}}
 
@@ -417,16 +393,16 @@ class MrClip
     }
     // }}}
 
-    // {{{ outputNl
-    protected function outputNl($string)
+    // {{{ output
+    protected function output($string = '')
     {
-        $this->output($string . "\n");
+        Cli::output($string);
     }
     // }}}
-    // {{{ output
-    protected function output($string)
+    // {{{ outputNl
+    protected function outputNl($string = '')
     {
-        fwrite(STDOUT, $string);
+        $this->output($string . "\n");
     }
     // }}}
     // {{{ echoComplete
