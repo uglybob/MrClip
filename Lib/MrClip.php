@@ -405,21 +405,15 @@ class MrClip
         $this->output($string . "\n");
     }
     // }}}
-    // {{{ echoComplete
-    protected function echoComplete($hint, $candidate, $prefix = '')
-    {
-        $escapedHint = preg_quote($hint);
-
-        if (preg_match("/^$escapedHint/", $prefix . $candidate)) {
-            $this->output("$prefix$candidate ");
-        }
-    }
-    // }}}
     // {{{ suggest
     protected function suggest($hint, $candidates, $prefix = '')
     {
         foreach($candidates as $candidate) {
-            $this->echoComplete($hint, $candidate, $prefix);
+            $escapedHint = preg_quote($hint);
+
+            if (preg_match("/^$escapedHint/", $prefix . $candidate)) {
+                $this->output("$prefix$candidate ");
+            }
         }
     }
     // }}}

@@ -12,6 +12,14 @@ class MrClipTestClass extends MrClip
 
     public $echoed = '';
     // }}}
+    // {{{ constructor
+    public function __construct($options = [])
+    {
+        parent::__construct($options);
+
+        $this->prm = new PrmMock();
+    }
+    // }}}
 
     // {{{ output
     public function output($string = '')
