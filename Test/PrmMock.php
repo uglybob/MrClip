@@ -93,4 +93,20 @@ class PrmMock
         return $actigories;
     }
     // }}}
+    // {{{ getTags
+    public function getTags()
+    {
+        $tags = [];
+
+        foreach($this->records as $record) {
+            foreach($record->getTags() as $tag) {
+                if (!in_array($tag, $tags)) {
+                    $tags[] = $tag;
+                }
+            }
+        }
+
+        return $tags;
+    }
+    // }}}
 }
