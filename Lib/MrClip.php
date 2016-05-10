@@ -106,6 +106,18 @@ class MrClip
         }
     }
     // }}}
+    // {{{ suggest
+    protected function suggest($hint, $candidates, $prefix = '')
+    {
+        foreach($candidates as $candidate) {
+            $escapedHint = preg_quote($hint);
+
+            if (preg_match("/^$escapedHint/", $prefix . $candidate)) {
+                $this->output("$prefix$candidate ");
+            }
+        }
+    }
+    // }}}
 
     // {{{ recordAdd
     protected function recordAdd()
@@ -191,13 +203,13 @@ class MrClip
     // {{{ todoList
     protected function todoList()
     {
-        $this->output($this->formatTodos($this->getTodoList()));
+        $this->output($this->formatTodos($this->getFilteredTodos()));
     }
     // }}}
     // {{{ todoEdit
     protected function todoEdit()
     {
-        $todos = $this->getTodoList();
+        $todos = $this->getFilteredTodos();
         $todosString = $this->formatTodos($todos);
         $answer = null;
 
@@ -220,6 +232,7 @@ class MrClip
         }
     }
     // }}}
+
     // {{{ editAndParse
     protected function editAndParse($string, $todos)
     {
@@ -344,9 +357,40 @@ class MrClip
         return $newString;
     }
     // }}}
+    // {{{ stringToTodo
+    protected function stringToTodo($activity, $category, $parent, $todoString)
+    {
+        $todoArray = explode(' ', trim($todoString));
+        $parser = new Parser($todoArray);
 
-    // {{{ getTodoList
-    protected function getTodoList()
+        $done = $parser->parseDone();
+        $listTags = $parser->parseTags();
+        $filterTags = $this->parser->getTags();
+        $tags = array_unique(array_merge($listTags, $filterTags));
+        $text = trim($parser->parseText());
+
+        $todo = new Todo(null, $activity, $category, $tags, $text, $parent, $done);
+
+        return $todo;
+    }
+    // }}}
+    // {{{ stringToHeader
+    protected function stringToHeader($headerString)
+    {
+        $todoArray = explode(' ', trim($headerString));
+        $parser = new Parser($todoArray);
+        $todo = null;
+
+        if ($parser->parseActigory()) {
+            $todo = new Todo(null, $parser->getActivity(), $parser->getCategory());
+        }
+
+        return $todo;
+    }
+    // }}}
+
+    // {{{ getFilteredTodos
+    protected function getFilteredTodos()
     {
         $parser = $this->parser;
 
@@ -389,31 +433,6 @@ class MrClip
             }
 
             $result = $this->prm->saveTodo($todo);
-        }
-    }
-    // }}}
-
-    // {{{ output
-    protected function output($string = '')
-    {
-        Cli::output($string);
-    }
-    // }}}
-    // {{{ outputNl
-    protected function outputNl($string = '')
-    {
-        $this->output($string . "\n");
-    }
-    // }}}
-    // {{{ suggest
-    protected function suggest($hint, $candidates, $prefix = '')
-    {
-        foreach($candidates as $candidate) {
-            $escapedHint = preg_quote($hint);
-
-            if (preg_match("/^$escapedHint/", $prefix . $candidate)) {
-                $this->output("$prefix$candidate ");
-            }
         }
     }
     // }}}
@@ -474,35 +493,16 @@ class MrClip
     }
     // }}}
 
-    // {{{ stringToTodo
-    protected function stringToTodo($activity, $category, $parent, $todoString)
+    // {{{ output
+    protected function output($string = '')
     {
-        $todoArray = explode(' ', trim($todoString));
-        $parser = new Parser('todo', $todoArray);
-
-        $done = $parser->parseDone();
-        $listTags = $parser->parseTags();
-        $filterTags = $this->parser->getTags();
-        $tags = array_unique(array_merge($listTags, $filterTags));
-        $text = trim($parser->parseText());
-
-        $todo = new Todo(null, $activity, $category, $tags, $text, $parent, $done);
-
-        return $todo;
+        Cli::output($string);
     }
     // }}}
-    // {{{ stringToHeader
-    protected function stringToHeader($headerString)
+    // {{{ outputNl
+    protected function outputNl($string = '')
     {
-        $todoArray = explode(' ', trim($headerString));
-        $parser = new Parser('todo', $todoArray);
-        $todo = null;
-
-        if ($parser->parseActigory()) {
-            $todo = new Todo(null, $parser->getActivity(), $parser->getCategory());
-        }
-
-        return $todo;
+        $this->output($string . "\n");
     }
     // }}}
 }
