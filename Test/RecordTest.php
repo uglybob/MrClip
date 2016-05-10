@@ -57,25 +57,31 @@ class RecordTest extends EntryTest
     // {{{ testFormat
     public function testFormat()
     {
-        $this->assertSame("2015-10-21 16:29 testActivity@testCategory +testTag1 +testTag2 testText", $this->object->format());
+        $this->assertSame('2015-10-21 16:29 testActivity@testCategory +testTag1 +testTag2 testText', $this->object->format());
+
+        $this->object->end = new \Datetime('2015-10-21 16:30');
+        $this->assertSame('2015-10-21 16:29 - 2015-10-21 16:30 testActivity@testCategory +testTag1 +testTag2 testText', $this->object->format());
 
         $this->object->activity = 'test2Activity';
-        $this->assertSame("2015-10-21 16:29 test2Activity@testCategory +testTag1 +testTag2 testText", $this->object->format());
+        $this->assertSame('2015-10-21 16:29 - 2015-10-21 16:30 test2Activity@testCategory +testTag1 +testTag2 testText', $this->object->format());
 
         $this->object->category = 'test2Category';
-        $this->assertSame("2015-10-21 16:29 test2Activity@test2Category +testTag1 +testTag2 testText", $this->object->format());
+        $this->assertSame('2015-10-21 16:29 - 2015-10-21 16:30 test2Activity@test2Category +testTag1 +testTag2 testText', $this->object->format());
 
         $this->object->tags = ['testTag3'];
-        $this->assertSame("2015-10-21 16:29 test2Activity@test2Category +testTag3 testText", $this->object->format());
+        $this->assertSame('2015-10-21 16:29 - 2015-10-21 16:30 test2Activity@test2Category +testTag3 testText', $this->object->format());
 
         $this->object->text = 'test2Text';
-        $this->assertSame("2015-10-21 16:29 test2Activity@test2Category +testTag3 test2Text", $this->object->format());
+        $this->assertSame('2015-10-21 16:29 - 2015-10-21 16:30 test2Activity@test2Category +testTag3 test2Text', $this->object->format());
 
         $this->object->tags = [];
-        $this->assertSame("2015-10-21 16:29 test2Activity@test2Category test2Text", $this->object->format());
+        $this->assertSame('2015-10-21 16:29 - 2015-10-21 16:30 test2Activity@test2Category test2Text', $this->object->format());
 
         $this->object->text = null;
-        $this->assertSame("2015-10-21 16:29 test2Activity@test2Category", $this->object->format());
+        $this->assertSame('2015-10-21 16:29 - 2015-10-21 16:30 test2Activity@test2Category', $this->object->format());
+
+        $this->object->end = null;
+        $this->assertSame('2015-10-21 16:29 test2Activity@test2Category', $this->object->format());
     }
     // }}}
 }
