@@ -5,10 +5,11 @@ namespace Uglybob\MrClip\Lib;
 class MrClip
 {
     // {{{ variables
-    protected $prm = null;
+    protected $prm;
+    protected $parser;
     // }}}
     // {{{ constructor
-    public function __construct($options)
+    public function __construct($options = [])
     {
         $this->commands = [
             'record' => [
