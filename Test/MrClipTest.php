@@ -84,4 +84,11 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
         $this->assertSame(date('H:i') . ' 22:00', $this->mrClip->echoed);
     }
     // }}}
+    // {{{ testCompletionRecordAddTime_
+    public function testCompletionRecordAddTime_()
+    {
+        $this->comp('record add 22:00 ');
+        $this->assertSame('activity1@category1 activity1@category2 activity2@category1 activity2@category2 @category1 @category2', $this->mrClip->echoed);
+    }
+    // }}}
 }

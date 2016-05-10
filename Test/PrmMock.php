@@ -49,4 +49,48 @@ class PrmMock
         return $last;
     }
     // }}}
+    // {{{ getActivities
+    public function getActivities()
+    {
+        $activities = [];
+
+        foreach($this->records as $record) {
+            if (!in_array($record->getActivity(), $activities)) {
+                $activities[] = $record->getActivity();
+            }
+        }
+
+        return $activities;
+    }
+    // }}}
+    // {{{ getCategories
+    public function getCategories()
+    {
+        $categories = [];
+
+        foreach($this->records as $record) {
+            if (!in_array($record->getCategory(), $categories)) {
+                $categories[] = $record->getCategory();
+            }
+        }
+
+        return $categories;
+    }
+    // }}}
+    // {{{ getActigories
+    public function getActigories()
+    {
+        $activities = $this->getActivities();
+        $activities[] = ''; // categories without activities
+        $categories = $this->getCategories();
+
+        foreach($activities as $activity) {
+            foreach($categories as $category) {
+                $actigories[] = "$activity@$category";
+            }
+        }
+
+        return $actigories;
+    }
+    // }}}
 }

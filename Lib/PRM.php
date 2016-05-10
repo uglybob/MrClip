@@ -25,12 +25,24 @@ class PRM
     }
     // }}}
 
+    // {{{ getActivities
+    public function getActivities()
+    {
+        return $this->getConnection()->getActivities();
+    }
+    // }}}
+    // {{{ getCategories
+    public function getCategories()
+    {
+        return $this->getConnection()->getCategories();
+    }
+    // }}}
     // {{{ getActigories
     public function getActigories()
     {
-        $activities = $this->getConnection()->getActivities();
+        $activities = $this->getActivities();
         $activities[] = ''; // categories without activities
-        $categories = $this->getConnection()->getCategories();
+        $categories = $this->getCategories();
 
         foreach($activities as $activity) {
             foreach($categories as $category) {
