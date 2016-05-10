@@ -20,9 +20,9 @@ class Parser
     protected $done;
     // }}}
     // {{{ constructor
-    public function __construct($domain = null, $options = [], $commands = [])
+    public function __construct($options = [], $commands = [])
     {
-        $this->domain = $domain;
+        $this->domain = null;
         $this->options = $options;
         $this->commands = $commands;
         $this->position = 0;

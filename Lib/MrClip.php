@@ -8,11 +8,8 @@ class MrClip
     protected $prm = null;
     // }}}
     // {{{ constructor
-    public function __construct($domain, $options)
+    public function __construct($options)
     {
-        $options = $this->cleanColons($options);
-        $this->prm = new PRM();
-
         $this->commands = [
             'record' => [
                 'add',
@@ -26,20 +23,25 @@ class MrClip
                 'list',
                 'edit',
             ],
+            'completion' => [],
         ];
 
-        if ($domain == 'completion') {
-            $this->completion($domain, $options);
-        } else {
-            $this->parser = new Parser($domain, $options, $this->commands);
+        $options = $this->cleanColons($options);
+        $this->prm = new PRM();
+        $this->parser = new Parser($options, $this->commands);
 
-            if (
-                array_key_exists($domain, $this->commands)
-                && $this->parser->parseCommand()
-                && in_array($this->parser->getCommand(), $this->commands[$domain])
-            ) {
-                $call = $domain . ucfirst($this->parser->getCommand());
-                $this->$call();
+        if ($domain = $this->parser->parseDomain()) {
+            if ($domain == 'completion') {
+                $this->completion($options);
+            } else {
+                if (
+                    array_key_exists($domain, $this->commands)
+                    && $this->parser->parseCommand()
+                    && in_array($this->parser->getCommand(), $this->commands[$domain])
+                ) {
+                    $call = $domain . ucfirst($this->parser->getCommand());
+                    $this->$call();
+                }
             }
         }
     }
@@ -69,15 +71,11 @@ class MrClip
     // }}}
 
     // {{{ completion
-    protected function completion($domain, $options)
+    protected function completion($options)
     {
-        if (!empty(substr(array_shift($options), 1, -1))) {
-            $current = array_pop($options);
-        } else {
-            $current = '';
-        }
-
-        $parser = new Parser($domain, $options, $this->commands);
+        $parser = $this->parser;
+        $current = substr(end($options), 1, -1);
+        unset($this->commands['completion']);
 
         if ($parser->parseDomain()) {
             if ($parser->getDomain() == 'record') {
