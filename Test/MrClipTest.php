@@ -15,10 +15,73 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
     }
     // }}}
 
+    // {{{ comp
+    protected function comp($string)
+    {
+        $options = explode(' ', $string);
+        array_unshift($options, 'completion');
+
+        if (substr($string, -1) == ' ') {
+            $options[] = "''";
+        } else {
+            end($options);
+            $key = key($options);
+            reset($options);
+
+            $options[$key] = "'" . $options[$key] . "'";
+        }
+
+        $this->mrClip->run($options);
+    }
+    // }}}
+
     // {{{ testEmpty
     public function testEmpty()
     {
         $this->assertSame('', $this->mrClip->echoed);
+    }
+    // }}}
+    // {{{ testCompletionEmpty
+    public function testCompletionEmpty()
+    {
+        $this->comp('');
+        $this->assertSame('record todo', $this->mrClip->echoed);
+    }
+    // }}}
+    // {{{ testCompletionR
+    public function testCompletionR()
+    {
+        $this->comp('r');
+        $this->assertSame('record', $this->mrClip->echoed);
+    }
+    // }}}
+    // {{{ testCompletionRecord
+    public function testCompletionRecord()
+    {
+        $this->comp('record');
+        $this->assertSame('record', $this->mrClip->echoed);
+    }
+    // }}}
+    // {{{ testCompletionRecord_
+    public function testCompletionRecord_()
+    {
+        $this->comp('record ');
+        $this->assertSame('add current list stop continue', $this->mrClip->echoed);
+    }
+    // }}}
+    // {{{ testCompletionRecordA
+    public function testCompletionRecordA()
+    {
+        $this->comp('record a');
+        $this->assertSame('add', $this->mrClip->echoed);
+    }
+    // }}}
+    // {{{ testCompletionRecordAdd
+    public function testCompletionRecordAdd()
+    {
+        $this->comp('record add ');
+
+        $this->assertSame(date('H:i') . ' 22:00', $this->mrClip->echoed);
     }
     // }}}
 }

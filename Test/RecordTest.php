@@ -12,16 +12,6 @@ class RecordTest extends EntryTest
     }
     // }}}
 
-    // {{{ testRecordDefaults
-    public function testRecordDefaults()
-    {
-        $default = new RecordTestClass();
-
-        $this->assertNull($default->getStart());
-        $this->assertNull($default->getEnd());
-    }
-    // }}}
-
     // {{{ testGetStart
     public function testGetStart()
     {
@@ -31,6 +21,10 @@ class RecordTest extends EntryTest
     // {{{ testGetEnd
     public function testGetEnd()
     {
+        $now = date('Y-m-d H:i');
+        $this->assertSame($now, $this->object->getEnd()->format('Y-m-d H:i'));
+
+        $this->object->end = new \Datetime('2015-10-21 16:29');
         $this->assertSame($this->object->end, $this->object->getEnd());
     }
     // }}}
@@ -57,7 +51,8 @@ class RecordTest extends EntryTest
     // {{{ testFormat
     public function testFormat()
     {
-        $this->assertSame('2015-10-21 16:29 testActivity@testCategory +testTag1 +testTag2 testText', $this->object->format());
+        $now = date('Y-m-d H:i');
+        $this->assertSame("2015-10-21 16:29 - $now testActivity@testCategory +testTag1 +testTag2 testText", $this->object->format());
 
         $this->object->end = new \Datetime('2015-10-21 16:30');
         $this->assertSame('2015-10-21 16:29 - 2015-10-21 16:30 testActivity@testCategory +testTag1 +testTag2 testText', $this->object->format());
@@ -81,7 +76,7 @@ class RecordTest extends EntryTest
         $this->assertSame('2015-10-21 16:29 - 2015-10-21 16:30 test2Activity@test2Category', $this->object->format());
 
         $this->object->end = null;
-        $this->assertSame('2015-10-21 16:29 test2Activity@test2Category', $this->object->format());
+        $this->assertSame("2015-10-21 16:29 - $now test2Activity@test2Category", $this->object->format());
     }
     // }}}
 }

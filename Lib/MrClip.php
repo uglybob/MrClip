@@ -28,6 +28,13 @@ class MrClip
         ];
 
         $this->prm = new PRM();
+
+        $this->run($options);
+    }
+    // }}}
+    // {{{ run
+    protected function run($options = [])
+    {
         $this->parser = new Parser($options, $this->commands);
 
         if ($domain = $this->parser->parseDomain()) {
@@ -109,13 +116,17 @@ class MrClip
     // {{{ suggest
     protected function suggest($hint, $candidates, $prefix = '')
     {
+        $output = [];
+
         foreach($candidates as $candidate) {
             $escapedHint = preg_quote($hint);
 
             if (preg_match("/^$escapedHint/", $prefix . $candidate)) {
-                $this->output("$prefix$candidate ");
+                $output[] = $prefix . $candidate;
             }
         }
+
+        $this->output(implode(' ', $output));
     }
     // }}}
 

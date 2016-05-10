@@ -9,7 +9,7 @@ class Record extends Entry
     protected $end;
     // }}}
     // {{{ constructor
-    public function __construct($id = null, $activity = null, $category = null, $tags = [], $text = null, $start = null, $end = null)
+    public function __construct($id = null, $activity = null, $category = null, $tags = [], $text = null, \Datetime $start, $end = null)
     {
         parent::__construct($id, $activity, $category, $tags, $text);
 
@@ -27,7 +27,13 @@ class Record extends Entry
     // {{{ getEnd
     public function getEnd()
     {
-        return $this->end;
+        if (is_null($this->end)) {
+            $end = new \Datetime();
+        } else {
+            $end = $this->end;
+        }
+
+        return $end;
     }
     // }}}
 
@@ -47,12 +53,9 @@ class Record extends Entry
     // {{{ format
     public function format()
     {
-        $output[] = $this->start->format('Y-m-d H:i');
-
-        if ($this->end) {
-            $output[] = '- ' . $this->end->format('Y-m-d H:i');
-        }
-
+        $output[] = $this->getStart()->format('Y-m-d H:i');
+        $output[] = '-';
+        $output[] = $this->getEnd()->format('Y-m-d H:i');
         $output[] = parent::format();
 
         return implode(' ', $output);
