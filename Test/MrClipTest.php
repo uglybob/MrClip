@@ -35,6 +35,63 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
     }
     // }}}
 
+    // {{{ testSuggest
+    public function testSuggest()
+    {
+        $candidates = ['test', 'test2', 'anotherTest', 'oneMoreTest'];
+        $this->mrClip->suggest('', $candidates);
+        $this->assertSame('test test2 anotherTest oneMoreTest', $this->mrClip->echoed);
+    }
+    // }}}
+    // {{{ testSuggestStart
+    public function testSuggestStart()
+    {
+        $candidates = ['test', 'test2', 'anotherTest', 'oneMoreTest'];
+        $this->mrClip->suggest('t', $candidates);
+        $this->assertSame('test test2', $this->mrClip->echoed);
+    }
+    // }}}
+    // {{{ testSuggestTwo
+    public function testSuggestTwo()
+    {
+        $candidates = ['test', 'test2', 'anotherTest', 'oneMoreTest'];
+        $this->mrClip->suggest('test', $candidates);
+        $this->assertSame('test test2', $this->mrClip->echoed);
+    }
+    // }}}
+    // {{{ testSuggestOne
+    public function testSuggestOne()
+    {
+        $candidates = ['test', 'test2', 'anotherTest', 'oneMoreTest'];
+        $this->mrClip->suggest('test2', $candidates);
+        $this->assertSame('test2', $this->mrClip->echoed);
+    }
+    // }}}
+    // {{{ testSuggestFail
+    public function testSuggestFail()
+    {
+        $candidates = ['test', 'test2', 'anotherTest', 'oneMoreTest'];
+        $this->mrClip->suggest('x', $candidates);
+        $this->assertSame('', $this->mrClip->echoed);
+    }
+    // }}}
+    // {{{ testSuggestEmpty
+    public function testSuggestEmpty()
+    {
+        $candidates = [];
+        $this->mrClip->suggest('', $candidates);
+        $this->assertSame('', $this->mrClip->echoed);
+    }
+    // }}}
+    // {{{ testSuggestEmptyStart
+    public function testSuggestEmptyStart()
+    {
+        $candidates = [];
+        $this->mrClip->suggest('t', $candidates);
+        $this->assertSame('', $this->mrClip->echoed);
+    }
+    // }}}
+
     // {{{ testEmpty
     public function testEmpty()
     {
@@ -159,6 +216,34 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
     {
         $this->comp('record add 22:00 activity1@category1 +tag1 ');
         $this->assertSame('+tag2', $this->mrClip->echoed);
+    }
+    // }}}
+    // {{{ testCompletionTodo_
+    public function testCompletionTodo_()
+    {
+        $this->comp('todo ');
+        $this->assertSame('add list edit', $this->mrClip->echoed);
+    }
+    // }}}
+    // {{{ testCompletionTodoL
+    public function testCompletionTodoL()
+    {
+        $this->comp('todo l');
+        $this->assertSame('list', $this->mrClip->echoed);
+    }
+    // }}}
+    // {{{ testCompletionTodoList
+    public function testCompletionTodoList()
+    {
+        $this->comp('todo list');
+        $this->assertSame('list', $this->mrClip->echoed);
+    }
+    // }}}
+    // {{{ testCompletionTodoList_
+    public function testCompletionTodoList_()
+    {
+        $this->comp('todo list ');
+        $this->assertSame('activity1@category1 activity1@category2 activity2@category1 activity2@category2 @category1 @category2', $this->mrClip->echoed);
     }
     // }}}
 }

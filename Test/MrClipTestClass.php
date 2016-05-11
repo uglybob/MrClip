@@ -27,6 +27,12 @@ class MrClipTestClass extends MrClip
         return parent::run($options);
     }
     // }}}
+    // {{{ suggest
+    public function suggest($hint, $candidates, $prefix = '')
+    {
+        return parent::suggest($hint, $candidates, $prefix);
+    }
+    // }}}
     // {{{ output
     public function output($string = '')
     {
