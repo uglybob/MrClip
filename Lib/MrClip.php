@@ -230,7 +230,7 @@ class MrClip
         ) {
             $parsed = $this->editAndParse($todosString, $todos);
             $todosString = $parsed->text;
-            $answer = readline('accept (y/N/c)');
+            $answer = $this->input('accept (y/N/c)');
         }
 
         if ($answer === 'y' || $answer === 'yes') {
@@ -514,6 +514,12 @@ class MrClip
     protected function outputNl($string = '')
     {
         $this->output($string . "\n");
+    }
+    // }}}
+    // {{{ input
+    protected function input($string = '')
+    {
+        return Cli::input($string);
     }
     // }}}
 }

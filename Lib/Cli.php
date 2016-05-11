@@ -33,4 +33,10 @@ class Cli
         fwrite(STDOUT, $string);
     }
     // }}}
+    // {{{ input
+    public static function input($string = '')
+    {
+        return readline($string);
+    }
+    // }}}
 }
