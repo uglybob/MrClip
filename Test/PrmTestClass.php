@@ -2,103 +2,24 @@
 
 namespace Uglybob\MrClip\Test;
 
-use Uglybob\MrClip\Lib\Record;
 use Uglybob\MrClip\Lib\PRM;
 
 class PrmTestClass extends PRM
 {
     // {{{ variables
-    public $records;
+    public $connection;
     // }}}
     // {{{ constructor
     public function __construct()
     {
-        $this->records = [];
-
-        $start1 = new \Datetime('2015-10-21 16:29');
-        $end1 = new \Datetime('2015-10-21 16:34');
-        $this->records[] = new Record(1, 'activity1', 'category1', ['tag1', 'tag2'], null, $start1, $end1);
-
-        $start2 = new \Datetime('2015-10-21 17:00');
-        $end2 = new \Datetime('2015-10-21 18:00');
-        $this->records[] = new Record(2, 'activity2', 'category1', ['tag2'], 'someMemo', $start2, $end2);
-
-        $start3 = new \Datetime('2015-10-21 19:00');
-        $end3 = new \Datetime('2015-10-21 20:00');
-        $this->records[] = new Record(3, 'activity1', 'category2', [], null, $start3, $end3);
-
-        $start4 = new \Datetime('2015-10-21 21:00');
-        $end4 = new \Datetime('2015-10-21 22:00');
-        $this->records[] = new Record(4, 'activity2', 'category1', ['tag2'], null, $start4, $end4);
+        $this->connection = new ApiMock();
     }
     // }}}
 
     // {{{ getConnection
     public function getConnection()
     {
-    }
-    // }}}
-
-    // {{{ getActivities
-    public function getActivities()
-    {
-        $activities = [];
-
-        foreach($this->records as $record) {
-            if (!in_array($record->getActivity(), $activities)) {
-                $activities[] = $record->getActivity();
-            }
-        }
-
-        return $activities;
-    }
-    // }}}
-    // {{{ getCategories
-    public function getCategories()
-    {
-        $categories = [];
-
-        foreach($this->records as $record) {
-            if (!in_array($record->getCategory(), $categories)) {
-                $categories[] = $record->getCategory();
-            }
-        }
-
-        return $categories;
-    }
-    // }}}
-    // {{{ getTags
-    public function getTags()
-    {
-        $tags = [];
-
-        foreach($this->records as $record) {
-            foreach($record->getTags() as $tag) {
-                if (!in_array($tag, $tags)) {
-                    $tags[] = $tag;
-                }
-            }
-        }
-
-        return $tags;
-    }
-    // }}}
-
-    // {{{ getLastRecord
-    public function getLastRecord()
-    {
-        $last = null;
-
-        foreach ($this->records as $record) {
-            if (
-                is_null($last)
-                || $last->getEnd()->getTimestamp() < $record->getEnd()->getTimestamp()
-            ) {
-                $last = $record;
-            }
-        }
-
-        return $last;
+        return $this->connection;
     }
     // }}}
 }
