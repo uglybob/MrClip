@@ -12,43 +12,26 @@ class ApiMock
     {
         $this->records = [];
 
-        $record1 = new \StdClass();
-        $record1->id = 1;
-        $record1->activity = 'activity1';
-        $record1->category = 'category1';
-        $record1->tags = ['tag1', 'tag2'];
-        $record1->text = null;
-        $record1->start = strtotime('2015-10-21 16:29');
-        $record1->end = strtotime('2015-10-21 16:34');
+        $this->records[1] = $this->createRecord(1, 'activity1', 'category1', ['tag1', 'tag2'],  null,       strtotime('2015-10-21 16:29'), strtotime('2015-10-21 16:34'));
+        $this->records[2] = $this->createRecord(2, 'activity2', 'category1', ['tag2'],          'someMemo', strtotime('2015-10-21 17:00'), strtotime('2015-10-21 18:00'));
+        $this->records[3] = $this->createRecord(3, 'activity1', 'category2', [],                null,       strtotime('2015-10-21 19:00'), strtotime('2015-10-21 20:00'));
+        $this->records[4] = $this->createRecord(4, 'activity2', 'category1', ['tag2'],          null,       strtotime('2015-10-21 21:00'), strtotime('2015-10-21 22:00'));
+    }
+    // }}}
+    // {{{ createRecord
+    public function createRecord($id, $activity, $category, $tags, $text, $start, $end)
+    {
+        $array = [
+            'id' => $id,
+            'activity' => $activity,
+            'category' => $category,
+            'tags' => $tags,
+            'text' => $text,
+            'start' => $start,
+            'end' => $end,
+        ];
 
-        $record2 = new \StdClass();
-        $record2->id = 2;
-        $record2->activity = 'activity2';
-        $record2->category = 'category1';
-        $record2->tags = ['tag2'];
-        $record2->text = 'someMemo';
-        $record2->start = strtotime('2015-10-21 17:00');
-        $record2->end = strtotime('2015-10-21 18:00');
-
-        $record3 = new \StdClass();
-        $record3->id = 3;
-        $record3->activity = 'activity1';
-        $record3->category = 'category2';
-        $record3->tags = [];
-        $record3->text = null;
-        $record3->start = strtotime('2015-10-21 19:00');
-        $record3->end = strtotime('2015-10-21 20:00');
-
-        $record4 = new \StdClass();
-        $record4->id = 4;
-        $record4->activity = 'activity2';
-        $record4->category = 'category1';
-        $record4->tags = ['tag2'];
-        $record4->text = null;
-        $record4->start = strtotime('2015-10-21 21:00');
-        $record4->end = strtotime('2015-10-21 22:00');
-
-        $this->records = [$record1, $record2, $record3, $record4];
+        return (object) $array;
     }
     // }}}
 
@@ -112,6 +95,20 @@ class ApiMock
         }
 
         return $last;
+    }
+    // }}}
+    // {{{ editRecord
+    public function editRecord($id, $activity, $category, $tags, $text, $start, $end)
+    {
+        $record = $this->createRecord($id, $activity, $category, $tags, $text, $start, $end);
+
+        if (is_null($record->id)) {
+            $record->id = count($this->records);
+        }
+
+        $this->records[$record->id] = $record;
+
+        return $record;
     }
     // }}}
 }
