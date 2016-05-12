@@ -143,10 +143,8 @@ class MrClip
         $tags = $parser->parseTags();
         $text = $parser->parseText();
 
-        if (empty(trim($activity))) {
-            $this->outputNl('Activity missing');
-        } else if (empty(trim($category))) {
-            $this->outputNl('Category missing');
+        if (empty(trim($activity)) || empty(trim($category))) {
+            $this->outputNl('Activity/category missing');
         } else {
             $record = new Record(
                 null,

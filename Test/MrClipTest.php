@@ -259,7 +259,61 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
     public function testRecordAddEmpty()
     {
         $this->mrClip->recordAdd();
-        $this->assertSame("Activity missing\n", $this->mrClip->echoed);
+        $this->assertSame("Activity/category missing\n", $this->mrClip->echoed);
+    }
+    // }}}
+    // {{{ testRecordAdd
+    public function testRecordAdd()
+    {
+        $options = 'testActivity@testCategory +testTag1 +testTag2 testText';
+        $now = date('Y-m-d H:i');
+
+        $this->mrClip->parser = new ParserTestClass(explode(' ', $options));
+        $this->mrClip->recordAdd();
+        $this->assertSame("(added) $now - $now testActivity@testCategory +testTag1 +testTag2 testText\n", $this->mrClip->echoed);
+    }
+    // }}}
+    // {{{ testRecordAddNoActivity
+    public function testRecordAddNoActivity()
+    {
+        $options = '@testCategory +testTag1 +testTag2 testText';
+
+        $this->mrClip->parser = new ParserTestClass(explode(' ', $options));
+        $this->mrClip->recordAdd();
+        $this->assertSame("Activity/category missing\n", $this->mrClip->echoed);
+    }
+    // }}}
+    // {{{ testRecordAddNoCategory
+    public function testRecordAddNoCategory()
+    {
+        $options = 'testActivity@ +testTag1 +testTag2 testText';
+        $now = date('Y-m-d H:i');
+
+        $this->mrClip->parser = new ParserTestClass(explode(' ', $options));
+        $this->mrClip->recordAdd();
+        $this->assertSame("Activity/category missing\n", $this->mrClip->echoed);
+    }
+    // }}}
+    // {{{ testRecordAddNoTag
+    public function testRecordAddNoTag()
+    {
+        $options = 'testActivity@testCategory testText';
+        $now = date('Y-m-d H:i');
+
+        $this->mrClip->parser = new ParserTestClass(explode(' ', $options));
+        $this->mrClip->recordAdd();
+        $this->assertSame("(added) $now - $now testActivity@testCategory testText\n", $this->mrClip->echoed);
+    }
+    // }}}
+    // {{{ testRecordAddNoText
+    public function testRecordAddNoText()
+    {
+        $options = 'testActivity@testCategory +testTag1 +testTag2';
+        $now = date('Y-m-d H:i');
+
+        $this->mrClip->parser = new ParserTestClass(explode(' ', $options));
+        $this->mrClip->recordAdd();
+        $this->assertSame("(added) $now - $now testActivity@testCategory +testTag1 +testTag2\n", $this->mrClip->echoed);
     }
     // }}}
 }
