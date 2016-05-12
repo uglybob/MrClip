@@ -135,30 +135,30 @@ class MrClip
     {
         $parser = $this->parser;
 
-        if ($parser->parseStart()) {
-            $parser->parseEnd();
-            if ($parser->parseActigory()) {
-                $parser->parseTags();
-                $parser->parseText();
+        $start = $parser->parseStart();
+        $end = $parser->parseEnd();
+        $parser->parseActigory();
+        $activity = $parser->getActivity();
+        $category = $parser->getCategory();
+        $tags = $parser->parseTags();
+        $text = $parser->parseText();
 
-                $record = new Record(
-                    null,
-                    $parser->getActivity(),
-                    $parser->getCategory(),
-                    $parser->getTags(),
-                    $parser->getText(),
-                    $parser->getStart(),
-                    $parser->getEnd()
-                );
+        $record = new Record(
+            null,
+            $activity,
+            $category,
+            $tags,
+            $text,
+            $start,
+            $end
+        );
 
-                $result = $this->prm->saveRecord($record);
+        $result = $this->prm->saveRecord($record);
 
-                if ($result) {
-                    $this->outputNl('(added) ' . $result->format());
-                } else {
-                    $this->outputNl('Failed to add record');
-                }
-            }
+        if ($result) {
+            $this->outputNl('(added) ' . $result->format());
+        } else {
+            $this->outputNl('Failed to add record');
         }
     }
     // }}}

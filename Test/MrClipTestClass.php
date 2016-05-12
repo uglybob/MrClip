@@ -39,4 +39,11 @@ class MrClipTestClass extends MrClip
         $this->echoed .= $string;
     }
     // }}}
+
+    // {{{ recordAdd
+    public function recordAdd()
+    {
+        return parent::recordAdd();
+    }
+    // }}}
 }

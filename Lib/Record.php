@@ -9,12 +9,12 @@ class Record extends Entry
     protected $end;
     // }}}
     // {{{ constructor
-    public function __construct($id = null, $activity = null, $category = null, $tags = [], $text = null, \Datetime $start, $end = null)
+    public function __construct($id = null, $activity = null, $category = null, $tags = [], $text = null, $start = null, $end = null)
     {
         parent::__construct($id, $activity, $category, $tags, $text);
 
-        $this->start = $start;
-        $this->end = $end;
+        $this->setStart($start);
+        $this->setEnd($end);
     }
     // }}}
 
@@ -38,9 +38,15 @@ class Record extends Entry
     // }}}
 
     // {{{ setStart
-    public function setStart(\Datetime $start)
+    public function setStart($start)
     {
-        $this->start = $start;
+        if (is_null($start)) {
+            $this->start = new \Datetime();
+        } else {
+            $this->start = $start;
+        }
+
+        return $this->start;
     }
     // }}}
     // {{{ setEnd
@@ -50,6 +56,12 @@ class Record extends Entry
     }
     // }}}
 
+    // {{{ isRunning
+    public function isRunning()
+    {
+        return (!$this->end);
+    }
+    // }}}
     // {{{ format
     public function format()
     {

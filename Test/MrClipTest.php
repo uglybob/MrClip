@@ -91,6 +91,14 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
         $this->assertSame('', $this->mrClip->echoed);
     }
     // }}}
+    // {{{ testSuggestPrefix
+    public function testSuggestPrefix()
+    {
+        $candidates = ['test', 'test2', 'anotherTest', 'oneMoreTest'];
+        $this->mrClip->suggest('', $candidates, 'testPrefix');
+        $this->assertSame('testPrefixtest testPrefixtest2 testPrefixanotherTest testPrefixoneMoreTest', $this->mrClip->echoed);
+    }
+    // }}}
 
     // {{{ testEmpty
     public function testEmpty()
@@ -244,6 +252,14 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
     {
         $this->comp('todo list ');
         $this->assertSame('activity1@category1 activity1@category2 activity2@category1 activity2@category2 @category1 @category2', $this->mrClip->echoed);
+    }
+    // }}}
+
+    // {{{ testRecordAdd
+    public function testRecordAdd()
+    {
+        $this->mrClip->recordAdd();
+        $this->assertSame('', $this->mrClip->echoed);
     }
     // }}}
 }

@@ -38,6 +38,14 @@ class RecordTest extends EntryTest
         $this->assertSame($start, $this->object->start);
     }
     // }}}
+    // {{{ testSetStartNull
+    public function testSetStartNull()
+    {
+        $this->object->setStart(null);
+
+        $this->assertSame(date('Y-m-d H:i'), $this->object->start->format('Y-m-d H:i'));
+    }
+    // }}}
     // {{{ testSetEnd
     public function testSetEnd()
     {
