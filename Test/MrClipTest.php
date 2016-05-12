@@ -255,11 +255,11 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
     }
     // }}}
 
-    // {{{ testRecordAdd
-    public function testRecordAdd()
+    // {{{ testRecordAddEmpty
+    public function testRecordAddEmpty()
     {
         $this->mrClip->recordAdd();
-        $this->assertSame('', $this->mrClip->echoed);
+        $this->assertSame("Activity missing\n", $this->mrClip->echoed);
     }
     // }}}
 }

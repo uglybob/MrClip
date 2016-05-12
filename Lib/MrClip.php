@@ -143,22 +143,28 @@ class MrClip
         $tags = $parser->parseTags();
         $text = $parser->parseText();
 
-        $record = new Record(
-            null,
-            $activity,
-            $category,
-            $tags,
-            $text,
-            $start,
-            $end
-        );
-
-        $result = $this->prm->saveRecord($record);
-
-        if ($result) {
-            $this->outputNl('(added) ' . $result->format());
+        if (empty(trim($activity))) {
+            $this->outputNl('Activity missing');
+        } else if (empty(trim($category))) {
+            $this->outputNl('Category missing');
         } else {
-            $this->outputNl('Failed to add record');
+            $record = new Record(
+                null,
+                $activity,
+                $category,
+                $tags,
+                $text,
+                $start,
+                $end
+            );
+
+            $result = $this->prm->saveRecord($record);
+
+            if ($result) {
+                $this->outputNl('(added) ' . $result->format());
+            } else {
+                $this->outputNl('Failed to add record');
+            }
         }
     }
     // }}}
