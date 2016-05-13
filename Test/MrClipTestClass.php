@@ -46,4 +46,11 @@ class MrClipTestClass extends MrClip
         return parent::recordAdd();
     }
     // }}}
+
+    // {{{ getFilteredTodos
+    public function getFilteredTodos()
+    {
+        return parent::getFilteredTodos();
+    }
+    // }}}
 }

@@ -16,10 +16,23 @@ class ApiMock
         $this->records[2] = $this->createRecord(2, 'activity2', 'category1', ['tag2'],          'someMemo', strtotime('2015-10-21 17:00'), strtotime('2015-10-21 18:00'));
         $this->records[3] = $this->createRecord(3, 'activity1', 'category2', [],                null,       strtotime('2015-10-21 19:00'), strtotime('2015-10-21 20:00'));
         $this->records[4] = $this->createRecord(4, 'activity2', 'category1', ['tag2'],          null,       strtotime('2015-10-21 21:00'), strtotime('2015-10-21 22:00'));
+
+        $this->todos = [];
+
+        $this->todos[1]     = $this->createTodo(1,  'activity1', 'category1', ['tag1', 'tag2'],         'parent1',      null,   false);
+        $this->todos[2]     = $this->createTodo(2,  'activity1', 'category1', ['tag1', 'tag2'],         'child1',       1,      false);
+        $this->todos[3]     = $this->createTodo(3,  'activity1', 'category1', ['tag1', 'tag2'],         'child2',       1,      false);
+        $this->todos[4]     = $this->createTodo(4,  'activity1', 'category1', ['tag1', 'tag2'],         'subchild1',    2,      false);
+        $this->todos[5]     = $this->createTodo(5,  'activity1', 'category1', ['tag1', 'tag2', 'tag3'], 'extra tag',    1,      false);
+        $this->todos[6]     = $this->createTodo(6,  'activity1', 'category1', ['tag1', 'tag2'],         'parent2',      null,   false);
+        $this->todos[7]     = $this->createTodo(7,  'activity1', 'category1', ['tag1', 'tag2'],         'child3',       6,      false);
+        $this->todos[8]     = $this->createTodo(8,  'activity1', 'category1', ['tag1', 'tag2'],         'done',         6,      true);
+        $this->todos[9]     = $this->createTodo(9,  'activity2', 'category1', ['tag2'],                 'other tags',   null,   false);
+        $this->todos[10]    = $this->createTodo(10, 'activity2', 'category1', ['tag2'],                 'other tags',   9,      false);
     }
     // }}}
     // {{{ createRecord
-    public function createRecord($id, $activity, $category, $tags, $text, $start, $end)
+    protected function createRecord($id, $activity, $category, $tags, $text, $start, $end)
     {
         $array = [
             'id' => $id,
@@ -29,6 +42,22 @@ class ApiMock
             'text' => $text,
             'start' => $start,
             'end' => $end,
+        ];
+
+        return (object) $array;
+    }
+    // }}}
+    // {{{ createTodo
+    protected function createTodo($id, $activity, $category, $tags, $text, $parent, $done)
+    {
+        $array = [
+            'id' => $id,
+            'activity' => $activity,
+            'category' => $category,
+            'tags' => $tags,
+            'text' => $text,
+            'parentId' => $parent,
+            'done' => $done,
         ];
 
         return (object) $array;
@@ -46,6 +75,12 @@ class ApiMock
             }
         }
 
+        foreach($this->todos as $todo) {
+            if (!in_array($todo->activity, $activities)) {
+                $activities[] = $todo->activity;
+            }
+        }
+
         return $activities;
     }
     // }}}
@@ -60,6 +95,12 @@ class ApiMock
             }
         }
 
+        foreach($this->todos as $todo) {
+            if (!in_array($todo->category, $categories)) {
+                $categories[] = $todo->category;
+            }
+        }
+
         return $categories;
     }
     // }}}
@@ -70,6 +111,14 @@ class ApiMock
 
         foreach($this->records as $record) {
             foreach($record->tags as $tag) {
+                if (!in_array($tag, $tags)) {
+                    $tags[] = $tag;
+                }
+            }
+        }
+
+        foreach($this->todos as $todo) {
+            foreach($todo->tags as $tag) {
                 if (!in_array($tag, $tags)) {
                     $tags[] = $tag;
                 }
@@ -109,6 +158,25 @@ class ApiMock
         $this->records[$record->id] = $record;
 
         return $record;
+    }
+    // }}}
+
+    // {{{ getTodos
+    public function getTodos($activity, $category, $tags)
+    {
+        $filtered = [];
+
+        foreach ($this->todos as $todo) {
+            if (
+                $todo->activity == $activity
+                && $todo->category == $category
+                && empty(array_diff($tags, $todo->tags))
+            ) {
+                $filtered[$todo->id] = $todo;
+            }
+        }
+
+        return $filtered;
     }
     // }}}
 }

@@ -195,21 +195,21 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
     public function testCompletionRecordAddTimeActivityAtCategory_()
     {
         $this->comp('record add 22:00 activity1@category1 ');
-        $this->assertSame('+tag1 +tag2', $this->mrClip->echoed);
+        $this->assertSame('+tag1 +tag2 +tag3', $this->mrClip->echoed);
     }
     // }}}
     // {{{ testCompletionRecordAddTimeActivityAtCategoryT
     public function testCompletionRecordAddTimeActivityAtCategoryT()
     {
         $this->comp('record add 22:00 activity1@category1 +');
-        $this->assertSame('+tag1 +tag2', $this->mrClip->echoed);
+        $this->assertSame('+tag1 +tag2 +tag3', $this->mrClip->echoed);
     }
     // }}}
     // {{{ testCompletionRecordAddTimeActivityAtCategoryT2
     public function testCompletionRecordAddTimeActivityAtCategoryT2()
     {
         $this->comp('record add 22:00 activity1@category1 +t');
-        $this->assertSame('+tag1 +tag2', $this->mrClip->echoed);
+        $this->assertSame('+tag1 +tag2 +tag3', $this->mrClip->echoed);
     }
     // }}}
     // {{{ testCompletionRecordAddTimeActivityAtCategoryTag
@@ -223,7 +223,7 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
     public function testCompletionRecordAddTimeActivityAtCategoryTag_()
     {
         $this->comp('record add 22:00 activity1@category1 +tag1 ');
-        $this->assertSame('+tag2', $this->mrClip->echoed);
+        $this->assertSame('+tag2 +tag3', $this->mrClip->echoed);
     }
     // }}}
     // {{{ testCompletionTodo_
@@ -314,6 +314,47 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
         $this->mrClip->parser = new ParserTestClass(explode(' ', $options));
         $this->mrClip->recordAdd();
         $this->assertSame("(added) $now - $now testActivity@testCategory +testTag1 +testTag2\n", $this->mrClip->echoed);
+    }
+    // }}}
+
+    // {{{ testGetFilteredTodos
+    public function testGetFilteredTodos()
+    {
+        $options = 'activity1@category1 +tag3';
+        $this->mrClip->parser = new ParserTestClass(explode(' ', $options));
+
+        $todos = $this->mrClip->getFilteredTodos();
+        $this->assertSame(1, count($todos));
+
+        $todos->rewind();
+        $todo = $todos->current();
+        $this->assertSame(5, $todo->getId());
+        $this->assertSame('activity1', $todo->getActivity());
+        $this->assertSame('category1', $todo->getCategory());
+        $this->assertSame(['tag1', 'tag2', 'tag3'], $todo->getTags());
+        $this->assertSame('extra tag', $todo->getText());
+        $this->assertSame(1, $todo->getParentId());
+        $this->assertFalse($todo->isDone());
+    }
+    // }}}
+    // {{{ testGetFilteredTodosMultiple
+    public function testGetFilteredTodosMultiple()
+    {
+        $options = 'activity1@category1 +tag1';
+
+        $this->mrClip->parser = new ParserTestClass(explode(' ', $options));
+
+        $this->assertSame(8, count($this->mrClip->getFilteredTodos()));
+    }
+    // }}}
+    // {{{ testGetFilteredTodosEmpty
+    public function testGetFilteredTodosEmpty()
+    {
+        $options = 'unknown@unknown +unknown';
+        $this->mrClip->parser = new ParserTestClass(explode(' ', $options));
+
+        $todos = $this->mrClip->getFilteredTodos();
+        $this->assertSame(0, count($todos));
     }
     // }}}
 }
