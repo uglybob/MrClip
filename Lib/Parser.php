@@ -213,13 +213,13 @@ class Parser
             if ($current == $checkedString) {
                 $done = true;
                 $this->advance();
-            }
+            } else {
+                preg_match("/^$checkedString/", $current, $matches);
 
-            preg_match("/^$checkedString/", $current, $matches);
-
-            if (isset($matches[0])) {
-                $done = true;
-                $this->options[$this->position] = substr($current, count($checkedString));
+                if (isset($matches[0])) {
+                    $done = true;
+                    $this->options[$this->position] = substr($current, count($checkedString));
+                }
             }
         }
 
