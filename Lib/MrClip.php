@@ -465,27 +465,34 @@ class MrClip
 
         foreach ($sorted as $actigory => $todos) {
             $list .= trim($actigory . ' ' . Todo::formatTags($tagFilter)) . "\n\n";
-            $undone = [];
+            $open = [];
+            $done = [];
 
             foreach ($todos as $todo) {
                 if ($todo->isDone()) {
-                    $list .= $todo->formatTagsText($tagFilter) . "\n";
+                    $done[] = $todo;
                 } else {
-                    $undone[] = $todo;
+                    $open[] = $todo;
                 }
             }
 
-            if (count($todos) > count($undone)) {
-                $list .= "\n";
-            }
-
-            foreach ($undone as $todo) {
+            foreach ($open as $todo) {
                 if (is_null($todo->getParent())) {
                     $list .= $this->todoTree($todo, $tagFilter, 0);
                 }
             }
 
-            $list .= "\n";
+            if (!empty($open)) {
+                $list .= "\n";
+            }
+
+            foreach ($done as $todo) {
+                $list .= $todo->formatTagsText($tagFilter) . "\n";
+            }
+
+            if (!empty($done)) {
+                $list .= "\n";
+            }
         }
 
         return $list;
