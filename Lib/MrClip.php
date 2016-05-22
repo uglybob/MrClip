@@ -313,6 +313,8 @@ class MrClip
         $lastHeader = null;
         $parents = [null];
         $last = null;
+        $activity = $this->parser->getActivity();
+        $category = $this->parser->getCategory();
 
         foreach ($list as $todoString) {
             $header = $this->stringToHeader($todoString);
