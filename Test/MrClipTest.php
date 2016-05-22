@@ -3,6 +3,7 @@
 namespace Uglybob\MrClip\Test;
 
 use Uglybob\MrClip\Lib\Parser;
+use Uglybob\MrClip\Lib\Todo;
 
 class MrClipTest extends \PhpUnit_Framework_TestCase
 {
@@ -355,6 +356,34 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
 
         $todos = $this->mrClip->getFilteredTodos();
         $this->assertSame(0, count($todos));
+    }
+    // }}}
+
+    // {{{ testMatchTodos
+    public function testMatchTodos()
+    {
+        $todos = $this->mrClip->prm->getTodos();
+
+        $candidates = new \SplObjectStorage();
+        $above = new \SplObjectStorage();
+        $under = new \SplObjectStorage();
+        $threshold = 70;
+
+        $candidate1 = new Todo(null, 'activity1', 'category1', ['tag1', 'tag2'], 'text', null, false);
+        $candidate2 = new Todo(null, 'activity1', 'category1', ['tag1', 'tag2'], 'text2', $candidate1, false);
+        $candidate3 = new Todo(null, 'noActivity', 'noCategory', [], 'idontknow', $candidate1, false);
+
+        $candidates->attach($candidate1);
+        $candidates->attach($candidate2);
+        $candidates->attach($candidate3);
+
+        $rest = $this->mrClip->matchTodos($todos, $candidates, $above, $under, $threshold);
+
+        $this->assertSame(1, $rest->count());
+        $this->assertSame(2, $above->count());
+        $this->assertSame(8, $under->count());
+
+        $this->assertTrue($rest->contains($candidate3));
     }
     // }}}
 }

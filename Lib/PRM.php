@@ -72,7 +72,7 @@ class PRM
     }
     // }}}
     // {{{ getTodos
-    public function getTodos($activity, $category, $tags)
+    public function getTodos($activity = null, $category = null, $tags = [])
     {
         $objArray = $this->getConnection()->getTodos($activity, $category, $tags);
         $todos = new \SplObjectStorage();

@@ -162,15 +162,15 @@ class ApiMock
     // }}}
 
     // {{{ getTodos
-    public function getTodos($activity, $category, $tags)
+    public function getTodos($activity = null, $category = null, $tags = [])
     {
         $filtered = [];
 
         foreach ($this->todos as $todo) {
             if (
-                $todo->activity == $activity
-                && $todo->category == $category
-                && empty(array_diff($tags, $todo->tags))
+                (is_null($activity) || $todo->activity == $activity)
+                && (is_null($category) || $todo->category == $category)
+                && (empty($tags) || empty(array_diff($tags, $todo->tags)))
             ) {
                 $filtered[$todo->id] = $todo;
             }
