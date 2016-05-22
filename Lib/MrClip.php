@@ -482,7 +482,7 @@ class MrClip
 
             foreach ($open as $todo) {
                 if (is_null($todo->getParent())) {
-                    $list[] = $this->todoTree($todo, $tagFilter, 0);
+                    $list = array_merge($list, $this->todoTree($todo, $tagFilter, 0));
                 }
             }
 
@@ -497,24 +497,23 @@ class MrClip
             $list[] = '';
         }
 
-        array_pop($list);
         return implode("\n", $list);
     }
     // }}}
     // {{{ todoTree
     protected function todoTree($todo, $tagFilter, $level)
     {
-        $string = '';
+        $list = [];
 
         if (!$todo->isDone()) {
-            $string = str_repeat('    ', $level) . $todo->formatTagsText($tagFilter) . "\n";
+            $list[] = str_repeat('    ', $level) . $todo->formatTagsText($tagFilter);
 
             foreach ($todo->getChildren() as $child) {
-                $string .= $this->todoTree($child, $tagFilter, $level + 1);
+                $list = array_merge($list, $this->todoTree($child, $tagFilter, $level + 1));
             }
         }
 
-        return $string;
+        return $list;
     }
     // }}}
 
