@@ -457,14 +457,14 @@ class MrClip
     {
         $tagFilter = $this->parser->getTags();
         $sorted = [];
-        $list = '';
+        $list = [];
 
         foreach ($todos as $todo) {
             $sorted[$todo->getActigory()][] = $todo;
         }
 
         foreach ($sorted as $actigory => $todos) {
-            $list .= trim($actigory . ' ' . Todo::formatTags($tagFilter)) . "\n\n";
+            $list[] = trim($actigory . ' ' . Todo::formatTags($tagFilter));
             $open = [];
             $done = [];
 
@@ -476,26 +476,29 @@ class MrClip
                 }
             }
 
+            if (!empty($open)) {
+                $list[] = '';
+            }
+
             foreach ($open as $todo) {
                 if (is_null($todo->getParent())) {
-                    $list .= $this->todoTree($todo, $tagFilter, 0);
+                    $list[] = $this->todoTree($todo, $tagFilter, 0);
                 }
             }
 
-            if (!empty($open)) {
-                $list .= "\n";
+            if (!empty($done)) {
+                $list[] = '';
             }
 
             foreach ($done as $todo) {
-                $list .= $todo->formatTagsText($tagFilter) . "\n";
+                $list[] = $todo->formatTagsText($tagFilter);
             }
 
-            if (!empty($done)) {
-                $list .= "\n";
-            }
+            $list[] = '';
         }
 
-        return $list;
+        array_pop($list);
+        return implode("\n", $list);
     }
     // }}}
     // {{{ todoTree
