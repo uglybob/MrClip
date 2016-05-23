@@ -500,6 +500,50 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
         $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2]));
     }
     // }}}
+    // {{{ testFormatTodosTagFilter
+    public function testFormatTodosTagFilter()
+    {
+        $this->mrClip->parser = new ParserTestClass(explode(' ', '+testTag1'));
+        $this->mrClip->parser->parseTags();
+
+        $todo1 = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, false);
+        $todo2 = new Todo(2, 'testActivity', 'testCategory', ['testTag1', 'testTag3'], 'testText2', null, false);
+        $todo3 = new Todo(3, 'testActivity', 'testCategory', ['testTag1'], 'testText3', null, false);
+
+        $expected = "testActivity@testCategory +testTag1\n\n" .
+        "+testTag2 testText\n" .
+        "+testTag3 testText2\n" .
+        "testText3\n";
+
+        $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2, $todo3]));
+    }
+    // }}}
+    // {{{ testFormatTodosDone
+    public function testFormatTodosDone()
+    {
+        $todo = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, true);
+
+        $expected = "testActivity@testCategory\n\n" .
+        "# +testTag1 +testTag2 testText\n";
+
+        $this->assertSame($expected, $this->mrClip->formatTodos([$todo]));
+    }
+    // }}}
+    // {{{ testFormatTodosDoneMixed
+    public function testFormatTodosDoneMixed()
+    {
+        $todo1 = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText1', null, true);
+        $todo2 = new Todo(2, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText2', null, false);
+
+        $expected = "testActivity@testCategory\n" .
+        "\n" .
+        "+testTag1 +testTag2 testText2\n" .
+        "\n" .
+        "# +testTag1 +testTag2 testText1\n";
+
+        $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2]));
+    }
+    // }}}
 
     // {{{ testMatchTodos
     public function testMatchTodos()
