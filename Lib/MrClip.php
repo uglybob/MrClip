@@ -450,6 +450,10 @@ class MrClip
             }
 
             $result = $this->prm->saveTodo($todo);
+
+            foreach($todo->getChildren() as $child) {
+                $child->setParent($result);
+            }
         }
     }
     // }}}
