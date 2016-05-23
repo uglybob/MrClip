@@ -545,6 +545,177 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
     }
     // }}}
 
+    // {{{ testParseTodoList
+    public function testParseTodoList()
+    {
+        $list = ['testActivity@testCategory',
+        '',
+        'testText',
+        ];
+
+        $todos = $this->mrClip->parseTodoList($list);
+        $this->assertSame(1, count($todos));
+
+        $todos->rewind();
+        $todo = $todos->current();
+
+        $this->assertFalse($todo->isDone());
+        $this->assertNull($todo->getParent());
+        $this->assertSame('testActivity', $todo->getActivity());
+        $this->assertSame('testCategory', $todo->getCategory());
+        $this->assertSame('testText', $todo->getText());
+        $this->assertSame([], $todo->getTags());
+    }
+    // }}}
+    // {{{ testParseTodoListTwo
+    public function testParseTodoListTwo()
+    {
+        $list = ['testActivity@testCategory',
+        '',
+        'testText1',
+        'testText2',
+        ];
+
+        $todos = $this->mrClip->parseTodoList($list);
+        $this->assertSame(2, count($todos));
+
+        $todos->rewind();
+        $todo1 = $todos->current();
+        $todos->next();
+        $todo2 = $todos->current();
+
+        $this->assertFalse($todo1->isDone());
+        $this->assertNull($todo1->getParent());
+        $this->assertSame('testActivity', $todo1->getActivity());
+        $this->assertSame('testCategory', $todo1->getCategory());
+        $this->assertSame('testText1', $todo1->getText());
+        $this->assertSame([], $todo1->getTags());
+
+        $this->assertFalse($todo2->isDone());
+        $this->assertNull($todo2->getParent());
+        $this->assertSame('testActivity', $todo2->getActivity());
+        $this->assertSame('testCategory', $todo2->getCategory());
+        $this->assertSame('testText2', $todo2->getText());
+        $this->assertSame([], $todo2->getTags());
+    }
+    // }}}
+    // {{{ testParseTodoListChild
+    public function testParseTodoListChild()
+    {
+        $list = ['testActivity@testCategory',
+        '',
+        'testText1',
+        '    testText2',
+        ];
+
+        $todos = $this->mrClip->parseTodoList($list);
+        $this->assertSame(2, count($todos));
+
+        $todos->rewind();
+        $todo1 = $todos->current();
+        $todos->next();
+        $todo2 = $todos->current();
+
+        $this->assertFalse($todo1->isDone());
+        $this->assertNull($todo1->getParent());
+        $this->assertSame('testActivity', $todo1->getActivity());
+        $this->assertSame('testCategory', $todo1->getCategory());
+        $this->assertSame('testText1', $todo1->getText());
+        $this->assertSame([], $todo1->getTags());
+
+        $this->assertFalse($todo2->isDone());
+        $this->assertSame($todo1, $todo2->getParent());
+        $this->assertSame('testActivity', $todo2->getActivity());
+        $this->assertSame('testCategory', $todo2->getCategory());
+        $this->assertSame('testText2', $todo2->getText());
+        $this->assertSame([], $todo2->getTags());
+    }
+    // }}}
+    // {{{ testParseTodoListChildren
+    public function testParseTodoListChildren()
+    {
+        $list = ['testActivity@testCategory',
+        '',
+        'testText1',
+        '    testText2',
+        '    testText3',
+        ];
+
+        $todos = $this->mrClip->parseTodoList($list);
+        $this->assertSame(3, count($todos));
+
+        $todos->rewind();
+        $todo1 = $todos->current();
+        $todos->next();
+        $todo2 = $todos->current();
+        $todos->next();
+        $todo3 = $todos->current();
+
+        $this->assertFalse($todo1->isDone());
+        $this->assertNull($todo1->getParent());
+        $this->assertSame('testActivity', $todo1->getActivity());
+        $this->assertSame('testCategory', $todo1->getCategory());
+        $this->assertSame('testText1', $todo1->getText());
+        $this->assertSame([], $todo1->getTags());
+
+        $this->assertFalse($todo2->isDone());
+        $this->assertSame($todo1, $todo2->getParent());
+        $this->assertSame('testActivity', $todo2->getActivity());
+        $this->assertSame('testCategory', $todo2->getCategory());
+        $this->assertSame('testText2', $todo2->getText());
+        $this->assertSame([], $todo2->getTags());
+
+        $this->assertFalse($todo3->isDone());
+        $this->assertSame($todo1, $todo3->getParent());
+        $this->assertSame('testActivity', $todo3->getActivity());
+        $this->assertSame('testCategory', $todo3->getCategory());
+        $this->assertSame('testText3', $todo3->getText());
+        $this->assertSame([], $todo3->getTags());
+    }
+    // }}}
+    // {{{ testParseTodoListChildChild
+    public function testParseTodoListChildChild()
+    {
+        $list = ['testActivity@testCategory',
+        '',
+        'testText1',
+        '    testText2',
+        '        testText3',
+        ];
+
+        $todos = $this->mrClip->parseTodoList($list);
+        $this->assertSame(3, count($todos));
+
+        $todos->rewind();
+        $todo1 = $todos->current();
+        $todos->next();
+        $todo2 = $todos->current();
+        $todos->next();
+        $todo3 = $todos->current();
+
+        $this->assertFalse($todo1->isDone());
+        $this->assertNull($todo1->getParent());
+        $this->assertSame('testActivity', $todo1->getActivity());
+        $this->assertSame('testCategory', $todo1->getCategory());
+        $this->assertSame('testText1', $todo1->getText());
+        $this->assertSame([], $todo1->getTags());
+
+        $this->assertFalse($todo2->isDone());
+        $this->assertSame($todo1, $todo2->getParent());
+        $this->assertSame('testActivity', $todo2->getActivity());
+        $this->assertSame('testCategory', $todo2->getCategory());
+        $this->assertSame('testText2', $todo2->getText());
+        $this->assertSame([], $todo2->getTags());
+
+        $this->assertFalse($todo3->isDone());
+        $this->assertSame($todo2, $todo3->getParent());
+        $this->assertSame('testActivity', $todo3->getActivity());
+        $this->assertSame('testCategory', $todo3->getCategory());
+        $this->assertSame('testText3', $todo3->getText());
+        $this->assertSame([], $todo3->getTags());
+    }
+    // }}}
+
     // {{{ testMatchTodos
     public function testMatchTodos()
     {

@@ -53,6 +53,12 @@ class MrClipTestClass extends MrClip
         return parent::formatTodos($todos);
     }
     // }}}
+    // {{{ parseTodoList
+    public function parseTodoList($list)
+    {
+        return parent::parseTodoList($list);
+    }
+    // }}}
     // {{{ getFilteredTodos
     public function getFilteredTodos()
     {
