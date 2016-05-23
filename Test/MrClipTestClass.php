@@ -47,6 +47,12 @@ class MrClipTestClass extends MrClip
     }
     // }}}
 
+    // {{{ formatTodos
+    public function formatTodos($todos)
+    {
+        return parent::formatTodos($todos);
+    }
+    // }}}
     // {{{ getFilteredTodos
     public function getFilteredTodos()
     {

@@ -359,6 +359,65 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
     }
     // }}}
 
+    // {{{ testFormatTodos
+    public function testFormatTodos()
+    {
+        $todo = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, false);
+
+        $expected = "testActivity@testCategory\n\n" . 
+        "+testTag1 +testTag2 testText\n";
+
+        $this->assertSame($expected, $this->mrClip->formatTodos([$todo]));
+    }
+    // }}}
+    // {{{ testFormatTodosTwo
+    public function testFormatTodosTwo()
+    {
+        $todo1 = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, false);
+        $todo2 = new Todo(2, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText2', null, false);
+
+        $expected = "testActivity@testCategory\n\n" . 
+        "+testTag1 +testTag2 testText\n" .
+        "+testTag1 +testTag2 testText2\n";
+
+        $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2]));
+    }
+    // }}}
+    // {{{ testFormatTodosChild
+    public function testFormatTodosChild()
+    {
+        $todo1 = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, false);
+        $todo2 = new Todo(2, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText2', $todo1, false);
+
+        $expected = "testActivity@testCategory\n\n" . 
+        "+testTag1 +testTag2 testText\n" .
+        "    +testTag1 +testTag2 testText2\n";
+
+        $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2]));
+    }
+    // }}}
+    // {{{ testFormatTodosChildren
+    public function testFormatTodosChildren()
+    {
+        $todo1 = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, false);
+        $todo2 = new Todo(2, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText2', $todo1, false);
+        $todo3 = new Todo(3, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText3', $todo1, false);
+
+        $expected = "testActivity@testCategory\n\n" . 
+        "+testTag1 +testTag2 testText\n" .
+        "    +testTag1 +testTag2 testText2\n" .
+        "    +testTag1 +testTag2 testText3\n";
+
+        $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2, $todo3]));
+    }
+    // }}}
+    // {{{ testFormatTodosEmpty
+    public function testFormatTodosEmpty()
+    {
+        $this->assertSame('', $this->mrClip->formatTodos([]));
+    }
+    // }}}
+
     // {{{ testMatchTodos
     public function testMatchTodos()
     {
