@@ -22,13 +22,13 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
         $options = explode(' ', $string);
         array_unshift($options, 'completion');
 
-        if (substr($string, -1) == ' ') {
-            $options[] = "''";
-        } else {
-            end($options);
-            $key = key($options);
-            reset($options);
+        end($options);
+        $key = key($options);
+        reset($options);
 
+        if (substr($string, -1) == ' ') {
+            $options[$key] = "''";
+        } else {
             $options[] = "'" . $options[$key] . "'";
         }
 
