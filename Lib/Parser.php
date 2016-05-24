@@ -69,9 +69,9 @@ class Parser
     }
     // }}}
     // {{{ isLast
-    protected function isLast()
+    public function isLast()
     {
-        return (($this->position + 2) >= count($this->options));
+        return (($this->position + 1) >= count($this->options));
     }
     // }}}
     // {{{ advance
@@ -104,31 +104,25 @@ class Parser
     }
     // }}}
     // {{{ parseActigory
-    public function parseActigory($categoryOptional = false, $completion = false, $current = null)
+    public function parseActigory($categoryOptional = false)
     {
-        $result = false;
+        $regex = '[a-zA-Z1-9]*@[a-zA-Z0-9]';
 
-        if (!$completion || !$this->isLast() || empty($current)) {
-            $regex = '[a-zA-Z0-9]*@[a-zA-Z0-9]';
-
-            if ($categoryOptional) {
-                $regex .= '*';
-            } else {
-                $regex .= '+';
-            }
-
-            $actigory = $this->process($regex);
-
-            if ($actigory) {
-                $actigoryArray = explode('@', $actigory);
-                $this->activity = ($actigoryArray[0]) ? ($actigoryArray[0]) : null;
-                $this->category = ($actigoryArray[1]) ? ($actigoryArray[1]) : null;
-            }
-
-            $result = $actigory;
+        if ($categoryOptional) {
+            $regex .= '*';
+        } else {
+            $regex .= '+';
         }
 
-        return $result;
+        $actigory = $this->process($regex);
+
+        if ($actigory) {
+            $actigoryArray = explode('@', $actigory);
+            $this->activity = ($actigoryArray[0]) ? ($actigoryArray[0]) : null;
+            $this->category = ($actigoryArray[1]) ? ($actigoryArray[1]) : null;
+        }
+
+        return $actigory;
     }
     // }}}
     // {{{ parseTag
