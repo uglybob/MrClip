@@ -13,8 +13,8 @@ class PRM
     {
         if (!$this->connection) {
             $soapOptions = [
+                'uri' => Setup::get('url') . '/',
                 'location' => Setup::get('url') . '/soap.php',
-                'uri' => 'http://localhost/',
             ];
 
             $this->connection = new \SoapClient(null, $soapOptions);
