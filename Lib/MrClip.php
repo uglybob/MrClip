@@ -104,7 +104,7 @@ class MrClip
     // {{{ completionActigoryTags
     protected function completionActigoryTags($current, $filter = false)
     {
-        if ($this->parser->parseActigory($filter)) {
+        if ($this->parser->parseActigory($filter, true, $current)) {
             $this->parser->parseTags();
             $tags = array_diff($this->prm->getTags(), $this->parser->getTags());
             $this->suggest($current, $tags, '+');
@@ -117,10 +117,9 @@ class MrClip
     protected function suggest($hint, $candidates, $prefix = '')
     {
         $output = [];
+        $escapedHint = preg_quote($hint);
 
         foreach($candidates as $candidate) {
-            $escapedHint = preg_quote($hint);
-
             if (preg_match("/^$escapedHint/", $prefix . $candidate)) {
                 $output[] = $prefix . $candidate;
             }
