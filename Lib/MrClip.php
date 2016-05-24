@@ -104,14 +104,16 @@ class MrClip
     // {{{ completionActigoryTags
     protected function completionActigoryTags($current, $filter = false)
     {
+        $parser = $this->parser;
+
         if (
-            !$this->parser->parseActigory($filter)
-            || ($this->parser->isLast() && !empty($current))
+            !$parser->parseActigory($filter)
+            || ($parser->isLast() && !empty($current))
         ) {
             $this->suggest($current, $this->prm->getActigories());
         } else {
-            $this->parser->parseTags();
-            $tags = array_diff($this->prm->getTags(), $this->parser->getTags());
+            $parser->parseTags();
+            $tags = array_diff($this->prm->getTags(), $parser->getTags());
             $this->suggest($current, $tags, '+');
         }
     }
