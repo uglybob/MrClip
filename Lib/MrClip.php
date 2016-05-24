@@ -329,10 +329,11 @@ class MrClip
                 && $activity && $category
             ) {
                 $level = $this->parseLevel($todoString);
+
                 if (count($parents) < $level + 1) {
                     array_push($parents, $last);
                 } else if (count($parents) > $level + 1) {
-                    array_pop($parents);
+                    $parents = array_slice($parents, 0, $level + 1);
                 }
 
                 $todo = $this->stringToTodo($activity, $category, $parents[$level], $todoString);
