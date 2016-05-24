@@ -1,4 +1,4 @@
-_prmcomp() 
+_prmcomp()
 {
     local cur
 
@@ -6,7 +6,7 @@ _prmcomp()
     options=("${COMP_WORDS[@]:1}")
     __ltrim_colon_completions "$cur"
 
-    COMPREPLY=( $(./prm completion ${options[*]} "'"$cur"'" ))
+    COMPREPLY=( $(prm completion ${options[*]} "'"$cur"'" ))
 
     return 0
 }
