@@ -108,7 +108,7 @@ class Parser
     {
         $result = false;
 
-        if (!$completion || (!$this->isLast() || empty($current))) {
+        if (!$completion || !$this->isLast() || empty($current)) {
             $regex = '[a-zA-Z0-9]*@[a-zA-Z0-9]';
 
             if ($categoryOptional) {

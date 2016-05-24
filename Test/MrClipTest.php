@@ -29,7 +29,7 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
             $key = key($options);
             reset($options);
 
-            $options[$key] = "'" . $options[$key] . "'";
+            $options[] = "'" . $options[$key] . "'";
         }
 
         $this->mrClip->run($options);
@@ -125,7 +125,7 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
     public function testCompletionRecord()
     {
         $this->comp('record');
-        $this->assertSame('record', $this->mrClip->echoed);
+        $this->assertSame('', $this->mrClip->echoed);
     }
     // }}}
     // {{{ testCompletionRecord_
@@ -217,7 +217,7 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
     public function testCompletionRecordAddTimeActivityAtCategoryTag()
     {
         $this->comp('record add 22:00 activity1@category1 +tag1');
-        $this->assertSame('+tag1', $this->mrClip->echoed);
+        $this->assertSame('', $this->mrClip->echoed);
     }
     // }}}
     // {{{ testCompletionRecordAddTimeActivityAtCategoryTag_
@@ -245,7 +245,7 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
     public function testCompletionTodoList()
     {
         $this->comp('todo list');
-        $this->assertSame('list', $this->mrClip->echoed);
+        $this->assertSame('', $this->mrClip->echoed);
     }
     // }}}
     // {{{ testCompletionTodoList_
