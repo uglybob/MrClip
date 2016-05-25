@@ -138,6 +138,7 @@ class MrClip
     protected function recordAdd()
     {
         $parser = $this->parser;
+        $result = null;
 
         $start = $parser->parseStart();
         $end = $parser->parseEnd();
@@ -168,6 +169,8 @@ class MrClip
                 $this->outputNl('Failed to add record');
             }
         }
+
+        return $result;
     }
     // }}}
     // {{{ recordCurrent

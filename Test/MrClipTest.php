@@ -13,6 +13,7 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
         parent::setUp();
 
         $this->mrClip = new MrClipTestClass();
+        $this->dateFormat = 'Y-m-d H:i';
     }
     // }}}
 
@@ -259,62 +260,95 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
     // {{{ testRecordAddEmpty
     public function testRecordAddEmpty()
     {
-        $this->mrClip->recordAdd();
+        $record = $this->mrClip->recordAdd();
+
         $this->assertSame("Activity/category missing\n", $this->mrClip->echoed);
+        $this->assertNull($record);
     }
     // }}}
     // {{{ testRecordAdd
     public function testRecordAdd()
     {
         $options = 'testActivity@testCategory +testTag1 +testTag2 testText';
-        $now = date('Y-m-d H:i');
-
         $this->mrClip->parser = new ParserTestClass(explode(' ', $options));
-        $this->mrClip->recordAdd();
+
+        $now = date($this->dateFormat);
+
+        $record = $this->mrClip->recordAdd();
+
         $this->assertSame("(added) $now - $now testActivity@testCategory +testTag1 +testTag2 testText\n", $this->mrClip->echoed);
+
+        $this->assertSame(4, $record->getId());
+        $this->assertSame($now, $record->getStart()->format($this->dateFormat));
+        $this->assertSame($now, $record->getEnd()->format($this->dateFormat));
+        $this->assertSame('testActivity', $record->getActivity());
+        $this->assertSame('testCategory', $record->getCategory());
+        $this->assertSame(['testTag1', 'testTag2'], $record->getTags());
+        $this->assertSame('testText', $record->getText());
     }
     // }}}
     // {{{ testRecordAddNoActivity
     public function testRecordAddNoActivity()
     {
         $options = '@testCategory +testTag1 +testTag2 testText';
-
         $this->mrClip->parser = new ParserTestClass(explode(' ', $options));
-        $this->mrClip->recordAdd();
+
+        $record = $this->mrClip->recordAdd();
+
         $this->assertSame("Activity/category missing\n", $this->mrClip->echoed);
+        $this->assertNull($record);
     }
     // }}}
     // {{{ testRecordAddNoCategory
     public function testRecordAddNoCategory()
     {
         $options = 'testActivity@ +testTag1 +testTag2 testText';
-        $now = date('Y-m-d H:i');
-
         $this->mrClip->parser = new ParserTestClass(explode(' ', $options));
-        $this->mrClip->recordAdd();
+
+        $record = $this->mrClip->recordAdd();
+
         $this->assertSame("Activity/category missing\n", $this->mrClip->echoed);
+        $this->assertNull($record);
     }
     // }}}
     // {{{ testRecordAddNoTag
     public function testRecordAddNoTag()
     {
         $options = 'testActivity@testCategory testText';
-        $now = date('Y-m-d H:i');
-
+        $now = date($this->dateFormat);
         $this->mrClip->parser = new ParserTestClass(explode(' ', $options));
-        $this->mrClip->recordAdd();
+
+        $record = $this->mrClip->recordAdd();
+
         $this->assertSame("(added) $now - $now testActivity@testCategory testText\n", $this->mrClip->echoed);
+
+        $this->assertSame(4, $record->getId());
+        $this->assertSame($now, $record->getStart()->format($this->dateFormat));
+        $this->assertSame($now, $record->getEnd()->format($this->dateFormat));
+        $this->assertSame('testActivity', $record->getActivity());
+        $this->assertSame('testCategory', $record->getCategory());
+        $this->assertSame([], $record->getTags());
+        $this->assertSame('testText', $record->getText());
     }
     // }}}
     // {{{ testRecordAddNoText
     public function testRecordAddNoText()
     {
         $options = 'testActivity@testCategory +testTag1 +testTag2';
-        $now = date('Y-m-d H:i');
-
+        $now = date($this->dateFormat);
         $this->mrClip->parser = new ParserTestClass(explode(' ', $options));
-        $this->mrClip->recordAdd();
+
+        $record = $this->mrClip->recordAdd();
+
         $this->assertSame("(added) $now - $now testActivity@testCategory +testTag1 +testTag2\n", $this->mrClip->echoed);
+
+        $this->assertSame(4, $record->getId());
+        $this->assertSame($now, $record->getStart()->format($this->dateFormat));
+        $this->assertSame($now, $record->getEnd()->format($this->dateFormat));
+        $this->assertSame('testActivity', $record->getActivity());
+        $this->assertSame('testCategory', $record->getCategory());
+        $this->assertSame(['testTag1', 'testTag2'], $record->getTags());
+        $this->assertNull($record->getText());
     }
     // }}}
 
