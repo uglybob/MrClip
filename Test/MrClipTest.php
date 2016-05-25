@@ -841,6 +841,28 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
         $this->assertSame([], $todo6->getTags());
     }
     // }}}
+    // {{{ testParseTodoListDone
+    public function testParseTodoListDone()
+    {
+        $list = ['testActivity@testCategory',
+        '',
+        '# testText',
+        ];
+
+        $todos = $this->mrClip->parseTodoList($list);
+        $this->assertSame(1, count($todos));
+
+        $todos->rewind();
+        $todo = $todos->current();
+
+        $this->assertTrue($todo->isDone());
+        $this->assertNull($todo->getParent());
+        $this->assertSame('testActivity', $todo->getActivity());
+        $this->assertSame('testCategory', $todo->getCategory());
+        $this->assertSame('testText', $todo->getText());
+        $this->assertSame([], $todo->getTags());
+    }
+    // }}}
 
     // {{{ testMatchTodos
     public function testMatchTodos()
@@ -862,11 +884,34 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
 
         $rest = $this->mrClip->matchTodos($todos, $candidates, $above, $under, $threshold);
 
-        $this->assertSame(1, $rest->count());
+        $this->assertSame(8, $rest->count());
         $this->assertSame(2, $above->count());
-        $this->assertSame(8, $under->count());
+        $this->assertSame(1, $under->count());
 
-        $this->assertTrue($rest->contains($candidate3));
+        $this->assertTrue($under->contains($candidate3));
+    }
+    // }}}
+    // {{{ testMatchTodosDone
+    public function testMatchTodosDone()
+    {
+        $todos = $this->mrClip->prm->getTodos();
+
+        $candidates = new \SplObjectStorage();
+        $above = new \SplObjectStorage();
+        $under = new \SplObjectStorage();
+        $threshold = 80;
+
+        $candidate1 = new Todo(null, 'activity1', 'category1', ['tag1', 'tag2'], 'child2', null, true);
+        $candidates->attach($candidate1);
+
+        $rest = $this->mrClip->matchTodos($todos, $candidates, $above, $under, $threshold);
+
+        $this->assertSame(9, $rest->count());
+        $this->assertSame(1, $above->count());
+        $this->assertSame(0, $under->count());
+
+        $above->rewind();
+        $this->assertSame(3, $above->current()->getGuess()->getId());
     }
     // }}}
 }

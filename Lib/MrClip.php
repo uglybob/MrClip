@@ -426,7 +426,7 @@ class MrClip
     }
     // }}}
     // {{{ matchTodos
-    protected function matchTodos($todos, $candidates, $above, $under, $threshold)
+    protected function matchTodos($candidates, $todos, $above, $under, $threshold)
     {
         $rest = new \SplObjectStorage();
         $rest->addAll($candidates);
