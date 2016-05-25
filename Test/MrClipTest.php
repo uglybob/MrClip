@@ -276,15 +276,16 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
 
         $record = $this->mrClip->recordAdd();
 
-        $this->assertSame("(added) $now - $now testActivity@testCategory +testTag1 +testTag2 testText\n", $this->mrClip->echoed);
+        $this->assertSame("(added) $now testActivity@testCategory +testTag1 +testTag2 testText\n", $this->mrClip->echoed);
 
         $this->assertSame(4, $record->getId());
         $this->assertSame($now, $record->getStart()->format($this->dateFormat));
-        $this->assertSame($now, $record->getEnd()->format($this->dateFormat));
+        $this->assertNull($record->getEnd());
         $this->assertSame('testActivity', $record->getActivity());
         $this->assertSame('testCategory', $record->getCategory());
         $this->assertSame(['testTag1', 'testTag2'], $record->getTags());
         $this->assertSame('testText', $record->getText());
+        $this->assertTrue($record->isRunning());
     }
     // }}}
     // {{{ testRecordAddNoActivity
@@ -320,15 +321,16 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
 
         $record = $this->mrClip->recordAdd();
 
-        $this->assertSame("(added) $now - $now testActivity@testCategory testText\n", $this->mrClip->echoed);
+        $this->assertSame("(added) $now testActivity@testCategory testText\n", $this->mrClip->echoed);
 
         $this->assertSame(4, $record->getId());
         $this->assertSame($now, $record->getStart()->format($this->dateFormat));
-        $this->assertSame($now, $record->getEnd()->format($this->dateFormat));
+        $this->assertNull($record->getEnd());
         $this->assertSame('testActivity', $record->getActivity());
         $this->assertSame('testCategory', $record->getCategory());
         $this->assertSame([], $record->getTags());
         $this->assertSame('testText', $record->getText());
+        $this->assertTrue($record->isRunning());
     }
     // }}}
     // {{{ testRecordAddNoText
@@ -340,15 +342,16 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
 
         $record = $this->mrClip->recordAdd();
 
-        $this->assertSame("(added) $now - $now testActivity@testCategory +testTag1 +testTag2\n", $this->mrClip->echoed);
+        $this->assertSame("(added) $now testActivity@testCategory +testTag1 +testTag2\n", $this->mrClip->echoed);
 
         $this->assertSame(4, $record->getId());
         $this->assertSame($now, $record->getStart()->format($this->dateFormat));
-        $this->assertSame($now, $record->getEnd()->format($this->dateFormat));
+        $this->assertNull($record->getEnd());
         $this->assertSame('testActivity', $record->getActivity());
         $this->assertSame('testCategory', $record->getCategory());
         $this->assertSame(['testTag1', 'testTag2'], $record->getTags());
         $this->assertNull($record->getText());
+        $this->assertTrue($record->isRunning());
     }
     // }}}
 

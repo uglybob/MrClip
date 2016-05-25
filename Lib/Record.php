@@ -27,13 +27,7 @@ class Record extends Entry
     // {{{ getEnd
     public function getEnd()
     {
-        if (is_null($this->end)) {
-            $end = new \Datetime();
-        } else {
-            $end = $this->end;
-        }
-
-        return $end;
+        return $this->end;
     }
     // }}}
 
@@ -66,8 +60,12 @@ class Record extends Entry
     public function format()
     {
         $output[] = $this->getStart()->format('Y-m-d H:i');
-        $output[] = '-';
-        $output[] = $this->getEnd()->format('Y-m-d H:i');
+
+        if (!$this->isRunning()) {
+            $output[] = '-';
+            $output[] = $this->getEnd()->format('Y-m-d H:i');
+        }
+
         $output[] = parent::format();
 
         return implode(' ', $output);

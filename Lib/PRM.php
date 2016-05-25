@@ -122,7 +122,7 @@ class PRM
     // {{{ saveRecord
     public function saveRecord(Record $record)
     {
-        $end = ($record->isRunning()) ? $record->getEnd()->getTimestamp() : null;
+        $end = ($record->isRunning()) ? null : $record->getEnd()->getTimestamp();
 
         $result = $this->getConnection()->editRecord(
             $record->getId(),
