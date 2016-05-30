@@ -14,6 +14,8 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
 
         $this->mrClip = new MrClipTestClass();
         $this->dateFormat = 'Y-m-d H:i';
+        $this->prm = $this->mrClip->prm;
+        $this->api = $this->prm->connection;
     }
     // }}}
 
@@ -872,7 +874,7 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
         $candidates = new \SplObjectStorage();
         $above = new \SplObjectStorage();
         $under = new \SplObjectStorage();
-        $threshold = 70;
+        $threshold = 80;
 
         $candidate1 = new Todo(null, 'activity1', 'category1', ['tag1', 'tag2'], 'text', null, false);
         $candidate2 = new Todo(null, 'activity1', 'category1', ['tag1', 'tag2'], 'text2', $candidate1, false);

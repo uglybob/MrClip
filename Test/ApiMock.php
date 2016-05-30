@@ -6,6 +6,7 @@ class ApiMock
 {
     // {{{ variables
     public $records;
+    public $todos;
     // }}}
     // {{{ constructor
     public function __construct()
@@ -32,7 +33,7 @@ class ApiMock
     }
     // }}}
     // {{{ createRecord
-    protected function createRecord($id, $activity, $category, $tags, $text, $start, $end)
+    public function createRecord($id, $activity, $category, $tags, $text, $start, $end)
     {
         $array = [
             'id' => $id,
@@ -48,7 +49,7 @@ class ApiMock
     }
     // }}}
     // {{{ createTodo
-    protected function createTodo($id, $activity, $category, $tags, $text, $parent, $done)
+    public function createTodo($id, $activity, $category, $tags, $text, $parent, $done)
     {
         $array = [
             'id' => $id,

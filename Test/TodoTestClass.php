@@ -7,6 +7,11 @@ use Uglybob\MrClip\Lib\Todo;
 class TodoTestClass extends Todo
 {
     // {{{ variables
+    public $activity;
+    public $category;
+    public $tags;
+    public $text;
+
     public $parent;
     public $parentId;
     public $done;

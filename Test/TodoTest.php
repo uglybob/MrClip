@@ -153,6 +153,81 @@ class TodoTest extends EntryTest
 
     }
     // }}}
+    // {{{ testMatchSame
+    public function testMatchSame()
+    {
+        $this->todo1 = new TodoTestClass(null, 'testActivity', 'testCategory', ['testTag'], 'testText', null, false);
+        $this->todo2 = new TodoTestClass(null, 'testActivity', 'testCategory', ['testTag'], 'testText', null, false);
+
+        $this->assertSame(100, $this->todo1->match($this->todo2));
+        $this->assertSame(100, $this->todo1->confidence);
+        $this->assertSame($this->todo2, $this->todo1->guess);
+    }
+    // }}}
+    // {{{ testMatchEditActivity
+    public function testMatchEditActivity()
+    {
+        $this->todo1 = new TodoTestClass(null, 'testActivity', 'testCategory', ['testTag'], 'testText', null, false);
+        $this->todo2 = new TodoTestClass(null, 'testActivity2', 'testCategory', ['testTag'], 'testText', null, false);
+
+        $this->assertSame(90, $this->todo1->match($this->todo2));
+        $this->assertSame(90, $this->todo1->confidence);
+        $this->assertSame($this->todo2, $this->todo1->guess);
+    }
+    // }}}
+    // {{{ testMatchEditCategory
+    public function testMatchEditCategory()
+    {
+        $this->todo1 = new TodoTestClass(null, 'testActivity', 'testCategory', ['testTag'], 'testText', null, false);
+        $this->todo2 = new TodoTestClass(null, 'testActivity', 'testCategory2', ['testTag'], 'testText', null, false);
+
+        $this->assertSame(90, $this->todo1->match($this->todo2));
+        $this->assertSame(90, $this->todo1->confidence);
+        $this->assertSame($this->todo2, $this->todo1->guess);
+    }
+    // }}}
+    // {{{ testMatchEditTagsMinus1
+    public function testMatchEditTagsMinus1()
+    {
+        $this->todo1 = new TodoTestClass(null, 'testActivity', 'testCategory', ['testTag'], 'testText', null, false);
+        $this->todo2 = new TodoTestClass(null, 'testActivity', 'testCategory', [], 'testText', null, false);
+
+        $this->assertSame(90, $this->todo1->match($this->todo2));
+        $this->assertSame(90, $this->todo1->confidence);
+        $this->assertSame($this->todo2, $this->todo1->guess);
+    }
+    // }}}
+    // {{{ testMatchEditTagsPlus1
+    public function testMatchEditTagsPlus1()
+    {
+        $this->todo1 = new TodoTestClass(null, 'testActivity', 'testCategory', ['testTag'], 'testText', null, false);
+        $this->todo2 = new TodoTestClass(null, 'testActivity', 'testCategory', ['testTag', 'testTag2'], 'testText', null, false);
+
+        $this->assertSame(90, $this->todo1->match($this->todo2));
+        $this->assertSame(90, $this->todo1->confidence);
+        $this->assertSame($this->todo2, $this->todo1->guess);
+    }
+    // }}}
+    // {{{ testMatchEditTagsEdit
+    public function testMatchEditTagsEdit()
+    {
+        $this->todo1 = new TodoTestClass(null, 'testActivity', 'testCategory', ['testTag'], 'testText', null, false);
+        $this->todo2 = new TodoTestClass(null, 'testActivity', 'testCategory', ['testTag2'], 'testText', null, false);
+
+        $this->assertSame(80, $this->todo1->match($this->todo2));
+        $this->assertSame(80, $this->todo1->confidence);
+        $this->assertSame($this->todo2, $this->todo1->guess);
+    }
+    // }}}
+    // {{{ testMatchEditText
+    public function testMatchEditText()
+    {
+        $this->todo1 = new TodoTestClass(null, 'testActivity', 'testCategory', ['testTag'], 'testText', null, false);
+        $this->todo2 = new TodoTestClass(null, 'testActivity', 'testCategory', ['testTag'], 'testText2', null, false);
+
+        $this->assertTrue(100 > $this->todo1->match($this->todo2));
+    }
+    // }}}
 
     // {{{ testGetGuess
     public function testGetGuess()
