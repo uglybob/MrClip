@@ -267,8 +267,8 @@ class MrClip
         $new = new \SplObjectStorage();
         $moved = new \SplObjectStorage();
 
-        $rest = $this->matchTodos($newTodos, $todos, $exact, $unsure, 100);
-        $rest = $this->matchTodos($unsure, $rest, $guess, $new, 80);
+        $rest = $this->matchTodos($todos, $newTodos, $exact, $unsure, 100);
+        $rest = $this->matchTodos($rest, $unsure, $guess, $new, 80);
 
         foreach ($exact as $todo) {
             if (

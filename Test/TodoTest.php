@@ -143,8 +143,8 @@ class TodoTest extends EntryTest
     // {{{ testMatch
     public function testMatch()
     {
-        $this->assertSame(96, $this->object->match($this->parent));
-        $this->assertSame(96, $this->object->confidence);
+        $this->assertSame(86, $this->object->match($this->parent));
+        $this->assertSame(86, $this->object->confidence);
         $this->assertSame($this->parent, $this->object->guess);
 
         $this->assertSame(100, $this->object->match($this->object));
@@ -234,7 +234,7 @@ class TodoTest extends EntryTest
     {
         $this->assertNull($this->object->getGuess());
 
-        $this->assertSame(96, $this->object->match($this->parent));
+        $this->assertSame(86, $this->object->match($this->parent));
         $this->assertSame($this->parent, $this->object->getGuess());
     }
     // }}}
@@ -243,8 +243,8 @@ class TodoTest extends EntryTest
     {
         $this->assertNull($this->object->getConfidence());
 
-        $this->assertSame(96, $this->object->match($this->parent));
-        $this->assertSame(96, $this->object->getConfidence());
+        $this->assertSame(86, $this->object->match($this->parent));
+        $this->assertSame(86, $this->object->getConfidence());
     }
     // }}}
 }

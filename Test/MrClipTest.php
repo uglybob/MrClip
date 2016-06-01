@@ -886,11 +886,9 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
 
         $rest = $this->mrClip->matchTodos($todos, $candidates, $above, $under, $threshold);
 
-        $this->assertSame(8, $rest->count());
-        $this->assertSame(2, $above->count());
-        $this->assertSame(1, $under->count());
-
-        $this->assertTrue($under->contains($candidate3));
+        $this->assertSame(10, $rest->count());
+        $this->assertSame(0, $above->count());
+        $this->assertSame(3, $under->count());
     }
     // }}}
     // {{{ testMatchTodosDone
@@ -903,7 +901,7 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
         $under = new \SplObjectStorage();
         $threshold = 80;
 
-        $candidate1 = new Todo(null, 'activity1', 'category1', ['tag1', 'tag2'], 'child2', null, true);
+        $candidate1 = new Todo(null, 'activity1', 'category1', ['tag1', 'tag2'], 'parent2', null, true);
         $candidates->attach($candidate1);
 
         $rest = $this->mrClip->matchTodos($todos, $candidates, $above, $under, $threshold);
@@ -913,7 +911,72 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
         $this->assertSame(0, $under->count());
 
         $above->rewind();
-        $this->assertSame(3, $above->current()->getGuess()->getId());
+        $this->assertSame(6, $above->current()->getGuess()->getId());
+    }
+    // }}}
+    // {{{ testMatchTodosEdit
+    public function testMatchTodosEdit()
+    {
+        $this->api->todos = [$this->api->createTodo(1, 'programming', 'work', ['MrClip'], 'abcde ', null, false)];
+        $todos = $this->prm->getTodos();
+
+        $todos->rewind();
+
+        $newTodos = new \SplObjectStorage();
+        $exact = new \SplObjectStorage();
+        $unsure = new \SplObjectStorage();
+        $guess = new \SplObjectStorage();
+        $noMatch = new \SplObjectStorage();
+        $threshold = 100;
+
+        $newTodo = new Todo(null, 'programming', 'work', ['MrClip'], 'abcde', null, false);
+        $newTodos->attach($newTodo);
+
+        $rest = $this->mrClip->matchTodos($todos, $newTodos, $exact, $unsure, $threshold);
+
+        $this->assertSame(1, $rest->count());
+        $this->assertSame(0, $exact->count());
+        $this->assertSame(1, $unsure->count());
+
+        $threshold = 80;
+        $rest = $this->mrClip->matchTodos($rest, $unsure, $guess, $noMatch, $threshold);
+
+        $this->assertSame(0, $rest->count());
+        $this->assertSame(1, $guess->count());
+        $this->assertSame(0, $noMatch->count());
+    }
+    // }}}
+    // {{{ testMatchTodosEditLong
+    public function testMatchTodosEditLong()
+    {
+        $this->api->todos = [$this->api->createTodo(1, 'programming', 'work', ['MrClip'], '\'record add 14:25 administration@ \' should throw error', null, false)];
+
+        $todos = $this->prm->getTodos();
+
+        $todos->rewind();
+
+        $newTodos = new \SplObjectStorage();
+        $exact = new \SplObjectStorage();
+        $unsure = new \SplObjectStorage();
+        $guess = new \SplObjectStorage();
+        $noMatch = new \SplObjectStorage();
+        $threshold = 100;
+
+        $newTodo = new Todo(null, 'programming', 'work', ['MrClip'], '\'record add 14:25 administration@\' should throw error', null, false);
+        $newTodos->attach($newTodo);
+
+        $rest = $this->mrClip->matchTodos($todos, $newTodos, $exact, $unsure, $threshold);
+
+        $this->assertSame(1, $rest->count());
+        $this->assertSame(0, $exact->count());
+        $this->assertSame(1, $unsure->count());
+
+        $threshold = 80;
+        $rest = $this->mrClip->matchTodos($rest, $unsure, $guess, $noMatch, $threshold);
+
+        $this->assertSame(0, $rest->count());
+        $this->assertSame(1, $guess->count());
+        $this->assertSame(0, $noMatch->count());
     }
     // }}}
 }
