@@ -165,7 +165,7 @@ class Todo extends Entry
             $confidence = $max;
         } else {
             similar_text($textA, $textB, $percent);
-            $confidence = (int) round($percent * $max / 100);
+            $confidence = (int) ($percent * $max / 100);
         }
 
         return $confidence;
