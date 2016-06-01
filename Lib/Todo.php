@@ -105,23 +105,79 @@ class Todo extends Entry
     // {{{ match
     public function match(Todo $candidate)
     {
-        $confidence = 0;
-
-        if ($this->activity == $candidate->getActivity()) $confidence += 10;
-        if ($this->category == $candidate->getCategory()) $confidence += 10;
-
-        $diffs = count(array_diff($this->tags, $candidate->getTags())) + count(array_diff($candidate->getTags(), $this->tags));
-        $tagConfidence = 30 - 10 * $diffs;
-        if ($tagConfidence > 0) $confidence += $tagConfidence;
-
-        $textConfidence = 49 - abs(strcmp($this->text, $candidate->getText()));
-        $confidence += $textConfidence;
-
-        if ($this->isDone() == $candidate->isDone()) $confidence += 1;
+        $confidence = $this->activityConfidence($this->activity, $candidate->getActivity(), 10)
+            + $this->categoryConfidence($this->category, $candidate->getCategory(), 10)
+            + $this->tagsConfidence($this->tags, $candidate->getTags(), 30)
+            + $this->textConfidence($this->text, $candidate->getText(), 49)
+            + $this->doneConfidence($this->isDone(), $candidate->isDone(), 1);
 
         if ($confidence > $this->confidence) {
             $this->confidence = $confidence;
             $this->guess = $candidate;
+        }
+
+        return $confidence;
+    }
+    // }}}
+    // {{{ activityConfidence
+    protected function activityConfidence($activityA, $activityB, $max)
+    {
+        if ($activityA == $activityB) {
+            $confidence = $max;
+        } else {
+            $confidence = 0;
+        }
+
+        return $confidence;
+    }
+    // }}}
+    // {{{ categoryConfidence
+    protected function categoryConfidence($categoryA, $categoryB, $max)
+    {
+        if ($categoryA == $categoryB) {
+            $confidence = $max;
+        } else {
+            $confidence = 0;
+        }
+
+        return $confidence;
+    }
+    // }}}
+    // {{{ tagsConfidence
+    protected function tagsConfidence($tagsA, $tagsB, $max)
+    {
+        $count = count(array_diff($tagsA, $tagsB)) + count(array_diff($tagsB, $tagsA));
+        $diff = $max - 10 * $count;
+
+        if ($diff > 0) {
+            $confidence = $diff;
+        } else {
+            $confidence = 0;
+        }
+
+        return $confidence;
+    }
+    // }}}
+    // {{{ textConfidence
+    protected function textConfidence($textA, $textB, $max)
+    {
+        if (strcmp($textA, $textB) === 0) {
+            $confidence = $max;
+        } else {
+            similar_text($textA, $textB, $percent);
+            $confidence = $max - round($percent * $max / 100);
+        }
+
+        return $confidence;
+    }
+    // }}}
+    // {{{ doneConfidence
+    protected function doneConfidence($doneA, $doneB, $max)
+    {
+        if ($doneA === $doneB) {
+            $confidence = $max;
+        } else {
+            $confidence = 0;
         }
 
         return $confidence;
