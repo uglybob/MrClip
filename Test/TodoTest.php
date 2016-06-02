@@ -236,10 +236,45 @@ class TodoTest extends EntryTest
         $this->assertSame(100, $this->todo->activityConfidence('testActivity', 'testActivity', 100));
         $this->assertSame(0, $this->todo->activityConfidence('testActivity', 'testActivity2', 100));
         $this->assertSame(0, $this->todo->activityConfidence(null, 'testActivity', 100));
+        $this->assertSame(0, $this->todo->activityConfidence(null, false, 100));
         $this->assertSame(0, $this->todo->activityConfidence(true, 'testActivity', 100));
         $this->assertSame(0, $this->todo->activityConfidence(1234, '1234', 100));
 
         $this->assertSame(10, $this->todo->activityConfidence('testActivity', 'testActivity', 10));
+    }
+    // }}}
+    // {{{ testCategoryConfidence
+    public function testCategoryConfidence()
+    {
+        $this->assertSame(100, $this->todo->categoryConfidence('testCategory', 'testCategory', 100));
+        $this->assertSame(0, $this->todo->categoryConfidence('testCategory', 'testCategory2', 100));
+        $this->assertSame(0, $this->todo->categoryConfidence(null, 'testCategory', 100));
+        $this->assertSame(0, $this->todo->categoryConfidence(null, false, 100));
+        $this->assertSame(0, $this->todo->categoryConfidence(true, 'testCategory', 100));
+        $this->assertSame(0, $this->todo->categoryConfidence(1234, '1234', 100));
+
+        $this->assertSame(10, $this->todo->categoryConfidence('testCategory', 'testCategory', 10));
+    }
+    // }}}
+    // {{{ testTagsConfidence
+    public function testTagsConfidence()
+    {
+        $this->assertSame(100, $this->todo->tagsConfidence([], [], 100));
+        $this->assertSame(100, $this->todo->tagsConfidence(['testTag'], ['testTag'], 100));
+        $this->assertSame(100, $this->todo->tagsConfidence(['testTag', 'testTag2'], ['testTag', 'testTag2'], 100));
+
+        $this->assertSame(67, $this->todo->tagsConfidence(['testTag', 'testTag2'], ['testTag2'], 100));
+        $this->assertSame(67, $this->todo->tagsConfidence(['testTag'], ['testTag', 'testTag2'], 100));
+
+        $this->assertSame(67, $this->todo->tagsConfidence(['testTag'], [], 100));
+        $this->assertSame(67, $this->todo->tagsConfidence([], ['testTag'], 100));
+
+        $this->assertSame(34, $this->todo->tagsConfidence([true], ['1234'], 100));
+
+        // @todo
+        // $this->assertSame(33, $this->todo->tagsConfidence([1234], ['1234'], 100));
+        // $this->assertSame(34, $this->todo->tagsConfidence([true], [1], 100));
+        // $this->assertSame(34, $this->todo->tagsConfidence([false], [null], 100));
     }
     // }}}
 

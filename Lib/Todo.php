@@ -122,7 +122,7 @@ class Todo extends Entry
     // {{{ activityConfidence
     protected function activityConfidence($activityA, $activityB, $max)
     {
-        if ($activityA == $activityB) {
+        if ($activityA === $activityB) {
             $confidence = $max;
         } else {
             $confidence = 0;
@@ -134,7 +134,7 @@ class Todo extends Entry
     // {{{ categoryConfidence
     protected function categoryConfidence($categoryA, $categoryB, $max)
     {
-        if ($categoryA == $categoryB) {
+        if ($categoryA === $categoryB) {
             $confidence = $max;
         } else {
             $confidence = 0;
@@ -146,8 +146,9 @@ class Todo extends Entry
     // {{{ tagsConfidence
     protected function tagsConfidence($tagsA, $tagsB, $max)
     {
+        $tagWeight = (int) round($max / 3);
         $count = count(array_diff($tagsA, $tagsB)) + count(array_diff($tagsB, $tagsA));
-        $diff = $max - 10 * $count;
+        $diff = $max - ($tagWeight * $count);
 
         if ($diff > 0) {
             $confidence = $diff;
