@@ -271,10 +271,50 @@ class TodoTest extends EntryTest
 
         $this->assertSame(34, $this->todo->tagsConfidence([true], ['1234'], 100));
 
+        $this->assertSame(30, $this->todo->tagsConfidence([], [], 30));
+        $this->assertSame(30, $this->todo->tagsConfidence(['testTag'], ['testTag'], 30));
+        $this->assertSame(30, $this->todo->tagsConfidence(['testTag', 'testTag2'], ['testTag', 'testTag2'], 30));
+
+        $this->assertSame(20, $this->todo->tagsConfidence(['testTag', 'testTag2'], ['testTag2'], 30));
+        $this->assertSame(20, $this->todo->tagsConfidence(['testTag'], ['testTag', 'testTag2'], 30));
+
+        $this->assertSame(0, $this->todo->tagsConfidence([], ['testTag', 'testTag2', 'testTag3'], 30));
+        $this->assertSame(0, $this->todo->tagsConfidence([], ['testTag', 'testTag2', 'testTag3', 'testTag4'], 30));
+
         // @todo
         // $this->assertSame(33, $this->todo->tagsConfidence([1234], ['1234'], 100));
         // $this->assertSame(34, $this->todo->tagsConfidence([true], [1], 100));
         // $this->assertSame(34, $this->todo->tagsConfidence([false], [null], 100));
+    }
+    // }}}
+    // {{{ testTextConfidence
+    public function testTextConfidence()
+    {
+        $this->assertSame(100, $this->todo->textConfidence('abcde', 'abcde', 100));
+        $this->assertTrue(85 < $this->todo->textConfidence('abcde', 'abcde ', 100));
+        $this->assertTrue(42 < $this->todo->textConfidence('abcde', 'abcde ', 49));
+
+        $this->assertTrue(85 < $this->todo->textConfidence('abcdefghijklmnopqrstuvwxy', 'abcdefghijklmnopqrstuvwxyz', 100));
+        $this->assertTrue(85 < $this->todo->textConfidence('abcdfghijklmnoqrstuvwxy', 'abcdefghijklmnopqrstuvwxyz', 100));
+
+        $this->assertTrue(60 < $this->todo->textConfidence('abcde nopqrstuvwxy fghijklm ', 'abcde fghijklm nopqrstuvwxyz', 100));
+        $this->assertTrue(60 < $this->todo->textConfidence('abcde nopqrstuvwxy', 'abcde fghijklm nopqrstuvwxyz', 100));
+
+        $this->assertSame(0, $this->todo->textConfidence('abcde nopqrstuvwxy', 'fghijklm', 100));
+
+        // @todo
+        // $this->assertSame(0, $this->todo->textConfidence('', null, 100));
+    }
+    // }}}
+    // {{{ testDoneConfidence
+    public function testDoneConfidence()
+    {
+        $this->assertSame(100, $this->todo->textConfidence(true, true, 100));
+        $this->assertSame(100, $this->todo->textConfidence(false, false, 100));
+        $this->assertSame(1, $this->todo->textConfidence(false, false, 1));
+
+        $this->assertSame(0, $this->todo->textConfidence(false, true, 100));
+        $this->assertSame(0, $this->todo->textConfidence(false, true, 1));
     }
     // }}}
 
