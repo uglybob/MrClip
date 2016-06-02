@@ -9,6 +9,7 @@ class TodoTest extends EntryTest
     {
         $this->parent = new TodoTestClass(41, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testParentText');
         $this->object = new TodoTestClass(42, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', $this->parent, false);
+        $this->todo = $this->object;
     }
     // }}}
 
@@ -226,6 +227,19 @@ class TodoTest extends EntryTest
         $this->todo2 = new TodoTestClass(null, 'testActivity', 'testCategory', ['testTag'], 'testText2', null, false);
 
         $this->assertTrue(100 > $this->todo1->match($this->todo2));
+    }
+    // }}}
+
+    // {{{ testActivityConfidence
+    public function testActivityConfidence()
+    {
+        $this->assertSame(100, $this->todo->activityConfidence('testActivity', 'testActivity', 100));
+        $this->assertSame(0, $this->todo->activityConfidence('testActivity', 'testActivity2', 100));
+        $this->assertSame(0, $this->todo->activityConfidence(null, 'testActivity', 100));
+        $this->assertSame(0, $this->todo->activityConfidence(true, 'testActivity', 100));
+        $this->assertSame(0, $this->todo->activityConfidence(1234, '1234', 100));
+
+        $this->assertSame(10, $this->todo->activityConfidence('testActivity', 'testActivity', 10));
     }
     // }}}
 
