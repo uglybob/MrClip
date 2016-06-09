@@ -11,6 +11,7 @@ class MrClipTestClass extends MrClip
     public $parser;
 
     public $echoed = '';
+    public $userEditString = [];
     // }}}
     // {{{ constructor
     public function __construct($options = [])
@@ -69,6 +70,19 @@ class MrClipTestClass extends MrClip
     public function matchTodos($todos, $candidates, $above, $under, $threshold)
     {
         return parent::matchTodos($todos, $candidates, $above, $under, $threshold);
+    }
+    // }}}
+
+    // {{{ editAndParse
+    public function editAndParse($string, $todos)
+    {
+        return parent::editAndParse($string, $todos);
+    }
+    // }}}
+    // {{{ userEditString
+    public function userEditString($string)
+    {
+        return $this->userEditString;
     }
     // }}}
 }
