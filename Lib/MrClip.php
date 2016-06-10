@@ -286,7 +286,7 @@ class MrClip
             $this->outputNl('(moved)   ' . $todo->format());
         }
         foreach ($guess as $todo) {
-            $this->outputNl('(edited) ' . $todo->getGuess()->format() . ' -> ' . $todo->format());
+            $this->outputNl('(edited)  ' . $todo->getGuess()->format() . ' -> ' . $todo->format());
         }
         foreach ($rest as $todo) {
             $this->outputNl('(deleted) ' . $todo->format());
@@ -322,6 +322,7 @@ class MrClip
         $last = null;
         $activity = $this->parser->getActivity();
         $category = $this->parser->getCategory();
+        $tags = $this->parser->getTags();
 
         foreach ($list as $todoString) {
             $header = $this->stringToHeader($todoString);
@@ -339,13 +340,14 @@ class MrClip
                     $parents = array_slice($parents, 0, $level + 1);
                 }
 
-                $todo = $this->stringToTodo($activity, $category, $parents[$level], $todoString);
+                $todo = $this->stringToTodo($activity, $category, $tags, $parents[$level], $todoString);
 
                 $newTodos->attach($todo);
                 $last = $todo;
             } else if ($lastHeader) {
                 $activity = $lastHeader->getActivity();
                 $category = $lastHeader->getCategory();
+                $tags = $lastHeader->getTags();
                 $parents = [null];
                 $last = null;
             }
@@ -383,15 +385,14 @@ class MrClip
     }
     // }}}
     // {{{ stringToTodo
-    protected function stringToTodo($activity, $category, $parent, $todoString)
+    protected function stringToTodo($activity, $category, $tags, $parent, $todoString)
     {
         $todoArray = explode(' ', trim($todoString));
         $parser = new Parser($todoArray);
 
         $done = $parser->parseDone();
-        $listTags = $parser->parseTags();
         $filterTags = $this->parser->getTags();
-        $tags = array_unique(array_merge($listTags, $filterTags));
+        $tags = array_unique(array_merge($tags, $filterTags));
         $text = trim($parser->parseText());
 
         $todo = new Todo(null, $activity, $category, $tags, $text, $parent, $done);
@@ -407,7 +408,7 @@ class MrClip
         $todo = null;
 
         if ($parser->parseActigory()) {
-            $todo = new Todo(null, $parser->getActivity(), $parser->getCategory());
+            $todo = new Todo(null, $parser->getActivity(), $parser->getCategory(), $parser->parseTags());
         }
 
         return $todo;
