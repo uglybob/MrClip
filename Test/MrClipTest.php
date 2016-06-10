@@ -983,9 +983,9 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
     // {{{ testParsingDeleted
     public function testParsingDeleted()
     {
-        $todo1 = new Todo(null, 'activity1', 'category1', ['tag1', 'tag2'], 'text', null, false);
-        $todo2 = new Todo(null, 'activity1', 'category1', ['tag1', 'tag2'], 'text2', $todo1, false);
-        $todo3 = new Todo(null, 'activity1', 'category1', ['tag1', 'tag2'], 'text3', $todo1, false);
+        $todo1 = new Todo(1, 'activity1', 'category1', ['tag1', 'tag2'], 'text', null, false);
+        $todo2 = new Todo(2, 'activity1', 'category1', ['tag1', 'tag2'], 'text2', $todo1, false);
+        $todo3 = new Todo(3, 'activity1', 'category1', ['tag1', 'tag2'], 'text3', $todo1, false);
 
         $todos = new \SplObjectStorage();
         $todos->attach($todo1);
@@ -1003,9 +1003,9 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
     // {{{ testParsingUnchanged
     public function testParsingUnchanged()
     {
-        $todo1 = new Todo(null, 'activity1', 'category1', ['tag1', 'tag2'], 'text', null, false);
-        $todo2 = new Todo(null, 'activity1', 'category1', ['tag1', 'tag2'], 'text2', $todo1, false);
-        $todo3 = new Todo(null, 'activity1', 'category1', ['tag1', 'tag2'], 'text3', $todo1, false);
+        $todo1 = new Todo(1, 'activity1', 'category1', ['tag1', 'tag2'], 'text', null, false);
+        $todo2 = new Todo(2, 'activity1', 'category1', ['tag1', 'tag2'], 'text2', $todo1, false);
+        $todo3 = new Todo(3, 'activity1', 'category1', ['tag1', 'tag2'], 'text3', $todo1, false);
 
         $todos = new \SplObjectStorage();
         $todos->attach($todo1);
@@ -1016,13 +1016,98 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
             'activity1@category1 +tag1 +tag2',
             '',
             'text',
-            '   text2',
-            '   text3',
+            '    text2',
+            '    text3',
         ];
 
         $parsed = $this->mrClip->editAndParse('', $todos);
 
         $this->assertSame(0, $parsed->new->count());
+        $this->assertSame(0, $parsed->moved->count());
+        $this->assertSame(0, $parsed->edited->count());
+        $this->assertSame(0, $parsed->delete->count());
+    }
+    // }}}
+    // {{{ testParsingEdit
+    public function testParsingEdit()
+    {
+        $todo1 = new Todo(1, 'activity1', 'category1', ['tag1', 'tag2'], 'text', null, false);
+        $todo2 = new Todo(2, 'activity1', 'category1', ['tag1', 'tag2'], 'text2', $todo1, false);
+        $todo3 = new Todo(3, 'activity1', 'category1', ['tag1', 'tag2'], 'text3', $todo1, false);
+
+        $todos = new \SplObjectStorage();
+        $todos->attach($todo1);
+        $todos->attach($todo2);
+        $todos->attach($todo3);
+
+        $this->mrClip->userEditString = [
+            'activity1@category1 +tag1 +tag2',
+            '',
+            'text',
+            '    text4',
+            '    text3',
+        ];
+
+        $parsed = $this->mrClip->editAndParse('', $todos);
+
+        $this->assertSame(0, $parsed->new->count());
+        $this->assertSame(0, $parsed->moved->count());
+        $this->assertSame(1, $parsed->edited->count());
+        $this->assertSame(0, $parsed->delete->count());
+    }
+    // }}}
+    // {{{ testParsingMove
+    public function testParsingMove()
+    {
+        $todo1 = new Todo(1, 'activity1', 'category1', ['tag1', 'tag2'], 'text', null, false);
+        $todo2 = new Todo(2, 'activity1', 'category1', ['tag1', 'tag2'], 'text2', $todo1, false);
+        $todo3 = new Todo(3, 'activity1', 'category1', ['tag1', 'tag2'], 'text3', $todo1, false);
+
+        $todos = new \SplObjectStorage();
+        $todos->attach($todo1);
+        $todos->attach($todo2);
+        $todos->attach($todo3);
+
+        $this->mrClip->userEditString = [
+            'activity1@category1 +tag1 +tag2',
+            '',
+            'text',
+            '    text2',
+            'text3',
+        ];
+
+        $parsed = $this->mrClip->editAndParse('', $todos);
+
+        $this->assertSame(0, $parsed->new->count());
+        $this->assertSame(1, $parsed->moved->count());
+        $this->assertSame(0, $parsed->edited->count());
+        $this->assertSame(0, $parsed->delete->count());
+    }
+    // }}}
+    // {{{ testParsingNew
+    public function testParsingNew()
+    {
+        $todo1 = new Todo(1, 'activity1', 'category1', ['tag1', 'tag2'], 'text', null, false);
+        $todo2 = new Todo(2, 'activity1', 'category1', ['tag1', 'tag2'], 'text2', $todo1, false);
+        $todo3 = new Todo(3, 'activity1', 'category1', ['tag1', 'tag2'], 'text3', $todo1, false);
+
+        $todos = new \SplObjectStorage();
+        $todos->attach($todo1);
+        $todos->attach($todo2);
+        $todos->attach($todo3);
+
+        $this->mrClip->userEditString = [
+            'activity1@category1 +tag1 +tag2',
+            '',
+            'text',
+            '    text2',
+            '    text3',
+            '    text4',
+        ];
+
+        $parsed = $this->mrClip->editAndParse('', $todos);
+
+        $this->assertSame(1, $parsed->new->count());
         $this->assertSame(0, $parsed->moved->count());
         $this->assertSame(0, $parsed->edited->count());
         $this->assertSame(0, $parsed->delete->count());

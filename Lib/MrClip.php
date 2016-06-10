@@ -427,22 +427,22 @@ class MrClip
     }
     // }}}
     // {{{ matchTodos
-    protected function matchTodos($candidates, $todos, $above, $under, $threshold)
+    protected function matchTodos($oldTodos, $newTodos, $above, $under, $threshold)
     {
         $rest = new \SplObjectStorage();
-        $rest->addAll($candidates);
+        $rest->addAll($oldTodos);
 
-        foreach ($todos as $todo) {
-            foreach($rest as $candidate) {
-                $todo->match($candidate);
+        foreach ($newTodos as $newTodo) {
+            foreach($rest as $oldTodo) {
+                $newTodo->match($oldTodo);
             }
 
-            if ($todo->getConfidence() >= $threshold) {
-                $above->attach($todo);
-                $todo->setId($todo->getGuess()->getId());
-                $rest->detach($todo->getGuess());
+            if ($newTodo->getConfidence() >= $threshold) {
+                $above->attach($newTodo);
+                $newTodo->setId($newTodo->getGuess()->getId());
+                $rest->detach($newTodo->getGuess());
             } else {
-                $under->attach($todo);
+                $under->attach($newTodo);
             }
         }
 
