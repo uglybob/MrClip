@@ -1102,6 +1102,66 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
         $this->assertSame("4 old, 4 new\n\n(edited)  activity1@category1 +tag1 +tag2 text4 -> activity1@category1 +tag1 +tag2 text5\n", $this->mrClip->echoed);
     }
     // }}}
+    // {{{ testParsingEditParent
+    public function testParsingEditParent()
+    {
+        $todo1 = new Todo(1, 'activity1', 'category1', ['tag1', 'tag2'], 'text', null, false);
+        $todo2 = new Todo(2, 'activity1', 'category1', ['tag1', 'tag2'], 'text2', null, false);
+        $todo3 = new Todo(3, 'activity1', 'category1', ['tag1', 'tag2'], 'text3', $todo2, false);
+
+        $todos = new \SplObjectStorage();
+        $todos->attach($todo1);
+        $todos->attach($todo2);
+        $todos->attach($todo3);
+
+        $this->mrClip->userEditString = [
+            'activity1@category1 +tag1 +tag2',
+            '',
+            'text',
+            'text4',
+            '    text3',
+        ];
+
+        $parsed = $this->mrClip->editAndParse('', $todos);
+
+        $this->assertSame(0, $parsed->new->count());
+        $this->assertSame(0, $parsed->moved->count());
+        $this->assertSame(1, $parsed->edited->count());
+        $this->assertSame(0, $parsed->delete->count());
+
+        $this->assertSame("3 old, 3 new\n\n(edited)  activity1@category1 +tag1 +tag2 text2 -> activity1@category1 +tag1 +tag2 text4\n", $this->mrClip->echoed);
+    }
+    // }}}
+    // {{{ testParsingEditDuplicate
+    public function testParsingEditDuplicate()
+    {
+        $todo1 = new Todo(1, 'activity1', 'category1', ['tag1', 'tag2'], 'text', null, false);
+        $todo2 = new Todo(2, 'activity1', 'category1', ['tag1', 'tag2'], 'text2', $todo1, false);
+        $todo3 = new Todo(3, 'activity1', 'category1', ['tag1', 'tag2'], 'text', $todo1, false);
+
+        $todos = new \SplObjectStorage();
+        $todos->attach($todo1);
+        $todos->attach($todo2);
+        $todos->attach($todo3);
+
+        $this->mrClip->userEditString = [
+            'activity1@category1 +tag1 +tag2',
+            '',
+            'text3',
+            '    text2',
+            '    text',
+        ];
+
+        $parsed = $this->mrClip->editAndParse('', $todos);
+
+        $this->assertSame(0, $parsed->new->count());
+        $this->assertSame(0, $parsed->moved->count());
+        $this->assertSame(1, $parsed->edited->count());
+        $this->assertSame(0, $parsed->delete->count());
+
+        $this->assertSame("3 old, 3 new\n\n(edited)  activity1@category1 +tag1 +tag2 text -> activity1@category1 +tag1 +tag2 text3\n", $this->mrClip->echoed);
+    }
+    // }}}
     // {{{ testParsingMove
     public function testParsingMove()
     {
