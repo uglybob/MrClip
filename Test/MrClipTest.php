@@ -992,12 +992,21 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
         $todos->attach($todo2);
         $todos->attach($todo3);
 
+        $this->mrClip->userEditString = [
+            'activity1@category1 +tag1 +tag2',
+            '',
+            'text',
+            '    text3',
+        ];
+
         $parsed = $this->mrClip->editAndParse('', $todos);
 
         $this->assertSame(0, $parsed->new->count());
         $this->assertSame(0, $parsed->moved->count());
         $this->assertSame(0, $parsed->edited->count());
-        $this->assertSame(3, $parsed->delete->count());
+        $this->assertSame(1, $parsed->delete->count());
+
+        $this->assertSame("3 old, 2 new\n\n(deleted) activity1@category1 +tag1 +tag2 text2\n", $this->mrClip->echoed);
     }
     // }}}
     // {{{ testParsingUnchanged
@@ -1026,6 +1035,8 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
         $this->assertSame(0, $parsed->moved->count());
         $this->assertSame(0, $parsed->edited->count());
         $this->assertSame(0, $parsed->delete->count());
+
+        $this->assertSame("3 old, 3 new\n\n", $this->mrClip->echoed);
     }
     // }}}
     // {{{ testParsingEdit
@@ -1054,6 +1065,41 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
         $this->assertSame(0, $parsed->moved->count());
         $this->assertSame(1, $parsed->edited->count());
         $this->assertSame(0, $parsed->delete->count());
+
+        $this->assertSame("3 old, 3 new\n\n(edited)  activity1@category1 +tag1 +tag2 text2 -> activity1@category1 +tag1 +tag2 text4\n", $this->mrClip->echoed);
+    }
+    // }}}
+    // {{{ testParsingEditGap
+    public function testParsingEditGap()
+    {
+        $todo1 = new Todo(1, 'activity1', 'category1', ['tag1', 'tag2'], 'text', null, false);
+        $todo2 = new Todo(2, 'activity1', 'category1', ['tag1', 'tag2'], 'text2', $todo1, false);
+        $todo3 = new Todo(3, 'activity1', 'category1', ['tag1', 'tag2'], 'text3', $todo2, false);
+        $todo4 = new Todo(4, 'activity1', 'category1', ['tag1', 'tag2'], 'text4', null, false);
+
+        $todos = new \SplObjectStorage();
+        $todos->attach($todo1);
+        $todos->attach($todo2);
+        $todos->attach($todo3);
+        $todos->attach($todo4);
+
+        $this->mrClip->userEditString = [
+            'activity1@category1 +tag1 +tag2',
+            '',
+            'text',
+            '    text2',
+            '        text3',
+            'text5',
+        ];
+
+        $parsed = $this->mrClip->editAndParse('', $todos);
+
+        $this->assertSame(0, $parsed->new->count());
+        $this->assertSame(0, $parsed->moved->count());
+        $this->assertSame(1, $parsed->edited->count());
+        $this->assertSame(0, $parsed->delete->count());
+
+        $this->assertSame("4 old, 4 new\n\n(edited)  activity1@category1 +tag1 +tag2 text4 -> activity1@category1 +tag1 +tag2 text5\n", $this->mrClip->echoed);
     }
     // }}}
     // {{{ testParsingMove
@@ -1082,6 +1128,8 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
         $this->assertSame(1, $parsed->moved->count());
         $this->assertSame(0, $parsed->edited->count());
         $this->assertSame(0, $parsed->delete->count());
+
+        $this->assertSame("3 old, 3 new\n\n(moved)   activity1@category1 +tag1 +tag2 text3\n", $this->mrClip->echoed);
     }
     // }}}
     // {{{ testParsingNew
@@ -1111,6 +1159,8 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
         $this->assertSame(0, $parsed->moved->count());
         $this->assertSame(0, $parsed->edited->count());
         $this->assertSame(0, $parsed->delete->count());
+
+        $this->assertSame("3 old, 4 new\n\n(new)     activity1@category1 +tag1 +tag2 text4\n", $this->mrClip->echoed);
     }
     // }}}
 }
