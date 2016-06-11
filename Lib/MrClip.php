@@ -248,7 +248,7 @@ class MrClip
             $this->saveTodos($parsed->new);
             $this->saveTodos($parsed->moved);
             $this->saveTodos($parsed->edited);
-            foreach ($parsed->delete as $todo) {
+            foreach ($parsed->deleted as $todo) {
                 $this->prm->deleteTodo($todo);
             }
         }
