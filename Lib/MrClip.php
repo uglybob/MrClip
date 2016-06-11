@@ -58,6 +58,8 @@ class MrClip
     // {{{ completion
     protected function completion($options)
     {
+        $this->cacheAttributes();
+
         $parser = $this->parser;
         $current = substr(end($options), 1, -1);
 
@@ -71,11 +73,8 @@ class MrClip
                         } else {
                             $times = [date('H:i')];
 
-                            if (
-                                ($last = $this->prm->getLastRecord())
-                                && ($end = $last->getEnd())
-                            ) {
-                                $times[] = $end->format('H:i');
+                            if ($end = $this->getLastRecordEnd()) {
+                                $times[] = $end;
                             }
 
                             $this->suggest($current, $times);
@@ -110,10 +109,10 @@ class MrClip
             !$parser->parseActigory($filter)
             || ($parser->isLast() && !empty($current))
         ) {
-            $this->suggest($current, $this->prm->getActigories());
+            $this->suggest($current, $this->getActigories());
         } else {
             $parser->parseTags();
-            $tags = array_diff($this->prm->getTags(), $parser->getTags());
+            $tags = array_diff($this->getTags(), $parser->getTags());
             $this->suggest($current, $tags, '+');
         }
     }
@@ -131,6 +130,30 @@ class MrClip
         }
 
         $this->output(implode(' ', $output));
+    }
+    // }}}
+
+    // {{{ cacheAttributes
+    protected function cacheAttributes()
+    {
+    }
+    // }}}
+    // {{{ getLastRecordEnd
+    protected function getLastRecordEnd()
+    {
+        return $this->prm->getLastRecord()->getEnd()->format('H:i');
+    }
+    // }}}
+    // {{{ getActigories
+    protected function getActigories()
+    {
+        return $this->prm->getActigories();
+    }
+    // }}}
+    // {{{ getTags
+    protected function getTags()
+    {
+        return $this->prm->getTags();
     }
     // }}}
 
