@@ -192,8 +192,8 @@ class TodoTest extends EntryTest
         $this->todo1 = new TodoTestClass(null, 'testActivity', 'testCategory', ['testTag'], 'testText', null, false);
         $this->todo2 = new TodoTestClass(null, 'testActivity', 'testCategory', [], 'testText', null, false);
 
-        $this->assertSame(92, $this->todo1->match($this->todo2));
-        $this->assertSame(92, $this->todo1->confidence);
+        $this->assertSame(91, $this->todo1->match($this->todo2));
+        $this->assertSame(91, $this->todo1->confidence);
         $this->assertSame($this->todo2, $this->todo1->match);
     }
     // }}}
@@ -203,8 +203,8 @@ class TodoTest extends EntryTest
         $this->todo1 = new TodoTestClass(null, 'testActivity', 'testCategory', ['testTag'], 'testText', null, false);
         $this->todo2 = new TodoTestClass(null, 'testActivity', 'testCategory', ['testTag', 'testTag2'], 'testText', null, false);
 
-        $this->assertSame(92, $this->todo1->match($this->todo2));
-        $this->assertSame(92, $this->todo1->confidence);
+        $this->assertSame(91, $this->todo1->match($this->todo2));
+        $this->assertSame(91, $this->todo1->confidence);
         $this->assertSame($this->todo2, $this->todo1->match);
     }
     // }}}
@@ -214,8 +214,8 @@ class TodoTest extends EntryTest
         $this->todo1 = new TodoTestClass(null, 'testActivity', 'testCategory', ['testTag'], 'testText', null, false);
         $this->todo2 = new TodoTestClass(null, 'testActivity', 'testCategory', ['testTag2'], 'testText', null, false);
 
-        $this->assertSame(84, $this->todo1->match($this->todo2));
-        $this->assertSame(84, $this->todo1->confidence);
+        $this->assertSame(83, $this->todo1->match($this->todo2));
+        $this->assertSame(83, $this->todo1->confidence);
         $this->assertSame($this->todo2, $this->todo1->match);
     }
     // }}}
@@ -230,91 +230,91 @@ class TodoTest extends EntryTest
     // }}}
 
 /*
-    // {{{ testActivityConfidence
-    public function testActivityConfidence()
+    // {{{ testActivityMatch
+    public function testActivityMatch()
     {
-        $this->assertSame(100, $this->todo->activityConfidence('testActivity', 'testActivity', 100));
-        $this->assertSame(0, $this->todo->activityConfidence('testActivity', 'testActivity2', 100));
-        $this->assertSame(0, $this->todo->activityConfidence(null, 'testActivity', 100));
-        $this->assertSame(0, $this->todo->activityConfidence(null, false, 100));
-        $this->assertSame(0, $this->todo->activityConfidence(true, 'testActivity', 100));
-        $this->assertSame(0, $this->todo->activityConfidence(1234, '1234', 100));
+        $this->assertSame(100, $this->todo->activityMatch('testActivity', 'testActivity', 100));
+        $this->assertSame(0, $this->todo->activityMatch('testActivity', 'testActivity2', 100));
+        $this->assertSame(0, $this->todo->activityMatch(null, 'testActivity', 100));
+        $this->assertSame(0, $this->todo->activityMatch(null, false, 100));
+        $this->assertSame(0, $this->todo->activityMatch(true, 'testActivity', 100));
+        $this->assertSame(0, $this->todo->activityMatch(1234, '1234', 100));
 
-        $this->assertSame(10, $this->todo->activityConfidence('testActivity', 'testActivity', 10));
+        $this->assertSame(10, $this->todo->activityMatch('testActivity', 'testActivity', 10));
     }
     // }}}
-    // {{{ testCategoryConfidence
-    public function testCategoryConfidence()
+    // {{{ testCategoryMatch
+    public function testCategoryMatch()
     {
-        $this->assertSame(100, $this->todo->categoryConfidence('testCategory', 'testCategory', 100));
-        $this->assertSame(0, $this->todo->categoryConfidence('testCategory', 'testCategory2', 100));
-        $this->assertSame(0, $this->todo->categoryConfidence(null, 'testCategory', 100));
-        $this->assertSame(0, $this->todo->categoryConfidence(null, false, 100));
-        $this->assertSame(0, $this->todo->categoryConfidence(true, 'testCategory', 100));
-        $this->assertSame(0, $this->todo->categoryConfidence(1234, '1234', 100));
+        $this->assertSame(100, $this->todo->categoryMatch('testCategory', 'testCategory', 100));
+        $this->assertSame(0, $this->todo->categoryMatch('testCategory', 'testCategory2', 100));
+        $this->assertSame(0, $this->todo->categoryMatch(null, 'testCategory', 100));
+        $this->assertSame(0, $this->todo->categoryMatch(null, false, 100));
+        $this->assertSame(0, $this->todo->categoryMatch(true, 'testCategory', 100));
+        $this->assertSame(0, $this->todo->categoryMatch(1234, '1234', 100));
 
-        $this->assertSame(10, $this->todo->categoryConfidence('testCategory', 'testCategory', 10));
+        $this->assertSame(10, $this->todo->categoryMatch('testCategory', 'testCategory', 10));
     }
     // }}}
-    // {{{ testTagsConfidence
-    public function testTagsConfidence()
+    // {{{ testTagsMatch
+    public function testTagsMatch()
     {
-        $this->assertSame(100, $this->todo->tagsConfidence([], [], 100));
-        $this->assertSame(100, $this->todo->tagsConfidence(['testTag'], ['testTag'], 100));
-        $this->assertSame(100, $this->todo->tagsConfidence(['testTag', 'testTag2'], ['testTag', 'testTag2'], 100));
+        $this->assertSame(100, $this->todo->tagsMatch([], [], 100));
+        $this->assertSame(100, $this->todo->tagsMatch(['testTag'], ['testTag'], 100));
+        $this->assertSame(100, $this->todo->tagsMatch(['testTag', 'testTag2'], ['testTag', 'testTag2'], 100));
 
-        $this->assertSame(67, $this->todo->tagsConfidence(['testTag', 'testTag2'], ['testTag2'], 100));
-        $this->assertSame(67, $this->todo->tagsConfidence(['testTag'], ['testTag', 'testTag2'], 100));
+        $this->assertSame(67, $this->todo->tagsMatch(['testTag', 'testTag2'], ['testTag2'], 100));
+        $this->assertSame(67, $this->todo->tagsMatch(['testTag'], ['testTag', 'testTag2'], 100));
 
-        $this->assertSame(67, $this->todo->tagsConfidence(['testTag'], [], 100));
-        $this->assertSame(67, $this->todo->tagsConfidence([], ['testTag'], 100));
+        $this->assertSame(67, $this->todo->tagsMatch(['testTag'], [], 100));
+        $this->assertSame(67, $this->todo->tagsMatch([], ['testTag'], 100));
 
-        $this->assertSame(34, $this->todo->tagsConfidence([true], ['1234'], 100));
+        $this->assertSame(34, $this->todo->tagsMatch([true], ['1234'], 100));
 
-        $this->assertSame(30, $this->todo->tagsConfidence([], [], 30));
-        $this->assertSame(30, $this->todo->tagsConfidence(['testTag'], ['testTag'], 30));
-        $this->assertSame(30, $this->todo->tagsConfidence(['testTag', 'testTag2'], ['testTag', 'testTag2'], 30));
+        $this->assertSame(30, $this->todo->tagsMatch([], [], 30));
+        $this->assertSame(30, $this->todo->tagsMatch(['testTag'], ['testTag'], 30));
+        $this->assertSame(30, $this->todo->tagsMatch(['testTag', 'testTag2'], ['testTag', 'testTag2'], 30));
 
-        $this->assertSame(20, $this->todo->tagsConfidence(['testTag', 'testTag2'], ['testTag2'], 30));
-        $this->assertSame(20, $this->todo->tagsConfidence(['testTag'], ['testTag', 'testTag2'], 30));
+        $this->assertSame(20, $this->todo->tagsMatch(['testTag', 'testTag2'], ['testTag2'], 30));
+        $this->assertSame(20, $this->todo->tagsMatch(['testTag'], ['testTag', 'testTag2'], 30));
 
-        $this->assertSame(0, $this->todo->tagsConfidence([], ['testTag', 'testTag2', 'testTag3'], 30));
-        $this->assertSame(0, $this->todo->tagsConfidence([], ['testTag', 'testTag2', 'testTag3', 'testTag4'], 30));
+        $this->assertSame(0, $this->todo->tagsMatch([], ['testTag', 'testTag2', 'testTag3'], 30));
+        $this->assertSame(0, $this->todo->tagsMatch([], ['testTag', 'testTag2', 'testTag3', 'testTag4'], 30));
 
         // @todo
-        // $this->assertSame(33, $this->todo->tagsConfidence([1234], ['1234'], 100));
-        // $this->assertSame(34, $this->todo->tagsConfidence([true], [1], 100));
-        // $this->assertSame(34, $this->todo->tagsConfidence([false], [null], 100));
+        // $this->assertSame(33, $this->todo->tagsMatch([1234], ['1234'], 100));
+        // $this->assertSame(34, $this->todo->tagsMatch([true], [1], 100));
+        // $this->assertSame(34, $this->todo->tagsMatch([false], [null], 100));
     }
     // }}}
-    // {{{ testTextConfidence
-    public function testTextConfidence()
+    // {{{ testTextMatch
+    public function testTextMatch()
     {
-        $this->assertSame(100, $this->todo->textConfidence('abcde', 'abcde', 100));
-        $this->assertTrue(85 < $this->todo->textConfidence('abcde', 'abcde ', 100));
-        $this->assertTrue(42 < $this->todo->textConfidence('abcde', 'abcde ', 49));
+        $this->assertSame(100, $this->todo->textMatch('abcde', 'abcde', 100));
+        $this->assertTrue(85 < $this->todo->textMatch('abcde', 'abcde ', 100));
+        $this->assertTrue(42 < $this->todo->textMatch('abcde', 'abcde ', 49));
 
-        $this->assertTrue(85 < $this->todo->textConfidence('abcdefghijklmnopqrstuvwxy', 'abcdefghijklmnopqrstuvwxyz', 100));
-        $this->assertTrue(85 < $this->todo->textConfidence('abcdfghijklmnoqrstuvwxy', 'abcdefghijklmnopqrstuvwxyz', 100));
+        $this->assertTrue(85 < $this->todo->textMatch('abcdefghijklmnopqrstuvwxy', 'abcdefghijklmnopqrstuvwxyz', 100));
+        $this->assertTrue(85 < $this->todo->textMatch('abcdfghijklmnoqrstuvwxy', 'abcdefghijklmnopqrstuvwxyz', 100));
 
-        $this->assertTrue(60 < $this->todo->textConfidence('abcde nopqrstuvwxy fghijklm ', 'abcde fghijklm nopqrstuvwxyz', 100));
-        $this->assertTrue(60 < $this->todo->textConfidence('abcde nopqrstuvwxy', 'abcde fghijklm nopqrstuvwxyz', 100));
+        $this->assertTrue(60 < $this->todo->textMatch('abcde nopqrstuvwxy fghijklm ', 'abcde fghijklm nopqrstuvwxyz', 100));
+        $this->assertTrue(60 < $this->todo->textMatch('abcde nopqrstuvwxy', 'abcde fghijklm nopqrstuvwxyz', 100));
 
-        $this->assertSame(0, $this->todo->textConfidence('abcde nopqrstuvwxy', 'fghijklm', 100));
+        $this->assertSame(0, $this->todo->textMatch('abcde nopqrstuvwxy', 'fghijklm', 100));
 
         // @todo
-        // $this->assertSame(0, $this->todo->textConfidence('', null, 100));
+        // $this->assertSame(0, $this->todo->textMatch('', null, 100));
     }
     // }}}
-    // {{{ testDoneConfidence
-    public function testDoneConfidence()
+    // {{{ testDoneMatch
+    public function testDoneMatch()
     {
-        $this->assertSame(100, $this->todo->textConfidence(true, true, 100));
-        $this->assertSame(100, $this->todo->textConfidence(false, false, 100));
-        $this->assertSame(1, $this->todo->textConfidence(false, false, 1));
+        $this->assertSame(100, $this->todo->textMatch(true, true, 100));
+        $this->assertSame(100, $this->todo->textMatch(false, false, 100));
+        $this->assertSame(1, $this->todo->textMatch(false, false, 1));
 
-        $this->assertSame(0, $this->todo->textConfidence(false, true, 100));
-        $this->assertSame(0, $this->todo->textConfidence(false, true, 1));
+        $this->assertSame(0, $this->todo->textMatch(false, true, 100));
+        $this->assertSame(0, $this->todo->textMatch(false, true, 1));
     }
     // }}}
 
@@ -336,5 +336,5 @@ class TodoTest extends EntryTest
         $this->assertSame(86, $this->object->getConfidence());
     }
     // }}}
-    */
+*/
 }

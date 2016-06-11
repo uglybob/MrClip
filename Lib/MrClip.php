@@ -307,10 +307,8 @@ class MrClip
             } else {
                 $matched->new->attach($bestMatch);
             }
-            //var_dump($rest->count() . ':' . $matched->total->count() . '/' . $toMatch . ':' . $bestMatch->format() . ' -> ' . $bestMatch->getMatch()->format() . ' (' . $bestMatch->getConfidence() . ')');
         }
 
-        //var_dump($unchanged->format() . ':' . $unchanged->getParentId() . ' -> ' . $unchanged->getMatch()->getParentId() . ':' . $unchanged->getMatch()->format() . ' (' . $unchanged->getConfidence() . ')');
         foreach ($matched->unchanged as $unchanged) {
             if ($unchanged->getParentId() == $unchanged->getMatch()->getParentId()) {
                 $matched->exact->attach($unchanged);

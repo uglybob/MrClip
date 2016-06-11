@@ -164,60 +164,33 @@ class Todo extends Entry
     // {{{ activityMatch
     protected function activityMatch($candidate, $max)
     {
-        if ($this->activity === $candidate->getActivity()) {
-            $match = $max;
-        } else {
-            $match = 0;
-        }
+        $percent = $this->compareExact($this->activity, $candidate->getActivity());
 
-        return $match;
+        return (int) ($percent * $max / 100);
     }
     // }}}
     // {{{ categoryMatch
     protected function categoryMatch($candidate, $max)
     {
-        if ($this->category === $candidate->getCategory()) {
-            $match = $max;
-        } else {
-            $match = 0;
-        }
+        $percent = $this->compareExact($this->category, $candidate->getCategory());
 
-        return $match;
+        return (int) ($percent * $max / 100);
     }
     // }}}
     // {{{ tagsMatch
     protected function tagsMatch($candidate, $max)
     {
-        $tagsA = $this->tags;
-        $tagsB = $candidate->getTags();
+        $percent = $this->tagsCompare($this->tags, $candidate->getTags());
 
-        $tagWeight = (int) round($max / 3);
-        $count = count(array_diff($tagsA, $tagsB)) + count(array_diff($tagsB, $tagsA));
-        $diff = $max - ($tagWeight * $count);
-
-        if ($diff > 0) {
-            $match = $diff;
-        } else {
-            $match = 0;
-        }
-
-        return $match;
+        return (int) ($percent * $max / 100);
     }
     // }}}
     // {{{ textMatch
     protected function textMatch($candidate, $max)
     {
-        $textA = $this->text;
-        $textB = $candidate->getText();
+        $percent = $this->textCompare($this->text, $candidate->getText());
 
-        if (strcmp($textA, $textB) === 0) {
-            $match = $max;
-        } else {
-            similar_text($textA, $textB, $percent);
-            $match = (int) ($percent * $max / 100);
-        }
-
-        return $match;
+        return (int) ($percent * $max / 100);
     }
     // }}}
     // {{{ doneMatch
@@ -227,13 +200,52 @@ class Todo extends Entry
             $candidate = $this->match;
         }
 
-        if ($this->isDone() === $candidate->isDone()) {
-            $match = $max;
+        $percent = $this->compareExact($this->isDone(), $candidate->isDone());
+
+        return (int) ($percent * $max / 100);
+    }
+    // }}}
+
+    // {{{ compareExact
+    protected function compareExact($a, $b)
+    {
+        if ($a === $b) {
+            $confidence = 100;
         } else {
-            $match = 0;
+            $confidence = 0;
         }
 
-        return $match;
+        return $confidence;
+    }
+    // }}}
+    // {{{ tagsCompare
+    protected function tagsCompare($tagsA, $tagsB)
+    {
+        $tagWeight = 100 / 3;
+
+        $count = count(array_diff($tagsA, $tagsB)) + count(array_diff($tagsB, $tagsA));
+        $diff = 100 - ($tagWeight * $count);
+
+        if ($diff > 0) {
+            $confidence = $diff;
+        } else {
+            $confidence = 0;
+        }
+
+        return $confidence;
+    }
+    // }}}
+    // {{{ textCompare
+    protected function textCompare($textA, $textB)
+    {
+        if (strcmp($textA, $textB) === 0) {
+            $confidence = 100;
+        } else {
+            similar_text($textA, $textB, $percent);
+            $confidence = (int) $percent;
+        }
+
+        return $confidence;
     }
     // }}}
 
