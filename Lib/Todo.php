@@ -105,89 +105,127 @@ class Todo extends Entry
     // {{{ match
     public function match(Todo $candidate)
     {
-        $confidence = $this->activityConfidence($this->activity, $candidate->getActivity(), 10)
-            + $this->categoryConfidence($this->category, $candidate->getCategory(), 10)
-            + $this->tagsConfidence($this->tags, $candidate->getTags(), 30)
-            + $this->textConfidence($this->text, $candidate->getText(), 49)
-            + $this->doneConfidence($this->isDone(), $candidate->isDone(), 1);
+        $match = $this->lexicalMatch($candidate, 70)
+            + $this->positionMatch($candidate, 29)
+            + $this->doneMatch($candidate, 1);
 
-        if ($confidence > $this->confidence) {
-            $this->confidence = $confidence;
-            $this->guess = $candidate;
+        if ($match > $this->match) {
+            $this->confidence = $match;
+            $this->match = $candidate;
         }
 
-        return $confidence;
+        return $match;
     }
     // }}}
-    // {{{ activityConfidence
-    protected function activityConfidence($activityA, $activityB, $max)
+
+    // {{{ positionMatch
+    public function positionMatch($candidate, $max)
     {
-        if ($activityA === $activityB) {
-            $confidence = $max;
+        $parentA = $this->parent;
+        $parentB = $candidate->getParent();
+
+        if ($parentA && $parentB) {
+            $percent = $parentA->lexicalMatch($parentB, 99);
+                + $parentA->doneMatch($parentB, 1);
+
+            $positionMatch = (int) ($percent * $max / 100);
+        } else if ($parentA == $parentB) {
+            $positionMatch = $max;
         } else {
-            $confidence = 0;
+            $positionMatch = 0;
         }
 
-        return $confidence;
+        return $positionMatch;
     }
     // }}}
-    // {{{ categoryConfidence
-    protected function categoryConfidence($categoryA, $categoryB, $max)
+    // {{{ lexicalMatch
+    public function lexicalMatch($candidate, $max)
     {
-        if ($categoryA === $categoryB) {
-            $confidence = $max;
+        $percent = $this->activityMatch($this->activity, $candidate->getActivity(), 10)
+            + $this->categoryMatch($this->category, $candidate->getCategory(), 10)
+            + $this->tagsMatch($this->tags, $candidate->getTags(), 30)
+            + $this->textMatch($this->text, $candidate->getText(), 60);
+
+        return = (int) ($percent * $max / 100);
+    }
+    // }}}
+
+    // {{{ activityMatch
+    protected function activityMatch($candidate, $max)
+    {
+        if ($this->activity === $candidate->getActivity()) {
+            $match = $max;
         } else {
-            $confidence = 0;
+            $match = 0;
         }
 
-        return $confidence;
+        return $match;
     }
     // }}}
-    // {{{ tagsConfidence
-    protected function tagsConfidence($tagsA, $tagsB, $max)
+    // {{{ categoryMatch
+    protected function categoryMatch($candidate, $max)
     {
+        if ($this->category === $candidate->getCategory()) {
+            $match = $max;
+        } else {
+            $match = 0;
+        }
+
+        return $match;
+    }
+    // }}}
+    // {{{ tagsMatch
+    protected function tagsMatch($candidate, $max)
+    {
+        $tagsA = $this->tags;
+        $tagsB = $candidate->getTags();
+
         $tagWeight = (int) round($max / 3);
         $count = count(array_diff($tagsA, $tagsB)) + count(array_diff($tagsB, $tagsA));
         $diff = $max - ($tagWeight * $count);
 
         if ($diff > 0) {
-            $confidence = $diff;
+            $match = $diff;
         } else {
-            $confidence = 0;
+            $match = 0;
         }
 
-        return $confidence;
+        return $match;
     }
     // }}}
-    // {{{ textConfidence
-    protected function textConfidence($textA, $textB, $max)
+    // {{{ textMatch
+    protected function textMatch($candidate, $max)
     {
+        $textA = $this->text;
+        $textB = $candidate->getText();
+
         if (strcmp($textA, $textB) === 0) {
-            $confidence = $max;
+            $match = $max;
         } else {
             similar_text($textA, $textB, $percent);
-            $confidence = (int) ($percent * $max / 100);
+            $match = (int) ($percent * $max / 100);
         }
 
-        return $confidence;
+        return $match;
     }
     // }}}
-    // {{{ doneConfidence
-    protected function doneConfidence($doneA, $doneB, $max)
+    // {{{ doneMatch
+    protected function doneMatch($candidate, $max)
     {
-        if ($doneA === $doneB) {
-            $confidence = $max;
+        if ($this->isDone() === $candidate->isDone()) {
+            $match = $max;
         } else {
-            $confidence = 0;
+            $match = 0;
         }
 
-        return $confidence;
+        return $match;
     }
     // }}}
-    // {{{ getGuess
-    public function getGuess()
+
+    // {{{ getMatch
+    public function getMatch()
     {
-        return $this->guess;
+        return $this->match;
     }
     // }}}
     // {{{ getConfidence
