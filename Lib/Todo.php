@@ -166,7 +166,7 @@ class Todo extends Entry
     {
         $percent = $this->compareExact($this->activity, $candidate->getActivity());
 
-        return (int) ($percent * $max / 100);
+        return $this->normalise($percent, $max);
     }
     // }}}
     // {{{ categoryMatch
@@ -174,7 +174,7 @@ class Todo extends Entry
     {
         $percent = $this->compareExact($this->category, $candidate->getCategory());
 
-        return (int) ($percent * $max / 100);
+        return $this->normalise($percent, $max);
     }
     // }}}
     // {{{ tagsMatch
@@ -182,7 +182,7 @@ class Todo extends Entry
     {
         $percent = $this->tagsCompare($this->tags, $candidate->getTags());
 
-        return (int) ($percent * $max / 100);
+        return $this->normalise($percent, $max);
     }
     // }}}
     // {{{ textMatch
@@ -190,7 +190,7 @@ class Todo extends Entry
     {
         $percent = $this->textCompare($this->text, $candidate->getText());
 
-        return (int) ($percent * $max / 100);
+        return $this->normalise($percent, $max);
     }
     // }}}
     // {{{ doneMatch
@@ -202,6 +202,13 @@ class Todo extends Entry
 
         $percent = $this->compareExact($this->isDone(), $candidate->isDone());
 
+        return $this->normalise($percent, $max);
+    }
+    // }}}
+
+    // {{{ normalise
+    protected function normalise($percent, $max)
+    {
         return (int) ($percent * $max / 100);
     }
     // }}}
