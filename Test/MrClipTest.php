@@ -925,6 +925,37 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
         $this->assertSame("3 old, 3 new\n\n", $this->mrClip->echoed);
     }
     // }}}
+    // {{{ testParsingUnchangedDone
+    public function testParsingUnchangedDone()
+    {
+        $todo1 = new Todo(1, 'activity1', 'category1', ['tag1', 'tag2'], 'text', null, false);
+        $todo2 = new Todo(2, 'activity1', 'category1', ['tag1', 'tag2'], 'text2', $todo1, false);
+        $todo3 = new Todo(3, 'activity1', 'category1', ['tag1', 'tag2'], 'text3', $todo1, true);
+
+        $todos = new \SplObjectStorage();
+        $todos->attach($todo1);
+        $todos->attach($todo2);
+        $todos->attach($todo3);
+
+        $this->mrClip->userEditString = [
+            'activity1@category1 +tag1 +tag2',
+            '',
+            'text',
+            '    text2',
+            '',
+            '# text3',
+        ];
+
+        $parsed = $this->mrClip->editAndParse('', $todos);
+
+        $this->assertSame(0, $parsed->new->count());
+        $this->assertSame(0, $parsed->moved->count());
+        $this->assertSame(0, $parsed->edited->count());
+        $this->assertSame(0, $parsed->deleted->count());
+
+        $this->assertSame("3 old, 3 new\n\n", $this->mrClip->echoed);
+    }
+    // }}}
     // {{{ testParsingEdit
     public function testParsingEdit()
     {

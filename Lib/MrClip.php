@@ -310,7 +310,10 @@ class MrClip
         }
 
         foreach ($matched->unchanged as $unchanged) {
-            if ($unchanged->getParentId() == $unchanged->getMatch()->getParentId()) {
+            if (
+                $unchanged->isDone()
+                || ($unchanged->getParentId() == $unchanged->getMatch()->getParentId())
+            ) {
                 $matched->exact->attach($unchanged);
             } else {
                 $matched->moved->attach($unchanged);
