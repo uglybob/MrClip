@@ -234,12 +234,23 @@ class MrClip
         $todos = $this->getFilteredTodos();
         $todosString = $this->formatTodos($todos);
         $answer = null;
+        $parsed = null;
 
         while (
             $answer !== 'y' && $answer !== 'yes'
             && $answer !== 'c' && $answer !== 'cancel'
         ) {
             $parsed = $this->editAndParse($todosString, $todos);
+
+            if (
+                !$parsed->new->count()
+                && !$parsed->moved->count()
+                && !$parsed->edited->count()
+                && !$parsed->deleted->count()
+            ) {
+                $this->outputNl('no change');
+                break;
+            }
             $todosString = $parsed->text;
             $answer = $this->input('accept (y/N/c)');
         }
