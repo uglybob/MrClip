@@ -26,28 +26,22 @@ class TodoTestClass extends Todo
     }
     // }}}
 
-    // {{{ activityMatch
-    public function activityMatch($candidate, $max)
+    // {{{ compareExact
+    public function compareExact($a, $b)
     {
-        return parent::activityMatch($candidate, $max);
+        return parent::compareExact($a, $b);
     }
     // }}}
-    // {{{ categoryMatch
-    public function categoryMatch($candidate, $max)
+    // {{{ tagsCompare
+    public function tagsCompare($tagsA, $tagsB)
     {
-        return parent::categoryMatch($candidate, $max);
+        return parent::tagsCompare($tagsA, $tagsB);
     }
     // }}}
-    // {{{ tagsMatch
-    public function tagsMatch($candidate, $max)
+    // {{{ textCompare
+    public function textCompare($textA, $textB)
     {
-        return parent::tagsMatch($candidate, $max);
-    }
-    // }}}
-    // {{{ textMatch
-    public function textMatch($candidate, $max)
-    {
-        return parent::textMatch($candidate, $max);
+        return parent::textCompare($textA, $textB);
     }
     // }}}
 }

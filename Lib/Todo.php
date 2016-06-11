@@ -232,7 +232,7 @@ class Todo extends Entry
             $confidence = 0;
         }
 
-        return $confidence;
+        return (int) $confidence;
     }
     // }}}
     // {{{ textCompare
