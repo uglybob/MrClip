@@ -466,7 +466,7 @@ class MrClip
     {
         foreach ($todos as $todo) {
             if ($todo->isDone()) {
-                $parent = ($todo->getGuess()) ? $todo->getGuess()->getParent() : null;
+                $parent = ($todo->getMatch()) ? $todo->getMatch()->getParent() : null;
                 $todo->setParent($parent);
             }
 
