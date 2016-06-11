@@ -144,14 +144,13 @@ class TodoTest extends EntryTest
     // {{{ testMatch
     public function testMatch()
     {
-        $this->assertSame(86, $this->object->match($this->parent));
-        $this->assertSame(86, $this->object->confidence);
-        $this->assertSame($this->parent, $this->object->guess);
+        $this->assertSame(69, $this->object->match($this->parent));
+        $this->assertSame(69, $this->object->confidence);
+        $this->assertSame($this->parent, $this->object->match);
 
         $this->assertSame(100, $this->object->match($this->object));
         $this->assertSame(100, $this->object->confidence);
-        $this->assertSame($this->object, $this->object->guess);
-
+        $this->assertSame($this->object, $this->object->match);
     }
     // }}}
     // {{{ testMatchSame
@@ -171,9 +170,9 @@ class TodoTest extends EntryTest
         $this->todo1 = new TodoTestClass(null, 'testActivity', 'testCategory', ['testTag'], 'testText', null, false);
         $this->todo2 = new TodoTestClass(null, 'testActivity2', 'testCategory', ['testTag'], 'testText', null, false);
 
-        $this->assertSame(90, $this->todo1->match($this->todo2));
-        $this->assertSame(90, $this->todo1->confidence);
-        $this->assertSame($this->todo2, $this->todo1->guess);
+        $this->assertSame(92, $this->todo1->match($this->todo2));
+        $this->assertSame(92, $this->todo1->confidence);
+        $this->assertSame($this->todo2, $this->todo1->match);
     }
     // }}}
     // {{{ testMatchEditCategory
@@ -182,9 +181,9 @@ class TodoTest extends EntryTest
         $this->todo1 = new TodoTestClass(null, 'testActivity', 'testCategory', ['testTag'], 'testText', null, false);
         $this->todo2 = new TodoTestClass(null, 'testActivity', 'testCategory2', ['testTag'], 'testText', null, false);
 
-        $this->assertSame(90, $this->todo1->match($this->todo2));
-        $this->assertSame(90, $this->todo1->confidence);
-        $this->assertSame($this->todo2, $this->todo1->guess);
+        $this->assertSame(92, $this->todo1->match($this->todo2));
+        $this->assertSame(92, $this->todo1->confidence);
+        $this->assertSame($this->todo2, $this->todo1->match);
     }
     // }}}
     // {{{ testMatchEditTagsMinus1
@@ -193,9 +192,9 @@ class TodoTest extends EntryTest
         $this->todo1 = new TodoTestClass(null, 'testActivity', 'testCategory', ['testTag'], 'testText', null, false);
         $this->todo2 = new TodoTestClass(null, 'testActivity', 'testCategory', [], 'testText', null, false);
 
-        $this->assertSame(90, $this->todo1->match($this->todo2));
-        $this->assertSame(90, $this->todo1->confidence);
-        $this->assertSame($this->todo2, $this->todo1->guess);
+        $this->assertSame(92, $this->todo1->match($this->todo2));
+        $this->assertSame(92, $this->todo1->confidence);
+        $this->assertSame($this->todo2, $this->todo1->match);
     }
     // }}}
     // {{{ testMatchEditTagsPlus1
@@ -204,9 +203,9 @@ class TodoTest extends EntryTest
         $this->todo1 = new TodoTestClass(null, 'testActivity', 'testCategory', ['testTag'], 'testText', null, false);
         $this->todo2 = new TodoTestClass(null, 'testActivity', 'testCategory', ['testTag', 'testTag2'], 'testText', null, false);
 
-        $this->assertSame(90, $this->todo1->match($this->todo2));
-        $this->assertSame(90, $this->todo1->confidence);
-        $this->assertSame($this->todo2, $this->todo1->guess);
+        $this->assertSame(92, $this->todo1->match($this->todo2));
+        $this->assertSame(92, $this->todo1->confidence);
+        $this->assertSame($this->todo2, $this->todo1->match);
     }
     // }}}
     // {{{ testMatchEditTagsEdit
@@ -215,9 +214,9 @@ class TodoTest extends EntryTest
         $this->todo1 = new TodoTestClass(null, 'testActivity', 'testCategory', ['testTag'], 'testText', null, false);
         $this->todo2 = new TodoTestClass(null, 'testActivity', 'testCategory', ['testTag2'], 'testText', null, false);
 
-        $this->assertSame(80, $this->todo1->match($this->todo2));
-        $this->assertSame(80, $this->todo1->confidence);
-        $this->assertSame($this->todo2, $this->todo1->guess);
+        $this->assertSame(84, $this->todo1->match($this->todo2));
+        $this->assertSame(84, $this->todo1->confidence);
+        $this->assertSame($this->todo2, $this->todo1->match);
     }
     // }}}
     // {{{ testMatchEditText

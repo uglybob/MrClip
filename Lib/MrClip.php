@@ -281,6 +281,7 @@ class MrClip
             $confidence = 0;
 
             foreach ($newTodos as $new) {
+                $new->resetMatch();
                 foreach ($rest as $old) {
                     $new->match($old);
 
@@ -294,8 +295,6 @@ class MrClip
             $newTodos->detach($bestMatch);
             $matched->total->attach($bestMatch);
 
-            //var_dump($bestMatch->format() . ' -> ' . $bestMatch->getMatch()->format() . ' (' . $bestMatch->getConfidence() . ')');
-
             if ($bestMatch->getConfidence() >= 80) {
                 $bestMatch->setId($bestMatch->getMatch()->getId());
                 $rest->detach($bestMatch->getMatch());
@@ -308,8 +307,10 @@ class MrClip
             } else {
                 $matched->new->attach($bestMatch);
             }
+            //var_dump($rest->count() . ':' . $matched->total->count() . '/' . $toMatch . ':' . $bestMatch->format() . ' -> ' . $bestMatch->getMatch()->format() . ' (' . $bestMatch->getConfidence() . ')');
         }
 
+        //var_dump($unchanged->format() . ':' . $unchanged->getParentId() . ' -> ' . $unchanged->getMatch()->getParentId() . ':' . $unchanged->getMatch()->format() . ' (' . $unchanged->getConfidence() . ')');
         foreach ($matched->unchanged as $unchanged) {
             if ($unchanged->getParentId() == $unchanged->getMatch()->getParentId()) {
                 $matched->exact->attach($unchanged);
@@ -319,6 +320,7 @@ class MrClip
         }
 
         $matched->deleted->addAll($rest);
+        $matched->new->addAll($newTodos);
         $matched->text = implode('', $newList);
 
         $this->outputNl(count($todos) . ' old, ' . $toMatch . ' new');

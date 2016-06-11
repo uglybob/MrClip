@@ -105,8 +105,8 @@ class Todo extends Entry
     // {{{ match
     public function match(Todo $candidate)
     {
-        $match = $this->lexicalMatch($candidate, 70)
-            + $this->positionMatch($candidate, 29)
+        $match = $this->lexicalMatch($candidate, 80)
+            + $this->positionMatch($candidate, 19)
             + $this->doneMatch($candidate, 1);
 
         if ($match > $this->confidence) {
@@ -117,6 +117,13 @@ class Todo extends Entry
         return $match;
     }
     // }}}
+    // {{{ resetMatch
+    public function resetMatch()
+    {
+        $this->confidence = 0;
+        $this->match = null;
+    }
+    // }}}
 
     // {{{ positionMatch
     public function positionMatch($candidate = null, $max = 1)
@@ -125,7 +132,7 @@ class Todo extends Entry
         $parentB = (is_null($candidate)) ? $this->match->getParent() : $candidate->getParent();
 
         if ($parentA && $parentB) {
-            $percent = $parentA->lexicalMatch($parentB, 99);
+            $percent = $parentA->lexicalMatch($parentB, 99)
                 + $parentA->doneMatch($parentB, 1);
 
             $positionMatch = (int) ($percent * $max / 100);
