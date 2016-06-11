@@ -141,19 +141,71 @@ class MrClip
     // {{{ getLastRecordEnd
     protected function getLastRecordEnd()
     {
-        return $this->prm->getLastRecord()->getEnd()->format('H:i');
+        $end = $this->cacheRead('end');
+
+        if ($end === false) {
+            $last = $this->prm->getLastRecord();
+
+            if ($last) {
+                $end = $last->getEnd()->format('H:i');
+            }
+
+            $this->cacheWrite('end', [$end]);
+        } else {
+            $end = $end[0];
+        }
+
+        return $end;
     }
     // }}}
     // {{{ getActigories
     protected function getActigories()
     {
-        return $this->prm->getActigories();
+        $actigories = $this->cacheRead('actigories');
+
+        if ($actigories === false) {
+            $actigories = $this->prm->getActigories();
+            $this->cacheWrite('actigories', $actigories);
+        }
+
+        return $actigories;
     }
     // }}}
     // {{{ getTags
     protected function getTags()
     {
-        return $this->prm->getTags();
+        $tags = $this->cacheRead('tags');
+
+        if ($tags === false) {
+            $tags = $this->prm->getTags();
+            $this->cacheWrite('tags', $tags);
+        }
+
+        return $tags;
+    }
+    // }}}
+
+    // {{{ cacheWrite
+    protected function cacheWrite($name, $data)
+    {
+        $file = Setup::get('cache') . '/' . $name;
+        file_put_contents($file, implode("\n", $data));
+    }
+    // }}}
+    // {{{ cacheRead
+    protected function cacheRead($name)
+    {
+        $data = false;
+        $file = Setup::get('cache') . '/' . $name;
+
+        if (
+            file_exists($file)
+            && ((time() - filemtime($file)) < 15)
+        ) {
+            $data = file($file, FILE_IGNORE_NEW_LINES);
+        }
+
+        return $data;
     }
     // }}}
 
