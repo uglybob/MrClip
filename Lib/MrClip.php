@@ -283,11 +283,15 @@ class MrClip
             foreach ($newTodos as $new) {
                 if (
                     $new->getMatch()
-                    && $rest->contains($new->getMatch())
                     && ($new->getConfidence() > $confidence)
+                    && $rest->contains($new->getMatch())
                 ) {
                     $confidence = $new->getConfidence();
                     $bestMatch = $new;
+
+                    if ($confidence === 100) {
+                        break;
+                    }
                 } else {
                     $new->resetMatch();
 
@@ -297,6 +301,10 @@ class MrClip
                         if ($new->getConfidence() > $confidence) {
                             $confidence = $new->getConfidence();
                             $bestMatch = $new;
+
+                            if ($confidence == 100) {
+                                break;
+                            }
                         }
                     }
                 }
