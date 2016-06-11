@@ -133,11 +133,6 @@ class MrClip
     }
     // }}}
 
-    // {{{ cacheAttributes
-    protected function cacheAttributes()
-    {
-    }
-    // }}}
     // {{{ getLastRecordEnd
     protected function getLastRecordEnd()
     {
@@ -185,6 +180,22 @@ class MrClip
     }
     // }}}
 
+    // {{{ cacheAttributes
+    protected function cacheAttributes()
+    {
+        $pid = pcntl_fork();
+
+        if ($pid == -1) {
+            die('could not fork');
+        } else if ($pid) {
+        } else {
+            $this->getLastRecordEnd();
+            $this->getActigories();
+            $this->getTags();
+            exit;
+        }
+    }
+    // }}}
     // {{{ cacheWrite
     protected function cacheWrite($name, $data)
     {
