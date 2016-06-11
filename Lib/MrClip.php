@@ -281,13 +281,23 @@ class MrClip
             $confidence = 0;
 
             foreach ($newTodos as $new) {
-                $new->resetMatch();
-                foreach ($rest as $old) {
-                    $new->match($old);
+                if (
+                    $new->getMatch()
+                    && $rest->contains($new->getMatch())
+                    && ($new->getConfidence() > $confidence)
+                ) {
+                    $confidence = $new->getConfidence();
+                    $bestMatch = $new;
+                } else {
+                    $new->resetMatch();
 
-                    if ($new->getConfidence() > $confidence) {
-                        $confidence = $new->getConfidence();
-                        $bestMatch = $new;
+                    foreach ($rest as $old) {
+                        $new->match($old);
+
+                        if ($new->getConfidence() > $confidence) {
+                            $confidence = $new->getConfidence();
+                            $bestMatch = $new;
+                        }
                     }
                 }
             }
