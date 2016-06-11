@@ -260,49 +260,84 @@ class MrClip
     {
         $newList = $this->userEditString($string);
         $newTodos = $this->parseTodoList($newList);
+        $toMatch = $newTodos->count();
 
-        $exact = new \SplObjectStorage();
-        $unsure = new \SplObjectStorage();
-        $guess = new \SplObjectStorage();
-        $new = new \SplObjectStorage();
-        $moved = new \SplObjectStorage();
+        $rest = new \SplObjectStorage();
+        $rest->addAll($todos);
 
-        $rest = $this->matchTodos($todos, $newTodos, $exact, $unsure, 100);
-        $rest = $this->matchTodos($rest, $unsure, $guess, $new, 80);
+        $matched = new \stdClass();
+        $matched->new = new \SplObjectStorage();
+        $matched->total = new \SplObjectStorage();
+        $matched->edited = new \SplObjectStorage();
+        $matched->unchanged = new \SplObjectStorage();
+        $matched->exact = new \SplObjectStorage();
+        $matched->moved = new \SplObjectStorage();
+        $matched->deleted = new \SplObjectStorage();
 
-        foreach ($exact as $todo) {
-            if (
-                !$todo->isDone()
-                && ($todo->getParentId() != $todo->getGuess()->getParentId())
-            ) {
-                $moved->attach($todo);
+        while (
+            ($rest->count() > 0)
+            && ($matched->total->count() < $toMatch)
+        ) {
+            $confidence = 0;
+
+            foreach ($newTodos as $new) {
+                foreach ($rest as $old) {
+                    $new->match($old);
+
+                    if ($new->getConfidence() > $confidence) {
+                        $confidence = $new->getConfidence();
+                        $bestMatch = $new;
+                    }
+                }
+            }
+
+            $newTodos->detach($bestMatch);
+            $matched->total->attach($bestMatch);
+
+            //var_dump($bestMatch->format() . ' -> ' . $bestMatch->getMatch()->format() . ' (' . $bestMatch->getConfidence() . ')');
+
+            if ($bestMatch->getConfidence() >= 80) {
+                $bestMatch->setId($bestMatch->getMatch()->getId());
+                $rest->detach($bestMatch->getMatch());
+
+                if ($bestMatch->lexicalMatch() && $bestMatch->doneMatch()) {
+                    $matched->unchanged->attach($bestMatch);
+                } else {
+                    $matched->edited->attach($bestMatch);
+                }
+            } else {
+                $matched->new->attach($bestMatch);
             }
         }
 
-        $this->outputNl(count($todos) . ' old, ' . count($newTodos) . ' new');
+        foreach ($matched->unchanged as $unchanged) {
+            if ($unchanged->getParentId() == $unchanged->getMatch()->getParentId()) {
+                $matched->exact->attach($unchanged);
+            } else {
+                $matched->moved->attach($unchanged);
+            }
+        }
+
+        $matched->deleted->addAll($rest);
+        $matched->text = implode('', $newList);
+
+        $this->outputNl(count($todos) . ' old, ' . $toMatch . ' new');
         $this->outputNl();
 
-        foreach ($moved as $todo) {
+        foreach ($matched->moved as $todo) {
             $this->outputNl('(moved)   ' . $todo->format());
         }
-        foreach ($guess as $todo) {
-            $this->outputNl('(edited)  ' . $todo->getGuess()->format() . ' -> ' . $todo->format());
+        foreach ($matched->edited as $todo) {
+            $this->outputNl('(edited)  ' . $todo->getMatch()->format() . ' -> ' . $todo->format());
         }
-        foreach ($rest as $todo) {
+        foreach ($matched->deleted as $todo) {
             $this->outputNl('(deleted) ' . $todo->format());
         }
-        foreach ($new as $todo) {
+        foreach ($matched->new as $todo) {
             $this->outputNl('(new)     ' . $todo->format());
         }
 
-        $parsed = new \stdclass();
-        $parsed->new = $new;
-        $parsed->moved = $moved;
-        $parsed->edited = $guess;
-        $parsed->delete = $rest;
-        $parsed->text = implode('', $newList);
-
-        return $parsed;
+        return $matched;
     }
     // }}}
     // {{{ parseLevel
@@ -424,29 +459,6 @@ class MrClip
         $parser->parseTags();
 
         return $this->prm->getTodos($parser->getActivity(), $parser->getCategory(), $parser->getTags());
-    }
-    // }}}
-    // {{{ matchTodos
-    protected function matchTodos($oldTodos, $newTodos, $above, $under, $threshold)
-    {
-        $rest = new \SplObjectStorage();
-        $rest->addAll($oldTodos);
-
-        foreach ($newTodos as $newTodo) {
-            foreach($rest as $oldTodo) {
-                $newTodo->match($oldTodo);
-            }
-
-            if ($newTodo->getConfidence() >= $threshold) {
-                $above->attach($newTodo);
-                $newTodo->setId($newTodo->getGuess()->getId());
-                $rest->detach($newTodo->getGuess());
-            } else {
-                $under->attach($newTodo);
-            }
-        }
-
-        return $rest;
     }
     // }}}
     // {{{ saveTodos

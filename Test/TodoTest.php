@@ -162,7 +162,7 @@ class TodoTest extends EntryTest
 
         $this->assertSame(100, $this->todo1->match($this->todo2));
         $this->assertSame(100, $this->todo1->confidence);
-        $this->assertSame($this->todo2, $this->todo1->guess);
+        $this->assertSame($this->todo2, $this->todo1->match);
     }
     // }}}
     // {{{ testMatchEditActivity
@@ -230,6 +230,7 @@ class TodoTest extends EntryTest
     }
     // }}}
 
+/*
     // {{{ testActivityConfidence
     public function testActivityConfidence()
     {
@@ -336,4 +337,5 @@ class TodoTest extends EntryTest
         $this->assertSame(86, $this->object->getConfidence());
     }
     // }}}
+    */
 }

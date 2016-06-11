@@ -66,12 +66,6 @@ class MrClipTestClass extends MrClip
         return parent::getFilteredTodos();
     }
     // }}}
-    // {{{ matchTodos
-    public function matchTodos($todos, $candidates, $above, $under, $threshold)
-    {
-        return parent::matchTodos($todos, $candidates, $above, $under, $threshold);
-    }
-    // }}}
 
     // {{{ editAndParse
     public function editAndParse($string, $todos)

@@ -9,7 +9,7 @@ class Todo extends Entry
     protected $parentId;
     protected $done;
     protected $children;
-    protected $guess;
+    protected $match;
     protected $confidence;
     // }}}
     // {{{ constructor
@@ -109,7 +109,7 @@ class Todo extends Entry
             + $this->positionMatch($candidate, 29)
             + $this->doneMatch($candidate, 1);
 
-        if ($match > $this->match) {
+        if ($match > $this->confidence) {
             $this->confidence = $match;
             $this->match = $candidate;
         }
@@ -119,10 +119,10 @@ class Todo extends Entry
     // }}}
 
     // {{{ positionMatch
-    public function positionMatch($candidate, $max)
+    public function positionMatch($candidate = null, $max = 1)
     {
         $parentA = $this->parent;
-        $parentB = $candidate->getParent();
+        $parentB = (is_null($candidate)) ? $this->match->getParent() : $candidate->getParent();
 
         if ($parentA && $parentB) {
             $percent = $parentA->lexicalMatch($parentB, 99);
@@ -139,14 +139,18 @@ class Todo extends Entry
     }
     // }}}
     // {{{ lexicalMatch
-    public function lexicalMatch($candidate, $max)
+    public function lexicalMatch($candidate = null, $max = 1)
     {
-        $percent = $this->activityMatch($this->activity, $candidate->getActivity(), 10)
-            + $this->categoryMatch($this->category, $candidate->getCategory(), 10)
-            + $this->tagsMatch($this->tags, $candidate->getTags(), 30)
-            + $this->textMatch($this->text, $candidate->getText(), 60);
+        if (is_null($candidate)) {
+            $candidate = $this->match;
+        }
 
-        return = (int) ($percent * $max / 100);
+        $percent = $this->activityMatch($candidate, 10)
+            + $this->categoryMatch($candidate, 10)
+            + $this->tagsMatch($candidate, 30)
+            + $this->textMatch($candidate, 50);
+
+        return (int) ($percent * $max / 100);
     }
     // }}}
 
@@ -210,8 +214,12 @@ class Todo extends Entry
     }
     // }}}
     // {{{ doneMatch
-    protected function doneMatch($candidate, $max)
+    public function doneMatch($candidate = null, $max = 1)
     {
+        if (is_null($candidate)) {
+            $candidate = $this->match;
+        }
+
         if ($this->isDone() === $candidate->isDone()) {
             $match = $max;
         } else {

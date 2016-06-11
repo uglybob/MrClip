@@ -16,7 +16,7 @@ class TodoTestClass extends Todo
     public $parentId;
     public $done;
     public $children;
-    public $guess;
+    public $match;
     public $confidence;
     // }}}
     // {{{ getFormattedTags
@@ -26,34 +26,28 @@ class TodoTestClass extends Todo
     }
     // }}}
 
-    // {{{ activityConfidence
-    public function activityConfidence($activityA, $activityB, $max)
+    // {{{ activityMatch
+    public function activityMatch($candidate, $max)
     {
-        return parent::activityConfidence($activityA, $activityB, $max);
+        return parent::activityMatch($candidate, $max);
     }
     // }}}
-    // {{{ categoryConfidence
-    public function categoryConfidence($categoryA, $categoryB, $max)
+    // {{{ categoryMatch
+    public function categoryMatch($candidate, $max)
     {
-        return parent::categoryConfidence($categoryA, $categoryB, $max);
+        return parent::categoryMatch($candidate, $max);
     }
     // }}}
-    // {{{ tagsConfidence
-    public function tagsConfidence($tagsA, $tagsB, $max)
+    // {{{ tagsMatch
+    public function tagsMatch($candidate, $max)
     {
-        return parent::tagsConfidence($tagsA, $tagsB, $max);
+        return parent::tagsMatch($candidate, $max);
     }
     // }}}
-    // {{{ textConfidence
-    public function textConfidence($textA, $textB, $max)
+    // {{{ textMatch
+    public function textMatch($candidate, $max)
     {
-        return parent::textConfidence($textA, $textB, $max);
-    }
-    // }}}
-    // {{{ doneConfidence
-    public function doneConfidence($doneA, $doneB, $max)
-    {
-        return parent::doneConfidence($doneA, $doneB, $max);
+        return parent::textMatch($candidate, $max);
     }
     // }}}
 }
