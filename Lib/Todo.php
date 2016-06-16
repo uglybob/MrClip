@@ -7,17 +7,19 @@ class Todo extends Entry
     // {{{ variables
     protected $parent;
     protected $parentId;
+    protected $position;
     protected $done;
     protected $children;
     protected $match;
     protected $confidence;
     // }}}
     // {{{ constructor
-    public function __construct($id = null, $activity = null, $category = null, $tags = [], $text = null, $parent = null, $done = null)
+    public function __construct($id = null, $activity = null, $category = null, $tags = [], $text = null, $parent = null, $position = null, $done = null)
     {
         parent::__construct($id, $activity, $category, $tags, $text);
 
         $this->setParent($parent);
+        $this->position = $position;
         $this->done = $done;
         $this->children = [];
         $this->confidence = null;
@@ -34,6 +36,12 @@ class Todo extends Entry
     public function getParent()
     {
         return $this->parent;
+    }
+    // }}}
+    // {{{ getPosition
+    public function getPosition()
+    {
+        return $this->position;
     }
     // }}}
     // {{{ getParentId

@@ -14,6 +14,7 @@ class TodoTestClass extends Todo
 
     public $parent;
     public $parentId;
+    public $position;
     public $done;
     public $children;
     public $match;

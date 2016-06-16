@@ -113,6 +113,7 @@ class PRM
             $todo->getTags(),
             $todo->getText(),
             $todo->getParentId(),
+            $todo->getPosition(),
             $todo->isDone()
         );
 
@@ -179,6 +180,7 @@ class PRM
                 $obj->tags,
                 $obj->text,
                 null,
+                $obj->position,
                 $obj->done
             );
             $todo->setParentId($obj->parentId);

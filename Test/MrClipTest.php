@@ -374,6 +374,7 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
         $this->assertSame(['tag1', 'tag2', 'tag3'], $todo->getTags());
         $this->assertSame('extra tag', $todo->getText());
         $this->assertSame(1, $todo->getParentId());
+        $this->assertSame(2, $todo->getPosition());
         $this->assertFalse($todo->isDone());
     }
     // }}}
@@ -577,7 +578,7 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
     // {{{ testFormatTodosDone
     public function testFormatTodosDone()
     {
-        $todo = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, true);
+        $todo = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, null, true);
 
         $expected = "testActivity@testCategory\n\n" .
         "# +testTag1 +testTag2 testText\n";
@@ -588,8 +589,8 @@ class MrClipTest extends \PhpUnit_Framework_TestCase
     // {{{ testFormatTodosDoneMixed
     public function testFormatTodosDoneMixed()
     {
-        $todo1 = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText1', null, true);
-        $todo2 = new Todo(2, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText2', null, false);
+        $todo1 = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText1', null, null, true);
+        $todo2 = new Todo(2, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText2', null, null, false);
 
         $expected = "testActivity@testCategory\n" .
         "\n" .
