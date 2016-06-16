@@ -514,7 +514,7 @@ class MrClip
     // {{{ userEditString
     protected function userEditString($string)
     {
-        $temp = tempnam(sys_get_temp_dir(), 'MrClip');
+        $temp = tempnam(Setup::get('cache') . '/', 'MrClip');
         file_put_contents($temp, $string);
 
         $pipes = array();
