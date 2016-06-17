@@ -3,6 +3,9 @@
     "autoload": {
         "psr-4": { "Uglybob\\MrClip\\": "" }
     },
+    "require-dev": {
+        "phpunit/phpunit": "*"
+    },
     "license": [
         "GPL-2.0"
     ]
