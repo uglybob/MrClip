@@ -5,7 +5,7 @@ namespace Uglybob\MrClip\Test;
 use Uglybob\MrClip\Lib\Parser;
 use Uglybob\MrClip\Lib\Todo;
 
-class MrClipTest extends \PhpUnit_Framework_TestCase
+class MrClipTest extends \PHPUnit_Framework_TestCase
 {
     // {{{ setUp
     protected function setUp()

@@ -4,7 +4,7 @@ namespace Uglybob\MrClip\Test;
 
 use Uglybob\MrClip\Lib\Entry;
 
-class EntryTest extends \PhpUnit_Framework_TestCase
+class EntryTest extends \PHPUnit_Framework_TestCase
 {
     // {{{ setUp
     protected function setUp()
