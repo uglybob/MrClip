@@ -402,7 +402,7 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
     // {{{ testFormatTodos
     public function testFormatTodos()
     {
-        $todo = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, false);
+        $todo = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, 0, false);
 
         $expected = "testActivity@testCategory\n\n" .
         "+testTag1 +testTag2 testText\n";
@@ -419,8 +419,8 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
     // {{{ testFormatTodosTwo
     public function testFormatTodosTwo()
     {
-        $todo1 = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, false);
-        $todo2 = new Todo(2, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText2', null, false);
+        $todo1 = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, 0, false);
+        $todo2 = new Todo(2, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText2', null, 1, false);
 
         $expected = "testActivity@testCategory\n\n" .
         "+testTag1 +testTag2 testText\n" .
@@ -432,8 +432,8 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
     // {{{ testFormatTodosTwoDifferentTags
     public function testFormatTodosTwoDifferentTags()
     {
-        $todo1 = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, false);
-        $todo2 = new Todo(2, 'testActivity', 'testCategory', ['testTag3', 'testTag4'], 'testText2', null, false);
+        $todo1 = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, 0, false);
+        $todo2 = new Todo(2, 'testActivity', 'testCategory', ['testTag3', 'testTag4'], 'testText2', null, 1, false);
 
         $expected = "testActivity@testCategory\n\n" .
         "+testTag1 +testTag2 testText\n" .
@@ -445,8 +445,8 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
     // {{{ testFormatTodosTwoDifferentTagsIntersect
     public function testFormatTodosTwoDifferentTagsIntersect()
     {
-        $todo1 = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, false);
-        $todo2 = new Todo(2, 'testActivity', 'testCategory', ['testTag2', 'testTag3'], 'testText2', null, false);
+        $todo1 = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, 0, false);
+        $todo2 = new Todo(2, 'testActivity', 'testCategory', ['testTag2', 'testTag3'], 'testText2', null, 1, false);
 
         $expected = "testActivity@testCategory\n\n" .
         "+testTag1 +testTag2 testText\n" .
@@ -458,8 +458,8 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
     // {{{ testFormatTodosChild
     public function testFormatTodosChild()
     {
-        $todo1 = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, false);
-        $todo2 = new Todo(2, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText2', $todo1, false);
+        $todo1 = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, 0, false);
+        $todo2 = new Todo(2, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText2', $todo1, 0, false);
 
         $expected = "testActivity@testCategory\n\n" .
         "+testTag1 +testTag2 testText\n" .
@@ -471,9 +471,9 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
     // {{{ testFormatTodosChildren
     public function testFormatTodosChildren()
     {
-        $todo1 = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, false);
-        $todo2 = new Todo(2, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText2', $todo1, false);
-        $todo3 = new Todo(3, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText3', $todo1, false);
+        $todo1 = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, 0, false);
+        $todo2 = new Todo(2, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText2', $todo1, 0, false);
+        $todo3 = new Todo(3, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText3', $todo1, 1, false);
 
         $expected = "testActivity@testCategory\n\n" .
         "+testTag1 +testTag2 testText\n" .
@@ -486,9 +486,9 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
     // {{{ testFormatTodosChildChild
     public function testFormatTodosChildChild()
     {
-        $todo1 = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, false);
-        $todo2 = new Todo(2, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText2', $todo1, false);
-        $todo3 = new Todo(3, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText3', $todo2, false);
+        $todo1 = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, 0, false);
+        $todo2 = new Todo(2, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText2', $todo1, 0, false);
+        $todo3 = new Todo(3, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText3', $todo2, 0, false);
 
         $expected = "testActivity@testCategory\n\n" .
         "+testTag1 +testTag2 testText\n" .
@@ -501,10 +501,10 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
     // {{{ testFormatTodosChildChildGap
     public function testFormatTodosChildChildGap()
     {
-        $todo1 = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, false);
-        $todo2 = new Todo(2, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText2', $todo1, false);
-        $todo3 = new Todo(3, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText3', $todo2, false);
-        $todo4 = new Todo(4, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText4', null, false);
+        $todo1 = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, 0, false);
+        $todo2 = new Todo(2, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText2', $todo1, 0, false);
+        $todo3 = new Todo(3, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText3', $todo2, 0, false);
+        $todo4 = new Todo(4, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText4', null, 1, false);
 
         $expected = "testActivity@testCategory\n\n" .
         "+testTag1 +testTag2 testText\n" .
@@ -518,8 +518,8 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
     // {{{ testFormatTodosMultipleActigories
     public function testFormatTodosMultipleActigories()
     {
-        $todo1 = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, false);
-        $todo2 = new Todo(2, 'testActivity2', 'testCategory2', ['testTag1', 'testTag2'], 'testText2', null, false);
+        $todo1 = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, 0, false);
+        $todo2 = new Todo(2, 'testActivity2', 'testCategory2', ['testTag1', 'testTag2'], 'testText2', null, 0, false);
 
         $expected = "testActivity@testCategory\n\n" .
         "+testTag1 +testTag2 testText\n\n" .
@@ -532,8 +532,8 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
     // {{{ testFormatTodosMultipleActivities
     public function testFormatTodosMultipleActivities()
     {
-        $todo1 = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, false);
-        $todo2 = new Todo(2, 'testActivity2', 'testCategory', ['testTag1', 'testTag2'], 'testText2', null, false);
+        $todo1 = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, 0, false);
+        $todo2 = new Todo(2, 'testActivity2', 'testCategory', ['testTag1', 'testTag2'], 'testText2', null, 0, false);
 
         $expected = "testActivity@testCategory\n\n" .
         "+testTag1 +testTag2 testText\n\n" .
@@ -546,8 +546,8 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
     // {{{ testFormatTodosMultipleCategories
     public function testFormatTodosMultipleCategories()
     {
-        $todo1 = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, false);
-        $todo2 = new Todo(2, 'testActivity', 'testCategory2', ['testTag1', 'testTag2'], 'testText2', null, false);
+        $todo1 = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, 0, false);
+        $todo2 = new Todo(2, 'testActivity', 'testCategory2', ['testTag1', 'testTag2'], 'testText2', null, 0, false);
 
         $expected = "testActivity@testCategory\n\n" .
         "+testTag1 +testTag2 testText\n\n" .
@@ -563,9 +563,9 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
         $this->mrClip->parser = new ParserTestClass(explode(' ', '+testTag1'));
         $this->mrClip->parser->parseTags();
 
-        $todo1 = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, false);
-        $todo2 = new Todo(2, 'testActivity', 'testCategory', ['testTag1', 'testTag3'], 'testText2', null, false);
-        $todo3 = new Todo(3, 'testActivity', 'testCategory', ['testTag1'], 'testText3', null, false);
+        $todo1 = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, 0, false);
+        $todo2 = new Todo(2, 'testActivity', 'testCategory', ['testTag1', 'testTag3'], 'testText2', null, 1, false);
+        $todo3 = new Todo(3, 'testActivity', 'testCategory', ['testTag1'], 'testText3', null, 2, false);
 
         $expected = "testActivity@testCategory +testTag1\n\n" .
         "+testTag2 testText\n" .
@@ -578,7 +578,7 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
     // {{{ testFormatTodosDone
     public function testFormatTodosDone()
     {
-        $todo = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, null, true);
+        $todo = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, 0, true);
 
         $expected = "testActivity@testCategory\n\n" .
         "# +testTag1 +testTag2 testText\n";
@@ -589,8 +589,8 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
     // {{{ testFormatTodosDoneMixed
     public function testFormatTodosDoneMixed()
     {
-        $todo1 = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText1', null, null, true);
-        $todo2 = new Todo(2, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText2', null, null, false);
+        $todo1 = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText1', null, 0, true);
+        $todo2 = new Todo(2, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText2', null, 1, false);
 
         $expected = "testActivity@testCategory\n" .
         "\n" .
@@ -870,9 +870,9 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
     // {{{ testParsingDeleted
     public function testParsingDeleted()
     {
-        $todo1 = new Todo(1, 'activity1', 'category1', ['tag1', 'tag2'], 'text', null, false);
-        $todo2 = new Todo(2, 'activity1', 'category1', ['tag1', 'tag2'], 'text2', $todo1, false);
-        $todo3 = new Todo(3, 'activity1', 'category1', ['tag1', 'tag2'], 'text3', $todo1, false);
+        $todo1 = new Todo(1, 'activity1', 'category1', ['tag1', 'tag2'], 'text', null, 0, false);
+        $todo2 = new Todo(2, 'activity1', 'category1', ['tag1', 'tag2'], 'text2', $todo1, 0, false);
+        $todo3 = new Todo(3, 'activity1', 'category1', ['tag1', 'tag2'], 'text3', $todo1, 1, false);
 
         $todos = new \SplObjectStorage();
         $todos->attach($todo1);
@@ -899,9 +899,9 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
     // {{{ testParsingUnchanged
     public function testParsingUnchanged()
     {
-        $todo1 = new Todo(1, 'activity1', 'category1', ['tag1', 'tag2'], 'text', null, false);
-        $todo2 = new Todo(2, 'activity1', 'category1', ['tag1', 'tag2'], 'text2', $todo1, false);
-        $todo3 = new Todo(3, 'activity1', 'category1', ['tag1', 'tag2'], 'text3', $todo1, false);
+        $todo1 = new Todo(1, 'activity1', 'category1', ['tag1', 'tag2'], 'text', null, 0, false);
+        $todo2 = new Todo(2, 'activity1', 'category1', ['tag1', 'tag2'], 'text2', $todo1, 0, false);
+        $todo3 = new Todo(3, 'activity1', 'category1', ['tag1', 'tag2'], 'text3', $todo1, 1, false);
 
         $todos = new \SplObjectStorage();
         $todos->attach($todo1);
@@ -929,9 +929,9 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
     // {{{ testParsingUnchangedDone
     public function testParsingUnchangedDone()
     {
-        $todo1 = new Todo(1, 'activity1', 'category1', ['tag1', 'tag2'], 'text', null, false);
-        $todo2 = new Todo(2, 'activity1', 'category1', ['tag1', 'tag2'], 'text2', $todo1, false);
-        $todo3 = new Todo(3, 'activity1', 'category1', ['tag1', 'tag2'], 'text3', $todo1, true);
+        $todo1 = new Todo(1, 'activity1', 'category1', ['tag1', 'tag2'], 'text', null, 0, false);
+        $todo2 = new Todo(2, 'activity1', 'category1', ['tag1', 'tag2'], 'text2', $todo1, 0, false);
+        $todo3 = new Todo(3, 'activity1', 'category1', ['tag1', 'tag2'], 'text3', $todo1, 1, true);
 
         $todos = new \SplObjectStorage();
         $todos->attach($todo1);
@@ -960,9 +960,9 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
     // {{{ testParsingEdit
     public function testParsingEdit()
     {
-        $todo1 = new Todo(1, 'activity1', 'category1', ['tag1', 'tag2'], 'text', null, false);
-        $todo2 = new Todo(2, 'activity1', 'category1', ['tag1', 'tag2'], 'text2', $todo1, false);
-        $todo3 = new Todo(3, 'activity1', 'category1', ['tag1', 'tag2'], 'text3', $todo1, false);
+        $todo1 = new Todo(1, 'activity1', 'category1', ['tag1', 'tag2'], 'text', null, 0, false);
+        $todo2 = new Todo(2, 'activity1', 'category1', ['tag1', 'tag2'], 'text2', $todo1, 0, false);
+        $todo3 = new Todo(3, 'activity1', 'category1', ['tag1', 'tag2'], 'text3', $todo1, 1, false);
 
         $todos = new \SplObjectStorage();
         $todos->attach($todo1);
@@ -990,10 +990,10 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
     // {{{ testParsingEditGap
     public function testParsingEditGap()
     {
-        $todo1 = new Todo(1, 'activity1', 'category1', ['tag1', 'tag2'], 'text', null, false);
-        $todo2 = new Todo(2, 'activity1', 'category1', ['tag1', 'tag2'], 'text2', $todo1, false);
-        $todo3 = new Todo(3, 'activity1', 'category1', ['tag1', 'tag2'], 'text3', $todo2, false);
-        $todo4 = new Todo(4, 'activity1', 'category1', ['tag1', 'tag2'], 'text4', null, false);
+        $todo1 = new Todo(1, 'activity1', 'category1', ['tag1', 'tag2'], 'text', null, 0, false);
+        $todo2 = new Todo(2, 'activity1', 'category1', ['tag1', 'tag2'], 'text2', $todo1, 0, false);
+        $todo3 = new Todo(3, 'activity1', 'category1', ['tag1', 'tag2'], 'text3', $todo2, 0, false);
+        $todo4 = new Todo(4, 'activity1', 'category1', ['tag1', 'tag2'], 'text4', null, 1, false);
 
         $todos = new \SplObjectStorage();
         $todos->attach($todo1);
@@ -1023,9 +1023,9 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
     // {{{ testParsingEditParent
     public function testParsingEditParent()
     {
-        $todo1 = new Todo(1, 'activity1', 'category1', ['tag1', 'tag2'], 'text', null, false);
-        $todo2 = new Todo(2, 'activity1', 'category1', ['tag1', 'tag2'], 'text2', null, false);
-        $todo3 = new Todo(3, 'activity1', 'category1', ['tag1', 'tag2'], 'text3', $todo2, false);
+        $todo1 = new Todo(1, 'activity1', 'category1', ['tag1', 'tag2'], 'text', null, 0, false);
+        $todo2 = new Todo(2, 'activity1', 'category1', ['tag1', 'tag2'], 'text2', null, 1, false);
+        $todo3 = new Todo(3, 'activity1', 'category1', ['tag1', 'tag2'], 'text3', $todo2, 0, false);
 
         $todos = new \SplObjectStorage();
         $todos->attach($todo1);
@@ -1053,9 +1053,9 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
     // {{{ testParsingEditDuplicate
     public function testParsingEditDuplicate()
     {
-        $todo1 = new Todo(1, 'activity1', 'category1', ['tag1', 'tag2'], 'text', null, false);
-        $todo2 = new Todo(2, 'activity1', 'category1', ['tag1', 'tag2'], 'text2', $todo1, false);
-        $todo3 = new Todo(3, 'activity1', 'category1', ['tag1', 'tag2'], 'text', $todo1, false);
+        $todo1 = new Todo(1, 'activity1', 'category1', ['tag1', 'tag2'], 'text', null, 0, false);
+        $todo2 = new Todo(2, 'activity1', 'category1', ['tag1', 'tag2'], 'text2', $todo1, 0, false);
+        $todo3 = new Todo(3, 'activity1', 'category1', ['tag1', 'tag2'], 'text', $todo1, 1, false);
 
         $todos = new \SplObjectStorage();
         $todos->attach($todo1);
@@ -1083,9 +1083,9 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
     // {{{ testParsingMove
     public function testParsingMove()
     {
-        $todo1 = new Todo(1, 'activity1', 'category1', ['tag1', 'tag2'], 'text', null, false);
-        $todo2 = new Todo(2, 'activity1', 'category1', ['tag1', 'tag2'], 'text2', $todo1, false);
-        $todo3 = new Todo(3, 'activity1', 'category1', ['tag1', 'tag2'], 'text3', $todo1, false);
+        $todo1 = new Todo(1, 'activity1', 'category1', ['tag1', 'tag2'], 'text', null, 0, false);
+        $todo2 = new Todo(2, 'activity1', 'category1', ['tag1', 'tag2'], 'text2', $todo1, 1, false);
+        $todo3 = new Todo(3, 'activity1', 'category1', ['tag1', 'tag2'], 'text3', $todo1, 1, false);
 
         $todos = new \SplObjectStorage();
         $todos->attach($todo1);
@@ -1113,9 +1113,9 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
     // {{{ testParsingNew
     public function testParsingNew()
     {
-        $todo1 = new Todo(1, 'activity1', 'category1', ['tag1', 'tag2'], 'text', null, false);
-        $todo2 = new Todo(2, 'activity1', 'category1', ['tag1', 'tag2'], 'text2', $todo1, false);
-        $todo3 = new Todo(3, 'activity1', 'category1', ['tag1', 'tag2'], 'text3', $todo1, false);
+        $todo1 = new Todo(1, 'activity1', 'category1', ['tag1', 'tag2'], 'text', null, 0, false);
+        $todo2 = new Todo(2, 'activity1', 'category1', ['tag1', 'tag2'], 'text2', $todo1, 0, false);
+        $todo3 = new Todo(3, 'activity1', 'category1', ['tag1', 'tag2'], 'text3', $todo1, 1, false);
 
         $todos = new \SplObjectStorage();
         $todos->attach($todo1);

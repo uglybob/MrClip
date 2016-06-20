@@ -493,7 +493,7 @@ class MrClip
                     $parents = array_slice($parents, 0, $level + 1);
                 }
 
-                $todo = $this->stringToTodo($activity, $category, $tags, $parents[$level], $todoString);
+                $todo = $this->stringToTodo($activity, $category, $tags, $parents[$level], null, $todoString);
 
                 $newTodos->attach($todo);
                 $last = $todo;
@@ -538,7 +538,7 @@ class MrClip
     }
     // }}}
     // {{{ stringToTodo
-    protected function stringToTodo($activity, $category, $tags, $parent, $todoString)
+    protected function stringToTodo($activity, $category, $tags, $parent, $position, $todoString)
     {
         $todoArray = explode(' ', trim($todoString));
         $parser = new Parser($todoArray);
@@ -548,7 +548,7 @@ class MrClip
         $tags = array_unique(array_merge($tags, $filterTags));
         $text = trim($parser->parseText());
 
-        $todo = new Todo(null, $activity, $category, $tags, $text, $parent, $done);
+        $todo = new Todo(null, $activity, $category, $tags, $text, $parent, $position, $done);
 
         return $todo;
     }
