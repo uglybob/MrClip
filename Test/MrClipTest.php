@@ -601,6 +601,21 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2]));
     }
     // }}}
+    // {{{ testFormatTodosPosition
+    public function testFormatTodosPosition()
+    {
+        $todo1 = new Todo(1, 'testActivity', 'testCategory', [], 'testText', null, 1, false);
+        $todo2 = new Todo(2, 'testActivity', 'testCategory', [], 'testText2', null, 2, false);
+        $todo3 = new Todo(3, 'testActivity', 'testCategory', [], 'testText3', null, 0, false);
+
+        $expected = "testActivity@testCategory\n\n" .
+        "testText3\n" .
+        "testText\n" .
+        "testText2\n";
+
+        $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2, $todo3]));
+    }
+    // }}}
 
     // {{{ testParseTodoList
     public function testParseTodoList()
@@ -1080,11 +1095,11 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
         $this->assertSame("3 old, 3 new\n\n(edited)  activity1@category1 +tag1 +tag2 text -> activity1@category1 +tag1 +tag2 text3\n", $this->mrClip->echoed);
     }
     // }}}
-    // {{{ testParsingMove
-    public function testParsingMove()
+    // {{{ testParsingMoveParent
+    public function testParsingMoveParent()
     {
         $todo1 = new Todo(1, 'activity1', 'category1', ['tag1', 'tag2'], 'text', null, 0, false);
-        $todo2 = new Todo(2, 'activity1', 'category1', ['tag1', 'tag2'], 'text2', $todo1, 1, false);
+        $todo2 = new Todo(2, 'activity1', 'category1', ['tag1', 'tag2'], 'text2', $todo1, 0, false);
         $todo3 = new Todo(3, 'activity1', 'category1', ['tag1', 'tag2'], 'text3', $todo1, 1, false);
 
         $todos = new \SplObjectStorage();
@@ -1107,6 +1122,37 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(0, $parsed->edited->count());
         $this->assertSame(0, $parsed->deleted->count());
 
+        $this->assertSame("3 old, 3 new\n\n(moved)   activity1@category1 +tag1 +tag2 text3\n", $this->mrClip->echoed);
+    }
+    // }}}
+    // {{{ testParsingMovePosition
+    public function testParsingMovePosition()
+    {
+        $todo1 = new Todo(1, 'activity1', 'category1', ['tag1', 'tag2'], 'text', null, 0, false);
+        $todo2 = new Todo(2, 'activity1', 'category1', ['tag1', 'tag2'], 'text2', $todo1, 0, false);
+        $todo3 = new Todo(3, 'activity1', 'category1', ['tag1', 'tag2'], 'text3', $todo1, 1, false);
+
+        $todos = new \SplObjectStorage();
+        $todos->attach($todo1);
+        $todos->attach($todo2);
+        $todos->attach($todo3);
+
+        $this->mrClip->userEditString = [
+            'activity1@category1 +tag1 +tag2',
+            '',
+            'text',
+            '    text3',
+            '    text2',
+        ];
+
+        $parsed = $this->mrClip->editAndParse('', $todos);
+
+        $this->assertSame(0, $parsed->new->count());
+        $this->assertSame(2, $parsed->moved->count());
+        $this->assertSame(0, $parsed->edited->count());
+        $this->assertSame(0, $parsed->deleted->count());
+
+        $this->assertSame("3 old, 3 new\n\n(moved)   activity1@category1 +tag1 +tag2 text2\n", $this->mrClip->echoed);
         $this->assertSame("3 old, 3 new\n\n(moved)   activity1@category1 +tag1 +tag2 text3\n", $this->mrClip->echoed);
     }
     // }}}
