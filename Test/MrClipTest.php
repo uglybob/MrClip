@@ -1228,4 +1228,35 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
         $this->assertSame("3 old, 4 new\n\n(new)     activity1@category1 +tag1 +tag2 text4\n", $this->mrClip->echoed);
     }
     // }}}
+    // {{{ testParsingNewParent
+    public function testParsingNewParent()
+    {
+        $todo1 = new Todo(1, 'activity1', 'category1', ['tag1', 'tag2'], 'text', null, 0, false);
+        $todo2 = new Todo(2, 'activity1', 'category1', ['tag1', 'tag2'], 'text2', $todo1, 0, false);
+        $todo3 = new Todo(3, 'activity1', 'category1', ['tag1', 'tag2'], 'text3', $todo1, 1, false);
+
+        $todos = new \SplObjectStorage();
+        $todos->attach($todo1);
+        $todos->attach($todo2);
+        $todos->attach($todo3);
+
+        $this->mrClip->userEditString = [
+            'activity1@category1 +tag1 +tag2',
+            '',
+            'text',
+            '    text2',
+            'text4',
+            '    text3',
+        ];
+
+        $parsed = $this->mrClip->editAndParse('', $todos);
+
+        $this->assertSame(1, $parsed->new->count());
+        $this->assertSame(1, $parsed->moved->count());
+        $this->assertSame(0, $parsed->edited->count());
+        $this->assertSame(0, $parsed->deleted->count());
+
+        $this->assertSame("3 old, 4 new\n\n(moved)   activity1@category1 +tag1 +tag2 text3\n(new)     activity1@category1 +tag1 +tag2 text4\n", $this->mrClip->echoed);
+    }
+    // }}}
 }
