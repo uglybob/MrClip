@@ -427,7 +427,10 @@ class MrClip
         foreach ($matched->unchanged as $unchanged) {
             if (
                 $unchanged->isDone()
-                || ($unchanged->getParentId() == $unchanged->getMatch()->getParentId())
+                || (
+                    $unchanged->getParentId() == $unchanged->getMatch()->getParentId()
+                    && $unchanged->getPosition() == $unchanged->getMatch()->getPosition()
+                )
             ) {
                 $matched->exact->attach($unchanged);
             } else {
@@ -472,6 +475,7 @@ class MrClip
         $newTodos = new \SplObjectStorage();
         $lastHeader = null;
         $parents = [null];
+        $positions = [0];
         $last = null;
         $activity = $this->parser->getActivity();
         $category = $this->parser->getCategory();
@@ -489,11 +493,14 @@ class MrClip
 
                 if (count($parents) < $level + 1) {
                     array_push($parents, $last);
+                    $positions[$level] = 0;
                 } else if (count($parents) > $level + 1) {
                     $parents = array_slice($parents, 0, $level + 1);
                 }
 
-                $todo = $this->stringToTodo($activity, $category, $tags, $parents[$level], null, $todoString);
+                $todo = $this->stringToTodo($activity, $category, $tags, $parents[$level], $positions[$level], $todoString);
+
+                $positions[$level]++;
 
                 $newTodos->attach($todo);
                 $last = $todo;

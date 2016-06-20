@@ -114,7 +114,7 @@ class Todo extends Entry
     public function match(Todo $candidate)
     {
         $match = $this->lexicalMatch($candidate, 80)
-            + $this->positionMatch($candidate, 19)
+            + $this->locationMatch($candidate, 19)
             + $this->doneMatch($candidate, 1);
 
         if ($match > $this->confidence) {
@@ -133,24 +133,17 @@ class Todo extends Entry
     }
     // }}}
 
-    // {{{ positionMatch
-    public function positionMatch($candidate = null, $max = 1)
+    // {{{ locationMatch
+    public function locationMatch($candidate = null, $max = 1)
     {
-        $parentA = $this->parent;
-        $parentB = (is_null($candidate)) ? $this->match->getParent() : $candidate->getParent();
-
-        if ($parentA && $parentB) {
-            $percent = $parentA->lexicalMatch($parentB, 99)
-                + $parentA->doneMatch($parentB, 1);
-
-            $positionMatch = (int) ($percent * $max / 100);
-        } else if ($parentA == $parentB) {
-            $positionMatch = $max;
-        } else {
-            $positionMatch = 0;
+        if (is_null($candidate)) {
+            $candidate = $this->match;
         }
 
-        return $positionMatch;
+        $percent = $this->parentMatch($candidate, 80)
+            + $this->positionMatch($candidate, 20);
+
+        return $this->normalise($percent, $max);
     }
     // }}}
     // {{{ lexicalMatch
@@ -165,7 +158,36 @@ class Todo extends Entry
             + $this->tagsMatch($candidate, 30)
             + $this->textMatch($candidate, 50);
 
-        return (int) ($percent * $max / 100);
+        return $this->normalise($percent, $max);
+    }
+    // }}}
+
+    // {{{ parentMatch
+    public function parentMatch($candidate = null, $max = 1)
+    {
+        $parentA = $this->parent;
+        $parentB = (is_null($candidate)) ? $this->match->getParent() : $candidate->getParent();
+
+        if ($parentA && $parentB) {
+            $percent = $parentA->lexicalMatch($parentB, 99)
+                + $parentA->doneMatch($parentB, 1);
+
+            $parentMatch = $this->normalise($percent, $max);
+        } else if ($parentA == $parentB) {
+            $parentMatch = $max;
+        } else {
+            $parentMatch = 0;
+        }
+
+        return $parentMatch;
+    }
+    // }}}
+    // {{{ positionMatch
+    public function positionMatch($candidate, $max = 1)
+    {
+        $percent = $this->compareExact($this->position, $candidate->getPosition());
+
+        return $this->normalise($percent, $max);
     }
     // }}}
 

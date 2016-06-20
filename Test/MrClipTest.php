@@ -904,11 +904,11 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
         $parsed = $this->mrClip->editAndParse('', $todos);
 
         $this->assertSame(0, $parsed->new->count());
-        $this->assertSame(0, $parsed->moved->count());
+        $this->assertSame(1, $parsed->moved->count());
         $this->assertSame(0, $parsed->edited->count());
         $this->assertSame(1, $parsed->deleted->count());
 
-        $this->assertSame("3 old, 2 new\n\n(deleted) activity1@category1 +tag1 +tag2 text2\n", $this->mrClip->echoed);
+        $this->assertSame("3 old, 2 new\n\n(moved)   activity1@category1 +tag1 +tag2 text3\n(deleted) activity1@category1 +tag1 +tag2 text2\n", $this->mrClip->echoed);
     }
     // }}}
     // {{{ testParsingUnchanged
@@ -1152,8 +1152,7 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(0, $parsed->edited->count());
         $this->assertSame(0, $parsed->deleted->count());
 
-        $this->assertSame("3 old, 3 new\n\n(moved)   activity1@category1 +tag1 +tag2 text2\n", $this->mrClip->echoed);
-        $this->assertSame("3 old, 3 new\n\n(moved)   activity1@category1 +tag1 +tag2 text3\n", $this->mrClip->echoed);
+        $this->assertSame("3 old, 3 new\n\n(moved)   activity1@category1 +tag1 +tag2 text3\n(moved)   activity1@category1 +tag1 +tag2 text2\n", $this->mrClip->echoed);
     }
     // }}}
     // {{{ testParsingNew
