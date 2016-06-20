@@ -625,6 +625,8 @@ class MrClip
                 $list[] = '';
             }
 
+            $open = $this->posSort($open);
+
             foreach ($open as $todo) {
                 if (is_null($todo->getParent())) {
                     $list = array_merge($list, $this->todoTree($todo, $tagFilter, 0));
@@ -645,6 +647,16 @@ class MrClip
         return implode("\n", $list);
     }
     // }}}
+    // {{{ posSort
+    protected function posSort($todos)
+    {
+        usort($todos, function($a, $b) {
+                return $a->getPosition() - $b->getPosition();
+        });
+
+        return $todos;
+    }
+    // }}}
     // {{{ todoTree
     protected function todoTree($todo, $tagFilter, $level)
     {
@@ -653,7 +665,9 @@ class MrClip
         if (!$todo->isDone()) {
             $list[] = str_repeat('    ', $level) . $todo->formatTagsText($tagFilter);
 
-            foreach ($todo->getChildren() as $child) {
+            $children = $this->posSort($todo->getChildren());
+
+            foreach ($children as $child) {
                 $list = array_merge($list, $this->todoTree($child, $tagFilter, $level + 1));
             }
         }
