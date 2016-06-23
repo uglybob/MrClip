@@ -500,7 +500,9 @@ class MrClip
 
                 $todo = $this->stringToTodo($activity, $category, $tags, $parents[$level], $positions[$level], $todoString);
 
-                $positions[$level]++;
+                if (!$todo->isDone()) {
+                    $positions[$level]++;
+                }
 
                 $newTodos->attach($todo);
                 $last = $todo;
