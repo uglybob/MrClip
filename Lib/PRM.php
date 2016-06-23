@@ -15,6 +15,7 @@ class PRM
             $soapOptions = [
                 'uri' => Setup::get('url') . '/',
                 'location' => Setup::get('url') . '/soap.php',
+                'compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP | 9,
             ];
 
             $this->connection = new \SoapClient(null, $soapOptions);
