@@ -106,7 +106,7 @@ class Parser
     // {{{ parseActigory
     public function parseActigory($categoryOptional = false)
     {
-        $regex = '[a-zA-Z1-9]*@[a-zA-Z0-9]';
+        $regex = '[^\ѕ@]*@[^\ѕ@]';
 
         if ($categoryOptional) {
             $regex .= '*';
@@ -129,7 +129,7 @@ class Parser
     public function parseTag()
     {
         $tag = null;
-        $match = $this->process('\+[a-zA-Z0-9]+');
+        $match = $this->process('\+[^\ѕ]+');
 
         if ($match) {
             $tag = substr($match, 1);
