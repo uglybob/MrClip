@@ -311,14 +311,14 @@ class MrClip
     // {{{ todoList
     protected function todoList()
     {
-        $this->output($this->formatTodos($this->getFilteredTodos()));
+        $this->output($this->formatTodos($this->getFilteredTodos(), false));
     }
     // }}}
     // {{{ todoEdit
     protected function todoEdit()
     {
         $todos = $this->getFilteredTodos();
-        $todosString = $this->formatTodos($todos);
+        $todosString = $this->formatTodos($todos, false);
         $answer = null;
         $parsed = null;
 
@@ -607,7 +607,7 @@ class MrClip
     // }}}
 
     // {{{ formatTodos
-    protected function formatTodos($todos)
+    protected function formatTodos($todos, $hideDone)
     {
         $tagFilter = $this->parser->getTags();
         $sorted = [];
@@ -620,34 +620,20 @@ class MrClip
         foreach ($sorted as $actigory => $todos) {
             $list[] = trim($actigory . ' ' . Todo::formatTags($tagFilter));
             $open = [];
-            $done = [];
+
+            if (!empty($todos)) {
+                $list[] = '';
+            }
+
+            $todos = $this->posSort($todos);
 
             foreach ($todos as $todo) {
-                if ($todo->isDone()) {
-                    $done[] = $todo;
-                } else {
-                    $open[] = $todo;
+                if (
+                    is_null($todo->getParent())
+                    && !($hideDone && $todo->isDone())
+                ) {
+                    $list = array_merge($list, $this->todoTree($todo, $tagFilter, $hideDone, 0));
                 }
-            }
-
-            if (!empty($open)) {
-                $list[] = '';
-            }
-
-            $open = $this->posSort($open);
-
-            foreach ($open as $todo) {
-                if (is_null($todo->getParent())) {
-                    $list = array_merge($list, $this->todoTree($todo, $tagFilter, 0));
-                }
-            }
-
-            if (!empty($done)) {
-                $list[] = '';
-            }
-
-            foreach ($done as $todo) {
-                $list[] = $todo->formatTagsText($tagFilter);
             }
 
             $list[] = '';
@@ -667,17 +653,17 @@ class MrClip
     }
     // }}}
     // {{{ todoTree
-    protected function todoTree($todo, $tagFilter, $level)
+    protected function todoTree($todo, $tagFilter, $hideDone, $level)
     {
         $list = [];
 
-        if (!$todo->isDone()) {
+        if (!($hideDone && $todo->isDone())) {
             $list[] = str_repeat('    ', $level) . $todo->formatTagsText($tagFilter);
 
             $children = $this->posSort($todo->getChildren());
 
             foreach ($children as $child) {
-                $list = array_merge($list, $this->todoTree($child, $tagFilter, $level + 1));
+                $list = array_merge($list, $this->todoTree($child, $tagFilter, $hideDone, $level + 1));
             }
         }
 

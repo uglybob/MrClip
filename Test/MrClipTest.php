@@ -407,13 +407,13 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
         $expected = "testActivity@testCategory\n\n" .
         "+testTag1 +testTag2 testText\n";
 
-        $this->assertSame($expected, $this->mrClip->formatTodos([$todo]));
+        $this->assertSame($expected, $this->mrClip->formatTodos([$todo], true));
     }
     // }}}
     // {{{ testFormatTodosEmpty
     public function testFormatTodosEmpty()
     {
-        $this->assertSame('', $this->mrClip->formatTodos([]));
+        $this->assertSame('', $this->mrClip->formatTodos([], true));
     }
     // }}}
     // {{{ testFormatTodosTwo
@@ -426,7 +426,7 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
         "+testTag1 +testTag2 testText\n" .
         "+testTag1 +testTag2 testText2\n";
 
-        $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2]));
+        $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2], true));
     }
     // }}}
     // {{{ testFormatTodosTwoDifferentTags
@@ -439,7 +439,7 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
         "+testTag1 +testTag2 testText\n" .
         "+testTag3 +testTag4 testText2\n";
 
-        $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2]));
+        $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2], true));
     }
     // }}}
     // {{{ testFormatTodosTwoDifferentTagsIntersect
@@ -452,7 +452,7 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
         "+testTag1 +testTag2 testText\n" .
         "+testTag2 +testTag3 testText2\n";
 
-        $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2]));
+        $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2], true));
     }
     // }}}
     // {{{ testFormatTodosChild
@@ -465,7 +465,7 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
         "+testTag1 +testTag2 testText\n" .
         "    +testTag1 +testTag2 testText2\n";
 
-        $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2]));
+        $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2], true));
     }
     // }}}
     // {{{ testFormatTodosChildren
@@ -480,7 +480,7 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
         "    +testTag1 +testTag2 testText2\n" .
         "    +testTag1 +testTag2 testText3\n";
 
-        $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2, $todo3]));
+        $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2, $todo3], true));
     }
     // }}}
     // {{{ testFormatTodosChildChild
@@ -495,7 +495,7 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
         "    +testTag1 +testTag2 testText2\n" .
         "        +testTag1 +testTag2 testText3\n";
 
-        $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2, $todo3]));
+        $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2, $todo3], true));
     }
     // }}}
     // {{{ testFormatTodosChildChildGap
@@ -512,7 +512,7 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
         "        +testTag1 +testTag2 testText3\n" .
         "+testTag1 +testTag2 testText4\n";
 
-        $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2, $todo3, $todo4]));
+        $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2, $todo3, $todo4], true));
     }
     // }}}
     // {{{ testFormatTodosMultipleActigories
@@ -526,7 +526,7 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
         $expected = "testActivity2@testCategory2\n\n" .
         "+testTag1 +testTag2 testText2\n";
 
-        $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2]));
+        $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2], true));
     }
     // }}}
     // {{{ testFormatTodosMultipleActivities
@@ -540,7 +540,7 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
         $expected = "testActivity2@testCategory\n\n" .
         "+testTag1 +testTag2 testText2\n";
 
-        $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2]));
+        $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2], true));
     }
     // }}}
     // {{{ testFormatTodosMultipleCategories
@@ -554,7 +554,7 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
         $expected = "testActivity@testCategory2\n\n" .
         "+testTag1 +testTag2 testText2\n";
 
-        $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2]));
+        $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2], true));
     }
     // }}}
     // {{{ testFormatTodosTagFilter
@@ -572,7 +572,7 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
         "+testTag3 testText2\n" .
         "testText3\n";
 
-        $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2, $todo3]));
+        $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2, $todo3], true));
     }
     // }}}
     // {{{ testFormatTodosDone
@@ -583,7 +583,7 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
         $expected = "testActivity@testCategory\n\n" .
         "# +testTag1 +testTag2 testText\n";
 
-        $this->assertSame($expected, $this->mrClip->formatTodos([$todo]));
+        $this->assertSame($expected, $this->mrClip->formatTodos([$todo], false));
     }
     // }}}
     // {{{ testFormatTodosDoneMixed
@@ -594,11 +594,10 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
 
         $expected = "testActivity@testCategory\n" .
         "\n" .
-        "+testTag1 +testTag2 testText2\n" .
-        "\n" .
-        "# +testTag1 +testTag2 testText1\n";
+        "# +testTag1 +testTag2 testText1\n" .
+        "+testTag1 +testTag2 testText2\n";
 
-        $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2]));
+        $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2], false));
     }
     // }}}
     // {{{ testFormatTodosPosition
@@ -613,7 +612,7 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
         "testText\n" .
         "testText2\n";
 
-        $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2, $todo3]));
+        $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2, $todo3], true));
     }
     // }}}
 
