@@ -12,6 +12,7 @@ class MrClipTestClass extends MrClip
 
     public $echoed = '';
     public $userEditString = [];
+    public $fs = [];
     // }}}
     // {{{ constructor
     public function __construct($options = [])
@@ -21,13 +22,13 @@ class MrClipTestClass extends MrClip
         $this->prm = new PrmTestClass();
     }
     // }}}
-
     // {{{ run
     public function run($options = [])
     {
         return parent::run($options);
     }
     // }}}
+
     // {{{ suggest
     public function suggest($hint, $candidates, $prefix = '')
     {
@@ -38,6 +39,19 @@ class MrClipTestClass extends MrClip
     public function output($string = '')
     {
         $this->echoed .= $string;
+    }
+    // }}}
+
+    // {{{ fsWrite
+    protected function fsWrite($name, $data)
+    {
+        $this->fs[$name] = $data;
+    }
+    // }}}
+    // {{{ fsRead
+    protected function fsRead($name, $ttl = null)
+    {
+        return (isset($this->fs[$name])) ? $this->fs[$name] : false;
     }
     // }}}
 

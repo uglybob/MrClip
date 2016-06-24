@@ -199,24 +199,53 @@ class MrClip
     // {{{ cacheWrite
     protected function cacheWrite($name, $data)
     {
-        $file = Setup::get('cache') . '/' . $name;
-        file_put_contents($file, implode("\n", $data));
+        $file = Setup::get('storage') . '/' . $name;
+        $this->fsWrite($file, implode("\n", $data));
     }
     // }}}
     // {{{ cacheRead
     protected function cacheRead($name)
     {
         $data = false;
-        $file = Setup::get('cache') . '/' . $name;
+        $file = Setup::get('storage') . '/' . $name;
+
+        return $this->fsRead($file, 15);
+    }
+    // }}}
+    // {{{ fsWrite
+    protected function fsWrite($path, $data)
+    {
+        // thanks, https://php.net/manual/en/function.file-put-contents.php#84180
+
+        $parts = explode('/', $path);
+        $file = array_pop($parts);
+        $path = '';
+
+        foreach($parts as $part) {
+            if (!is_dir($path .= "/$part")) {
+                mkdir($path);
+            }
+        }
+
+        file_put_contents("$path/$file", $contents);
+    }
+    // }}}
+    // {{{ fsRead
+    protected function fsRead($path, $ttl = null)
+    {
+        $result = false;
 
         if (
             file_exists($file)
-            && ((time() - filemtime($file)) < 15)
+            && (
+                is_null($ttl)
+                || ((time() - filemtime($file)) < $ttl)
+            )
         ) {
-            $data = file($file, FILE_IGNORE_NEW_LINES);
+            $result = file($path, FILE_IGNORE_NEW_LINES);
         }
 
-        return $data;
+        return $result;
     }
     // }}}
 
@@ -523,8 +552,8 @@ class MrClip
     // {{{ userEditString
     protected function userEditString($string)
     {
-        $temp = tempnam(Setup::get('cache') . '/', 'MrClip');
-        file_put_contents($temp, $string);
+        $temp = tempnam(Setup::get('storage') . '/', 'MrClip');
+        $this->writeToFile($temp, $string);
 
         $pipes = array();
 
