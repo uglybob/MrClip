@@ -206,7 +206,6 @@ class MrClip
     // {{{ cacheRead
     protected function cacheRead($name)
     {
-        $data = false;
         $file = Setup::get('storage') . '/' . $name;
 
         return $this->fsRead($file, 15);

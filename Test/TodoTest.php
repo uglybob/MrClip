@@ -140,6 +140,14 @@ class TodoTest extends EntryTest
         $this->assertSame('testText', $this->object->formatTagsText($filter));
     }
     // }}}
+    // {{{ testFormatSortTags
+    public function testFormatSortTags()
+    {
+        $todo = new TodoTestClass(null, 'testActivity', 'testCategory', ['testTag2', 'testTag1'], 'testText', null, false);
+
+        $this->assertSame('testActivity@testCategory +testTag1 +testTag2', $todo->formatBase());
+    }
+    // }}}
 
     // {{{ testMatch
     public function testMatch()

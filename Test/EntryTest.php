@@ -71,8 +71,22 @@ class EntryTest extends \PHPUnit_Framework_TestCase
     public function testSetId()
     {
         $this->assertSame(42, $this->object->getId());
-        $this->object->SetId(1);
+        $this->object->setId(1);
         $this->assertSame(1, $this->object->getId());
+    }
+    // }}}
+    // {{{ testSetTags
+    public function testSetTags()
+    {
+        $this->object->setTags(['testTag1', 'testTag2']);
+        $this->assertSame(['testTag1', 'testTag2'], $this->object->getTags());
+    }
+    // }}}
+    // {{{ testSetTagsSort
+    public function testSetTagsSort()
+    {
+        $this->object->setTags(['testTag2', 'testTag1']);
+        $this->assertSame(['testTag1', 'testTag2'], $this->object->getTags());
     }
     // }}}
 

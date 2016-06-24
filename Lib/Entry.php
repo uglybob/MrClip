@@ -17,7 +17,7 @@ abstract class Entry
         $this->id = $id;
         $this->activity = $activity;
         $this->category = $category;
-        $this->tags = $tags;
+        $this->setTags($tags);
         $this->text = $text;
     }
     // }}}
@@ -59,6 +59,16 @@ abstract class Entry
         $this->id = $id;
     }
     // }}}
+    // {{{ setTags
+    public function setTags($tags)
+    {
+        if (!is_null($tags)) {
+            sort($tags);
+        }
+
+        $this->tags = $tags;
+    }
+    // }}}
 
     // {{{ getActigory
     public function getActigory()
@@ -66,11 +76,19 @@ abstract class Entry
         return $this->activity . '@' . $this->category;
     }
     // }}}
-    // {{{ format
-    public function format()
+    // {{{ formatBase
+    public function formatBase()
     {
         $output[] = $this->getActigory();
         if (!empty($this->tags)) $output[] = $this->getFormattedTags();
+
+        return implode(' ', $output);
+    }
+    // }}}
+    // {{{ format
+    public function format()
+    {
+        $output[] = $this->formatBase();
         if ($this->text) $output[] = $this->text;
 
         return implode(' ', $output);
