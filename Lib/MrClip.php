@@ -15,14 +15,14 @@ class MrClip
             'record' => [
                 'add',
                 'current',
-                'list',
                 'stop',
                 'continue',
             ],
             'todo' => [
-                'add',
                 'list',
+                'listAll',
                 'edit',
+                'editAll',
             ],
             'completion' => null,
         ];
@@ -339,14 +339,33 @@ class MrClip
     // {{{ todoList
     protected function todoList()
     {
+        $this->output($this->formatTodos($this->getFilteredTodos(), true));
+    }
+    // }}}
+    // {{{ todoListAll
+    protected function todoListAll()
+    {
         $this->output($this->formatTodos($this->getFilteredTodos(), false));
     }
     // }}}
     // {{{ todoEdit
     protected function todoEdit()
     {
+        $this->editTodos(true);
+    }
+    // }}}
+    // {{{ todoEditAll
+    protected function todoEditAll()
+    {
+        $this->editTodos(false);
+    }
+    // }}}
+
+    // {{{ editTodos
+    protected function editTodos($hideDone)
+    {
         $todos = $this->getFilteredTodos();
-        $todosString = $this->formatTodos($todos, false);
+        $todosString = $this->formatTodos($todos, $hideDone);
         $answer = null;
         $parsed = null;
 

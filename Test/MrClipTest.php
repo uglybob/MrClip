@@ -135,7 +135,7 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
     public function testCompletionRecord_()
     {
         $this->comp('record ');
-        $this->assertSame('add current list stop continue', $this->mrClip->echoed);
+        $this->assertSame('add current stop continue', $this->mrClip->echoed);
     }
     // }}}
     // {{{ testCompletionRecordA
@@ -234,14 +234,14 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
     public function testCompletionTodo_()
     {
         $this->comp('todo ');
-        $this->assertSame('add list edit', $this->mrClip->echoed);
+        $this->assertSame('list listAll edit editAll', $this->mrClip->echoed);
     }
     // }}}
     // {{{ testCompletionTodoL
     public function testCompletionTodoL()
     {
         $this->comp('todo l');
-        $this->assertSame('list', $this->mrClip->echoed);
+        $this->assertSame('list listAll', $this->mrClip->echoed);
     }
     // }}}
     // {{{ testCompletionTodoList
