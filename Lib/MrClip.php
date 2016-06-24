@@ -539,6 +539,7 @@ class MrClip
                 $category = $lastHeader->getCategory();
                 $tags = $lastHeader->getTags();
                 $parents = [null];
+                $positions = [0];
                 $last = null;
             }
 
