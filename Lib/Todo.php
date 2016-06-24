@@ -96,14 +96,12 @@ class Todo extends Entry
         return implode(' ', $output);
     }
     // }}}
-    // {{{ formatTagsText
-    public function formatTagsText($tagFilter = [])
+    // {{{ formatText
+    public function formatText()
     {
         $output = [];
 
         if ($this->isDone()) $output[] = '#';
-        $tags = array_diff($this->tags, $tagFilter);
-        if (!empty($tags)) $output[] = Todo::formatTags($tags);
         if (!empty($this->text)) $output[] = $this->text;
 
         return implode(' ', $output);

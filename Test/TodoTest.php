@@ -121,23 +121,9 @@ class TodoTest extends EntryTest
     // {{{ testFormatFiltered
     public function testFormatFiltered()
     {
-        $filter = [];
-        $this->assertSame('+testTag1 +testTag2 testText', $this->object->formatTagsText($filter));
-
-        $filter = ['testTag3'];
-        $this->assertSame('+testTag1 +testTag2 testText', $this->object->formatTagsText($filter));
-
-        $filter = ['testTag2'];
-        $this->assertSame('+testTag1 testText', $this->object->formatTagsText($filter));
-
-        $filter = ['testTag1', 'testTag2'];
-        $this->assertSame('testText', $this->object->formatTagsText($filter));
-
-        $filter = ['testTag2', 'testTag1'];
-        $this->assertSame('testText', $this->object->formatTagsText($filter));
-
-        $filter = ['testTag1', 'testTag2', 'testTag3'];
-        $this->assertSame('testText', $this->object->formatTagsText($filter));
+        $this->assertSame('testText', $this->object->formatText());
+        $this->object->done = true;
+        $this->assertSame('# testText', $this->object->formatText());
     }
     // }}}
     // {{{ testFormatSortTags

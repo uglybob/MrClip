@@ -404,8 +404,8 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
     {
         $todo = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, 0, false);
 
-        $expected = "testActivity@testCategory\n\n" .
-        "+testTag1 +testTag2 testText\n";
+        $expected = "testActivity@testCategory +testTag1 +testTag2\n\n" .
+        "testText\n";
 
         $this->assertSame($expected, $this->mrClip->formatTodos([$todo], true));
     }
@@ -422,9 +422,9 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
         $todo1 = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, 0, false);
         $todo2 = new Todo(2, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText2', null, 1, false);
 
-        $expected = "testActivity@testCategory\n\n" .
-        "+testTag1 +testTag2 testText\n" .
-        "+testTag1 +testTag2 testText2\n";
+        $expected = "testActivity@testCategory +testTag1 +testTag2\n\n" .
+        "testText\n" .
+        "testText2\n";
 
         $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2], true));
     }
@@ -435,9 +435,10 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
         $todo1 = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, 0, false);
         $todo2 = new Todo(2, 'testActivity', 'testCategory', ['testTag3', 'testTag4'], 'testText2', null, 1, false);
 
-        $expected = "testActivity@testCategory\n\n" .
-        "+testTag1 +testTag2 testText\n" .
-        "+testTag3 +testTag4 testText2\n";
+        $expected = "testActivity@testCategory +testTag1 +testTag2\n\n" .
+        "testText\n\n" .
+        "testActivity@testCategory +testTag3 +testTag4\n\n" .
+        "testText2\n";
 
         $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2], true));
     }
@@ -448,9 +449,10 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
         $todo1 = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, 0, false);
         $todo2 = new Todo(2, 'testActivity', 'testCategory', ['testTag2', 'testTag3'], 'testText2', null, 1, false);
 
-        $expected = "testActivity@testCategory\n\n" .
-        "+testTag1 +testTag2 testText\n" .
-        "+testTag2 +testTag3 testText2\n";
+        $expected = "testActivity@testCategory +testTag1 +testTag2\n\n" .
+        "testText\n\n" .
+        $expected = "testActivity@testCategory +testTag2 +testTag3\n\n" .
+        "testText2\n";
 
         $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2], true));
     }
@@ -461,9 +463,9 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
         $todo1 = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, 0, false);
         $todo2 = new Todo(2, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText2', $todo1, 0, false);
 
-        $expected = "testActivity@testCategory\n\n" .
-        "+testTag1 +testTag2 testText\n" .
-        "    +testTag1 +testTag2 testText2\n";
+        $expected = "testActivity@testCategory +testTag1 +testTag2\n\n" .
+        "testText\n" .
+        "    testText2\n";
 
         $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2], true));
     }
@@ -475,10 +477,10 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
         $todo2 = new Todo(2, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText2', $todo1, 0, false);
         $todo3 = new Todo(3, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText3', $todo1, 1, false);
 
-        $expected = "testActivity@testCategory\n\n" .
-        "+testTag1 +testTag2 testText\n" .
-        "    +testTag1 +testTag2 testText2\n" .
-        "    +testTag1 +testTag2 testText3\n";
+        $expected = "testActivity@testCategory +testTag1 +testTag2\n\n" .
+        "testText\n" .
+        "    testText2\n" .
+        "    testText3\n";
 
         $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2, $todo3], true));
     }
@@ -490,10 +492,10 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
         $todo2 = new Todo(2, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText2', $todo1, 0, false);
         $todo3 = new Todo(3, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText3', $todo2, 0, false);
 
-        $expected = "testActivity@testCategory\n\n" .
-        "+testTag1 +testTag2 testText\n" .
-        "    +testTag1 +testTag2 testText2\n" .
-        "        +testTag1 +testTag2 testText3\n";
+        $expected = "testActivity@testCategory +testTag1 +testTag2\n\n" .
+        "testText\n" .
+        "    testText2\n" .
+        "        testText3\n";
 
         $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2, $todo3], true));
     }
@@ -506,11 +508,11 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
         $todo3 = new Todo(3, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText3', $todo2, 0, false);
         $todo4 = new Todo(4, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText4', null, 1, false);
 
-        $expected = "testActivity@testCategory\n\n" .
-        "+testTag1 +testTag2 testText\n" .
-        "    +testTag1 +testTag2 testText2\n" .
-        "        +testTag1 +testTag2 testText3\n" .
-        "+testTag1 +testTag2 testText4\n";
+        $expected = "testActivity@testCategory +testTag1 +testTag2\n\n" .
+        "testText\n" .
+        "    testText2\n" .
+        "        testText3\n" .
+        "testText4\n";
 
         $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2, $todo3, $todo4], true));
     }
@@ -521,10 +523,10 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
         $todo1 = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, 0, false);
         $todo2 = new Todo(2, 'testActivity2', 'testCategory2', ['testTag1', 'testTag2'], 'testText2', null, 0, false);
 
-        $expected = "testActivity@testCategory\n\n" .
-        "+testTag1 +testTag2 testText\n\n" .
-        $expected = "testActivity2@testCategory2\n\n" .
-        "+testTag1 +testTag2 testText2\n";
+        $expected = "testActivity@testCategory +testTag1 +testTag2\n\n" .
+        "testText\n\n" .
+        $expected = "testActivity2@testCategory2 +testTag1 +testTag2\n\n" .
+        "testText2\n";
 
         $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2], true));
     }
@@ -535,10 +537,10 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
         $todo1 = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, 0, false);
         $todo2 = new Todo(2, 'testActivity2', 'testCategory', ['testTag1', 'testTag2'], 'testText2', null, 0, false);
 
-        $expected = "testActivity@testCategory\n\n" .
-        "+testTag1 +testTag2 testText\n\n" .
-        $expected = "testActivity2@testCategory\n\n" .
-        "+testTag1 +testTag2 testText2\n";
+        $expected = "testActivity@testCategory +testTag1 +testTag2\n\n" .
+        "testText\n\n" .
+        $expected = "testActivity2@testCategory +testTag1 +testTag2\n\n" .
+        "testText2\n";
 
         $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2], true));
     }
@@ -549,10 +551,10 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
         $todo1 = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, 0, false);
         $todo2 = new Todo(2, 'testActivity', 'testCategory2', ['testTag1', 'testTag2'], 'testText2', null, 0, false);
 
-        $expected = "testActivity@testCategory\n\n" .
-        "+testTag1 +testTag2 testText\n\n" .
-        $expected = "testActivity@testCategory2\n\n" .
-        "+testTag1 +testTag2 testText2\n";
+        $expected = "testActivity@testCategory +testTag1 +testTag2\n\n" .
+        "testText\n\n" .
+        $expected = "testActivity@testCategory2 +testTag1 +testTag2\n\n" .
+        "testText2\n";
 
         $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2], true));
     }
@@ -567,9 +569,11 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
         $todo2 = new Todo(2, 'testActivity', 'testCategory', ['testTag1', 'testTag3'], 'testText2', null, 1, false);
         $todo3 = new Todo(3, 'testActivity', 'testCategory', ['testTag1'], 'testText3', null, 2, false);
 
-        $expected = "testActivity@testCategory +testTag1\n\n" .
-        "+testTag2 testText\n" .
-        "+testTag3 testText2\n" .
+        $expected = "testActivity@testCategory +testTag1 +testTag2\n\n" .
+        "testText\n\n" .
+        "testActivity@testCategory +testTag1 +testTag3\n\n" .
+        "testText2\n\n" .
+        "testActivity@testCategory +testTag1\n\n" .
         "testText3\n";
 
         $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2, $todo3], true));
@@ -580,8 +584,8 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
     {
         $todo = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText', null, 0, true);
 
-        $expected = "testActivity@testCategory\n\n" .
-        "# +testTag1 +testTag2 testText\n";
+        $expected = "testActivity@testCategory +testTag1 +testTag2\n\n" .
+        "# testText\n";
 
         $this->assertSame($expected, $this->mrClip->formatTodos([$todo], false));
     }
@@ -592,10 +596,10 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
         $todo1 = new Todo(1, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText1', null, 0, true);
         $todo2 = new Todo(2, 'testActivity', 'testCategory', ['testTag1', 'testTag2'], 'testText2', null, 1, false);
 
-        $expected = "testActivity@testCategory\n" .
+        $expected = "testActivity@testCategory +testTag1 +testTag2\n" .
         "\n" .
-        "# +testTag1 +testTag2 testText1\n" .
-        "+testTag1 +testTag2 testText2\n";
+        "# testText1\n" .
+        "testText2\n";
 
         $this->assertSame($expected, $this->mrClip->formatTodos([$todo1, $todo2], false));
     }

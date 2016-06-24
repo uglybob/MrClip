@@ -637,34 +637,21 @@ class MrClip
     // {{{ formatTodos
     protected function formatTodos($todos, $hideDone)
     {
-        $tagFilter = $this->parser->getTags();
-        $sorted = [];
+        $top = [];
         $list = [];
 
         foreach ($todos as $todo) {
-            $sorted[$todo->getActigory()][] = $todo;
+            if (is_null($todo->getParent())) {
+                if (!isset($top[$todo->formatBase()])) {
+                    $top[$todo->formatBase()] = new Todo(null, $todo->getActivity(), $todo->getCategory(), $todo->getTags());
+                }
+
+                $top[$todo->formatBase()]->addChild($todo);
+            }
         }
 
-        foreach ($sorted as $actigory => $todos) {
-            $list[] = trim($actigory . ' ' . Todo::formatTags($tagFilter));
-            $open = [];
-
-            if (!empty($todos)) {
-                $list[] = '';
-            }
-
-            $todos = $this->posSort($todos);
-
-            foreach ($todos as $todo) {
-                if (
-                    is_null($todo->getParent())
-                    && !($hideDone && $todo->isDone())
-                ) {
-                    $list = array_merge($list, $this->todoTree($todo, $tagFilter, $hideDone, 0));
-                }
-            }
-
-            $list[] = '';
+        foreach ($top as $group => $head) {
+           $list = array_merge($list, $this->todoTree($head, $hideDone, -1));
         }
 
         return implode("\n", $list);
@@ -673,25 +660,35 @@ class MrClip
     // {{{ posSort
     protected function posSort($todos)
     {
-        usort($todos, function($a, $b) {
+        usort(
+            $todos,
+            function($a, $b) {
                 return $a->getPosition() - $b->getPosition();
-        });
+            }
+        );
 
         return $todos;
     }
     // }}}
     // {{{ todoTree
-    protected function todoTree($todo, $tagFilter, $hideDone, $level)
+    protected function todoTree($todo, $hideDone, $level)
     {
-        $list = [];
-
         if (!($hideDone && $todo->isDone())) {
-            $list[] = str_repeat('    ', $level) . $todo->formatTagsText($tagFilter);
+            if ($level < 0) {
+                $list[] = $todo->formatBase();
+                $list[] = '';
+            } else {
+                $list[] = str_repeat('    ', $level) . $todo->formatText();
+            }
 
             $children = $this->posSort($todo->getChildren());
 
             foreach ($children as $child) {
-                $list = array_merge($list, $this->todoTree($child, $tagFilter, $hideDone, $level + 1));
+                $list = array_merge($list, $this->todoTree($child, $hideDone, $level + 1));
+            }
+
+            if ($level < 0) {
+                $list[] = '';
             }
         }
 
