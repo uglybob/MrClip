@@ -75,9 +75,9 @@ class MrClipTestClass extends MrClip
     }
     // }}}
     // {{{ getFilteredTodos
-    public function getFilteredTodos()
+    public function getFilteredTodos($includeDone = true)
     {
-        return parent::getFilteredTodos();
+        return parent::getFilteredTodos($includeDone);
     }
     // }}}
 

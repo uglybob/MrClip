@@ -398,6 +398,16 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(0, count($todos));
     }
     // }}}
+    // {{{ testGetFilteredTodosNotDone
+    public function testGetFilteredTodosNotDone()
+    {
+        $options = 'activity1@category1 +tag1';
+
+        $this->mrClip->parser = new ParserTestClass(explode(' ', $options));
+
+        $this->assertSame(7, count($this->mrClip->getFilteredTodos(false)));
+    }
+    // }}}
 
     // {{{ testFormatTodos
     public function testFormatTodos()

@@ -164,7 +164,7 @@ class ApiMock
     // }}}
 
     // {{{ getTodos
-    public function getTodos($activity = null, $category = null, $tags = [])
+    public function getTodos($activity = null, $category = null, $tags = [], $includeDone = true)
     {
         $filtered = [];
 
@@ -173,6 +173,10 @@ class ApiMock
                 (is_null($activity) || $todo->activity == $activity)
                 && (is_null($category) || $todo->category == $category)
                 && (empty($tags) || empty(array_diff($tags, $todo->tags)))
+                && (
+                    ($includeDone == $todo->done)
+                    || !$todo->done
+                )
             ) {
                 $filtered[$todo->id] = $todo;
             }

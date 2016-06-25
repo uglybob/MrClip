@@ -339,32 +339,32 @@ class MrClip
     // {{{ todoList
     protected function todoList()
     {
-        $this->output($this->formatTodos($this->getFilteredTodos(true)));
+        $this->output($this->formatTodos($this->getFilteredTodos(false)));
     }
     // }}}
     // {{{ todoListAll
     protected function todoListAll()
     {
-        $this->output($this->formatTodos($this->getFilteredTodos(false)));
+        $this->output($this->formatTodos($this->getFilteredTodos(true)));
     }
     // }}}
     // {{{ todoEdit
     protected function todoEdit()
     {
-        $this->editTodos(true);
+        $this->editTodos(false);
     }
     // }}}
     // {{{ todoEditAll
     protected function todoEditAll()
     {
-        $this->editTodos(false);
+        $this->editTodos(true);
     }
     // }}}
 
     // {{{ editTodos
-    protected function editTodos($hideDone)
+    protected function editTodos($includeDone)
     {
-        $todos = $this->getFilteredTodos($hideDone);
+        $todos = $this->getFilteredTodos($includeDone);
         $todosString = $this->formatTodos($todos);
         $answer = null;
         $parsed = null;
@@ -626,23 +626,14 @@ class MrClip
     // }}}
 
     // {{{ getFilteredTodos
-    protected function getFilteredTodos($hideDone)
+    protected function getFilteredTodos($includeDone = true)
     {
-        $todos = [];
         $parser = $this->parser;
 
         $parser->parseActigory(true);
         $parser->parseTags();
 
-        $mixed = $this->prm->getTodos($parser->getActivity(), $parser->getCategory(), $parser->getTags());
-
-        foreach ($mixed as $todo) {
-            if (!($hideDone && $todo->isDone())) {
-                $todos[] = $todo;
-            }
-        }
-
-        return $todos;
+        return $this->prm->getTodos($parser->getActivity(), $parser->getCategory(), $parser->getTags(), $includeDone);
     }
     // }}}
     // {{{ saveTodos
