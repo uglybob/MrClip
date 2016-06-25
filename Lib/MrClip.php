@@ -226,7 +226,7 @@ class MrClip
             }
         }
 
-        file_put_contents("$path/$file", $contents);
+        file_put_contents("$path/$file", $data);
     }
     // }}}
     // {{{ fsRead
@@ -235,10 +235,10 @@ class MrClip
         $result = false;
 
         if (
-            file_exists($file)
+            file_exists($path)
             && (
                 is_null($ttl)
-                || ((time() - filemtime($file)) < $ttl)
+                || ((time() - filemtime($path)) < $ttl)
             )
         ) {
             $result = file($path, FILE_IGNORE_NEW_LINES);
@@ -580,7 +580,7 @@ class MrClip
     protected function userEditString($string)
     {
         $temp = tempnam(Setup::get('storage') . '/', 'MrClip');
-        $this->writeToFile($temp, $string);
+        $this->fsWrite($temp, $string);
 
         $pipes = array();
 
