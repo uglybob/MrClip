@@ -381,7 +381,7 @@ class MrClip
             $answer !== 'y' && $answer !== 'yes'
             && $answer !== 'c' && $answer !== 'cancel'
         ) {
-            $parsed = $this->editAndParse($todosString, $todos);
+            $parsed = $this->editAndParse($todosString, $filtered);
 
             if (
                 !$parsed->new->count()
