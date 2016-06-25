@@ -339,13 +339,13 @@ class MrClip
     // {{{ todoList
     protected function todoList()
     {
-        $this->output($this->formatTodos($this->getFilteredTodos(), true));
+        $this->output($this->formatTodos($this->getFilteredTodos(true)));
     }
     // }}}
     // {{{ todoListAll
     protected function todoListAll()
     {
-        $this->output($this->formatTodos($this->getFilteredTodos(), false));
+        $this->output($this->formatTodos($this->getFilteredTodos(false)));
     }
     // }}}
     // {{{ todoEdit
@@ -364,16 +364,8 @@ class MrClip
     // {{{ editTodos
     protected function editTodos($hideDone)
     {
-        $todos = $this->getFilteredTodos();
-        $filtered = [];
-
-        foreach ($todos as $todo) {
-            if (!($hideDone && $todo->isDone())) {
-                $filtered[] = $todo;
-            }
-        }
-
-        $todosString = $this->formatTodos($filtered);
+        $todos = $this->getFilteredTodos($hideDone);
+        $todosString = $this->formatTodos($todos);
         $answer = null;
         $parsed = null;
 
@@ -381,7 +373,7 @@ class MrClip
             $answer !== 'y' && $answer !== 'yes'
             && $answer !== 'c' && $answer !== 'cancel'
         ) {
-            $parsed = $this->editAndParse($todosString, $filtered);
+            $parsed = $this->editAndParse($todosString, $todos);
 
             if (
                 !$parsed->new->count()
@@ -634,14 +626,23 @@ class MrClip
     // }}}
 
     // {{{ getFilteredTodos
-    protected function getFilteredTodos()
+    protected function getFilteredTodos($hideDone)
     {
+        $todos = [];
         $parser = $this->parser;
 
         $parser->parseActigory(true);
         $parser->parseTags();
 
-        return $this->prm->getTodos($parser->getActivity(), $parser->getCategory(), $parser->getTags());
+        $mixed = $this->prm->getTodos($parser->getActivity(), $parser->getCategory(), $parser->getTags());
+
+        foreach ($mixed as $todo) {
+            if (!($hideDone && $todo->isDone())) {
+                $todos[] = $todo;
+            }
+        }
+
+        return $todos;
     }
     // }}}
     // {{{ saveTodos
