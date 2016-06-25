@@ -365,7 +365,15 @@ class MrClip
     protected function editTodos($hideDone)
     {
         $todos = $this->getFilteredTodos();
-        $todosString = $this->formatTodos($todos, $hideDone);
+        $filtered = [];
+
+        foreach ($todos as $todo) {
+            if (!($hideDone && $todo->isDone())) {
+                $filtered[] = $todo;
+            }
+        }
+
+        $todosString = $this->formatTodos($filtered);
         $answer = null;
         $parsed = null;
 
@@ -655,7 +663,7 @@ class MrClip
     // }}}
 
     // {{{ formatTodos
-    protected function formatTodos($todos, $hideDone)
+    protected function formatTodos($todos)
     {
         $top = [];
         $list = [];
@@ -671,7 +679,7 @@ class MrClip
         }
 
         foreach ($top as $group => $head) {
-           $list = array_merge($list, $this->todoTree($head, $hideDone, -1));
+           $list = array_merge($list, $this->todoTree($head, -1));
         }
 
         return implode("\n", $list);
@@ -691,25 +699,23 @@ class MrClip
     }
     // }}}
     // {{{ todoTree
-    protected function todoTree($todo, $hideDone, $level)
+    protected function todoTree($todo, $level)
     {
-        if (!($hideDone && $todo->isDone())) {
-            if ($level < 0) {
-                $list[] = $todo->formatBase();
-                $list[] = '';
-            } else {
-                $list[] = str_repeat('    ', $level) . $todo->formatText();
-            }
+        if ($level < 0) {
+            $list[] = $todo->formatBase();
+            $list[] = '';
+        } else {
+            $list[] = str_repeat('    ', $level) . $todo->formatText();
+        }
 
-            $children = $this->posSort($todo->getChildren());
+        $children = $this->posSort($todo->getChildren());
 
-            foreach ($children as $child) {
-                $list = array_merge($list, $this->todoTree($child, $hideDone, $level + 1));
-            }
+        foreach ($children as $child) {
+            $list = array_merge($list, $this->todoTree($child, $level + 1));
+        }
 
-            if ($level < 0) {
-                $list[] = '';
-            }
+        if ($level < 0) {
+            $list[] = '';
         }
 
         return $list;
