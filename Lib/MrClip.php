@@ -12,19 +12,20 @@ class MrClip
     public function __construct($options = [])
     {
         $this->commands = [
+            'completion' => null,
             'record' => [
                 'add',
+                'continue',
                 'current',
                 'stop',
-                'continue',
             ],
+            'status' => null,
             'todo' => [
-                'list',
-                'listAll',
                 'edit',
                 'editAll',
+                'list',
+                'listAll',
             ],
-            'completion' => null,
         ];
 
         $this->prm = new PRM();
@@ -358,6 +359,13 @@ class MrClip
     protected function todoEditAll()
     {
         $this->editTodos(true);
+    }
+    // }}}
+
+    // {{{ status
+    protected function status()
+    {
+        $this->recordCurrent();
     }
     // }}}
 

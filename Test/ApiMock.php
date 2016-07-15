@@ -131,6 +131,20 @@ class ApiMock
     }
     // }}}
 
+    // {{{ getCurrentRecord
+    public function getCurrentRecord()
+    {
+        $current = null;
+
+        foreach ($this->records as $record) {
+            if (is_null($record->end)) {
+                $current = $record;
+            }
+        }
+
+        return $current;
+    }
+    // }}}
     // {{{ getLastRecord
     public function getLastRecord()
     {

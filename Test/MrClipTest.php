@@ -114,7 +114,7 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
     public function testCompletionEmpty()
     {
         $this->comp('');
-        $this->assertSame('record todo', $this->mrClip->echoed);
+        $this->assertSame('record status todo', $this->mrClip->echoed);
     }
     // }}}
     // {{{ testCompletionR
@@ -135,7 +135,7 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
     public function testCompletionRecord_()
     {
         $this->comp('record ');
-        $this->assertSame('add current stop continue', $this->mrClip->echoed);
+        $this->assertSame('add continue current stop', $this->mrClip->echoed);
     }
     // }}}
     // {{{ testCompletionRecordA
@@ -234,7 +234,7 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
     public function testCompletionTodo_()
     {
         $this->comp('todo ');
-        $this->assertSame('list listAll edit editAll', $this->mrClip->echoed);
+        $this->assertSame('edit editAll list listAll', $this->mrClip->echoed);
     }
     // }}}
     // {{{ testCompletionTodoL
@@ -354,6 +354,21 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(['testTag1', 'testTag2'], $record->getTags());
         $this->assertNull($record->getText());
         $this->assertTrue($record->isRunning());
+    }
+    // }}}
+
+    // {{{ testRecordCurrent
+    public function testRecordCurrent()
+    {
+        $this->assertNull($this->mrClip->recordCurrent());
+        $this->assertSame("(last) 2015-10-21 21:00 - 2015-10-21 22:00 activity2@category1 +tag2\n", $this->mrClip->echoed);
+    }
+    // }}}
+    // {{{ testStatus
+    public function testStatus()
+    {
+        $this->assertNull($this->mrClip->status());
+        $this->assertSame("(last) 2015-10-21 21:00 - 2015-10-21 22:00 activity2@category1 +tag2\n", $this->mrClip->echoed);
     }
     // }}}
 
