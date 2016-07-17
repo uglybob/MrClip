@@ -114,7 +114,7 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
     public function testCompletionEmpty()
     {
         $this->comp('');
-        $this->assertSame('record status todo', $this->mrClip->echoed);
+        $this->assertSame('record status stop todo', $this->mrClip->echoed);
     }
     // }}}
     // {{{ testCompletionR

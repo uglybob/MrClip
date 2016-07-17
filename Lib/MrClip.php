@@ -20,6 +20,7 @@ class MrClip
                 'stop',
             ],
             'status' => null,
+            'stop' => null,
             'todo' => [
                 'edit',
                 'editAll',
@@ -312,6 +313,12 @@ class MrClip
         } else {
             $this->outputNl('Failed to stop record');
         }
+    }
+    // }}}
+    // {{{ stop
+    protected function stop()
+    {
+        return $this->recordStop();
     }
     // }}}
     // {{{ recordContinue
