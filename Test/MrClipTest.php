@@ -364,6 +364,14 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
         $this->assertSame("(last) 2015-10-21 21:00 - 2015-10-21 22:00 activity2@category1 +tag2\n", $this->mrClip->echoed);
     }
     // }}}
+    // {{{ testRecordCurrentRunning
+    public function testRecordCurrentRunning()
+    {
+        $this->prm->getConnection()->records[3]->end = null;
+        $this->assertNull($this->mrClip->status());
+        $this->assertSame("(running) 2015-10-21 19:00 activity1@category2\n", $this->mrClip->echoed);
+    }
+    // }}}
     // {{{ testStatus
     public function testStatus()
     {
