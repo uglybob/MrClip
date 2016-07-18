@@ -176,6 +176,21 @@ class ApiMock
         return $record;
     }
     // }}}
+    // {{{ stopRecord
+    public function stopRecord()
+    {
+        $stopped = null;
+
+        foreach ($this->records as $record) {
+            if (is_null($record->end)) {
+                $record->end = time();
+                $stopped = $record;
+            }
+        }
+
+        return $stopped;
+    }
+    // }}}
 
     // {{{ getTodos
     public function getTodos($activity = null, $category = null, $tags = [], $includeDone = true)

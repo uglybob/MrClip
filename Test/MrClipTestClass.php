@@ -67,6 +67,18 @@ class MrClipTestClass extends MrClip
         return parent::recordCurrent();
     }
     // }}}
+    // {{{ recordStop
+    public function recordStop()
+    {
+        return parent::recordStop();
+    }
+    // }}}
+    // {{{ stop
+    public function stop()
+    {
+        return parent::stop();
+    }
+    // }}}
     // {{{ status
     public function status()
     {

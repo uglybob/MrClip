@@ -380,6 +380,31 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
     }
     // }}}
 
+    // {{{ testRecordStop
+    public function testRecordStop()
+    {
+        $this->prm->getConnection()->records[3]->end = null;
+        $this->assertNull($this->mrClip->recordStop());
+
+        $timestamp = $this->prm->getConnection()->records[3]->end;
+        $date = date('Y-m-d H:i', $timestamp);
+
+        $this->assertSame("(stopped) 2015-10-21 19:00 - $date activity1@category2\n", $this->mrClip->echoed);
+    }
+    // }}}
+    // {{{ testStop
+    public function testStop()
+    {
+        $this->prm->getConnection()->records[3]->end = null;
+        $this->assertNull($this->mrClip->stop());
+
+        $timestamp = $this->prm->getConnection()->records[3]->end;
+        $date = date('Y-m-d H:i', $timestamp);
+
+        $this->assertSame("(stopped) 2015-10-21 19:00 - $date activity1@category2\n", $this->mrClip->echoed);
+    }
+    // }}}
+
     // {{{ testGetFilteredTodos
     public function testGetFilteredTodos()
     {
