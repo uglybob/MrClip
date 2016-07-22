@@ -43,15 +43,9 @@ class MrClip
             if ($domain == 'completion') {
                 unset($this->commands['completion']);
                 $this->completion($options);
-            } else {
-                if (
-                    array_key_exists($domain, $this->commands)
-                    && $this->parser->parseCommand()
-                    && in_array($this->parser->getCommand(), $this->commands[$domain])
-                ) {
-                    $call = 'call' . ucfirst($domain) . ucfirst($this->parser->getCommand());
-                    $this->$call();
-                }
+            } else if ($this->parser->parseCommand() && in_array($this->parser->getCommand(), $this->commands[$domain])) {
+                $call = 'call' . ucfirst($domain) . ucfirst($this->parser->getCommand());
+                $this->$call();
             }
         }
     }
