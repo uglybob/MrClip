@@ -49,7 +49,7 @@ class MrClip
                     && $this->parser->parseCommand()
                     && in_array($this->parser->getCommand(), $this->commands[$domain])
                 ) {
-                    $call = $domain . ucfirst($this->parser->getCommand());
+                    $call = 'call' . ucfirst($domain) . ucfirst($this->parser->getCommand());
                     $this->$call();
                 }
             }
@@ -250,8 +250,8 @@ class MrClip
     }
     // }}}
 
-    // {{{ recordAdd
-    protected function recordAdd()
+    // {{{ callRecordAdd
+    protected function callRecordAdd()
     {
         $parser = $this->parser;
         $result = null;
@@ -289,8 +289,8 @@ class MrClip
         return $result;
     }
     // }}}
-    // {{{ recordCurrent
-    protected function recordCurrent()
+    // {{{ callRecordCurrent
+    protected function callRecordCurrent()
     {
         if ($current = $this->prm->getCurrentRecord()) {
             $this->outputNl('(running) ' . $current->format());
@@ -303,8 +303,8 @@ class MrClip
         }
     }
     // }}}
-    // {{{ recordStop
-    protected function recordStop()
+    // {{{ callRecordStop
+    protected function callRecordStop()
     {
         $stopped = $this->prm->stopRecord();
 
@@ -315,14 +315,14 @@ class MrClip
         }
     }
     // }}}
-    // {{{ stop
-    protected function stop()
+    // {{{ callStop
+    protected function callStop()
     {
-        return $this->recordStop();
+        return $this->callRecordStop();
     }
     // }}}
-    // {{{ recordContinue
-    protected function recordContinue()
+    // {{{ callRecordContinue
+    protected function callRecordContinue()
     {
         $last = $this->prm->getLastRecord();
 
@@ -344,35 +344,35 @@ class MrClip
     }
     // }}}
 
-    // {{{ todoList
-    protected function todoList()
+    // {{{ callTodoList
+    protected function callTodoList()
     {
         $this->output($this->formatTodos($this->getFilteredTodos(false)));
     }
     // }}}
-    // {{{ todoListAll
-    protected function todoListAll()
+    // {{{ callTodoListAll
+    protected function callTodoListAll()
     {
         $this->output($this->formatTodos($this->getFilteredTodos(true)));
     }
     // }}}
-    // {{{ todoEdit
-    protected function todoEdit()
+    // {{{ callTodoEdit
+    protected function callTodoEdit()
     {
         $this->editTodos(false);
     }
     // }}}
-    // {{{ todoEditAll
-    protected function todoEditAll()
+    // {{{ callTodoEditAll
+    protected function callTodoEditAll()
     {
         $this->editTodos(true);
     }
     // }}}
 
-    // {{{ status
-    protected function status()
+    // {{{ callStatus
+    protected function callStatus()
     {
-        $this->recordCurrent();
+        $this->callRecordCurrent();
     }
     // }}}
 
