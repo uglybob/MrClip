@@ -38,13 +38,18 @@ class MrClip
     protected function run($options = [])
     {
         $this->parser = new Parser($options, $this->commands);
+        $domain = $this->parser->parseDomain();
+        $command = $this->parser->parseCommand();
 
-        if ($domain = $this->parser->parseDomain()) {
+        if ($domain) {
             if ($domain == 'completion') {
                 unset($this->commands['completion']);
                 $this->completion($options);
-            } else if ($this->parser->parseCommand() && in_array($this->parser->getCommand(), $this->commands[$domain])) {
-                $call = 'call' . ucfirst($domain) . ucfirst($this->parser->getCommand());
+            } else if (
+                empty($command) && $empty($this->commands[$domain])
+                || in_array($command, $this->commands[$domain])
+            ) {
+                $call = 'call' . ucfirst($domain) . ucfirst($command);
                 $this->$call();
             }
         }
