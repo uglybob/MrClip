@@ -4,13 +4,16 @@ namespace Uglybob\MrClip\Test;
 
 class MrClipCommandTestClass extends MrClipTestClass
 {
-    public $called = [];
     public $executed = [];
 
-    public function __call($name, $arguments)
+    // {{{ constructor
+    public function __construct($options = [])
     {
-        $this->called[] = $name;
+        parent::__construct($options);
+
+        $this->run($options);
     }
+    // }}}
 
     // {{{ completion
     public function completion($options)

@@ -15,6 +15,15 @@ class MrClipCommandTest extends \PHPUnit_Framework_TestCase
         $this->assertSame([$expected], $this->mrClip->executed, "Failed asserting that '$expected' was executed.");
     }
     // }}}
+    // {{{ assertCommandNotExecuted
+    public function assertCommandNotExecuted($expectedError, $options)
+    {
+        $this->mrClip = new MrClipCommandTestClass($options);
+
+        $this->assertEmpty($this->mrClip->executed);
+        $this->assertSame($expectedError, $this->mrClip->echoed);
+    }
+    // }}}
 
     // {{{ testExecute
     public function testExecute()
@@ -31,6 +40,15 @@ class MrClipCommandTest extends \PHPUnit_Framework_TestCase
         $this->assertCommandExecuted('callTodoListAll', ['todo', 'listAll']);
         $this->assertCommandExecuted('callTodoEdit', ['todo', 'edit']);
         $this->assertCommandExecuted('callTodoEditAll', ['todo', 'editAll']);
+    }
+    // }}}
+
+    // {{{ testExecuteFail
+    public function testExecuteFail()
+    {
+        $this->assertCommandNotExecuted("Invalid/ incomplete command\n", ['record']);
+        $this->assertCommandNotExecuted("Invalid/ incomplete command\n", ['record', 'nonsense']);
+        $this->assertCommandNotExecuted("Invalid/ incomplete command\n", ['nonsense']);
     }
     // }}}
 }

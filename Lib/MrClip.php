@@ -7,28 +7,27 @@ class MrClip
     // {{{ variables
     protected $prm;
     protected $parser;
+    protected $commands = [
+        'completion' => null,
+        'record' => [
+            'add',
+            'continue',
+            'current',
+            'stop',
+        ],
+        'status' => null,
+        'stop' => null,
+        'todo' => [
+            'edit',
+            'editAll',
+            'list',
+            'listAll',
+        ],
+    ];
     // }}}
     // {{{ constructor
     public function __construct($options = [])
     {
-        $this->commands = [
-            'completion' => null,
-            'record' => [
-                'add',
-                'continue',
-                'current',
-                'stop',
-            ],
-            'status' => null,
-            'stop' => null,
-            'todo' => [
-                'edit',
-                'editAll',
-                'list',
-                'listAll',
-            ],
-        ];
-
         $this->prm = new PRM();
 
         $this->run($options);
@@ -51,7 +50,11 @@ class MrClip
             ) {
                 $call = 'call' . ucfirst($domain) . ucfirst($command);
                 $this->$call();
+            } else {
+                $this->outputNl('Invalid/ incomplete command');
             }
+        } else {
+            $this->outputNl('Invalid/ incomplete command');
         }
     }
     // }}}

@@ -17,8 +17,7 @@ class MrClipTestClass extends MrClip
     // {{{ constructor
     public function __construct($options = [])
     {
-        parent::__construct($options);
-
+        $this->parser = new ParserTestClass($options, $this->commands);
         $this->prm = new PrmTestClass();
     }
     // }}}
