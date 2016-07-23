@@ -46,7 +46,7 @@ class MrClip
                 unset($this->commands['completion']);
                 $this->completion($options);
             } else if (
-                empty($command) && $empty($this->commands[$domain])
+                empty($command) && empty($this->commands[$domain])
                 || in_array($command, $this->commands[$domain])
             ) {
                 $call = 'call' . ucfirst($domain) . ucfirst($command);

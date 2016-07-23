@@ -42,6 +42,12 @@ class MrClipTestClass extends MrClip
     }
     // }}}
 
+    // {{{ cacheAttributes
+    protected function cacheAttributes()
+    {
+        // no caching here
+    }
+    // }}}
     // {{{ fsWrite
     protected function fsWrite($name, $data)
     {
