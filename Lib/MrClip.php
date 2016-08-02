@@ -8,6 +8,7 @@ class MrClip
     protected $prm;
     protected $parser;
     protected $commands = [
+        'continue' => null,
         'completion' => null,
         'record' => [
             'add',
@@ -343,6 +344,12 @@ class MrClip
         } else {
             $this->outputNl('No previous record to continue');
         }
+    }
+    // }}}
+    // {{{ callContinue
+    protected function callContinue()
+    {
+        return $this->callRecordContinue();
     }
     // }}}
 

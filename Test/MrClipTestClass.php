@@ -90,6 +90,18 @@ class MrClipTestClass extends MrClip
         return parent::callStatus();
     }
     // }}}
+    // {{{ callRecordContinue
+    public function callRecordContinue()
+    {
+        return parent::callRecordContinue();
+    }
+    // }}}
+    // {{{ callContinue
+    public function callContinue()
+    {
+        return parent::callContinue();
+    }
+    // }}}
 
     // {{{ formatTodos
     public function formatTodos($todos)

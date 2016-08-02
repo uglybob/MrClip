@@ -35,6 +35,7 @@ class MrClipCommandTest extends \PHPUnit_Framework_TestCase
         $this->assertCommandExecuted('callRecordContinue', ['record', 'continue']);
         $this->assertCommandExecuted('callStop', ['stop']);
         $this->assertCommandExecuted('callStatus', ['status']);
+        $this->assertCommandExecuted('callContinue', ['continue']);
 
         $this->assertCommandExecuted('callTodoList', ['todo', 'list']);
         $this->assertCommandExecuted('callTodoListAll', ['todo', 'listAll']);

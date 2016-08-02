@@ -40,12 +40,6 @@ class MrClipCommandTestClass extends MrClipTestClass
         $this->executed[] = 'callRecordStop';
     }
     // }}}
-    // {{{ callRecordContinue
-    protected function callRecordContinue()
-    {
-        $this->executed[] = 'callRecordContinue';
-    }
-    // }}}
     // {{{ callStop
     public function callStop()
     {
@@ -56,6 +50,18 @@ class MrClipCommandTestClass extends MrClipTestClass
     public function callStatus()
     {
         $this->executed[] = 'callStatus';
+    }
+    // }}}
+    // {{{ callRecordContinue
+    public function callRecordContinue()
+    {
+        $this->executed[] = 'callRecordContinue';
+    }
+    // }}}
+    // {{{ callContinue
+    public function callContinue()
+    {
+        $this->executed[] = 'callContinue';
     }
     // }}}
 

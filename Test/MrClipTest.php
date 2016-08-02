@@ -114,7 +114,7 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
     public function testCompletionEmpty()
     {
         $this->comp('');
-        $this->assertSame('record status stop todo', $this->mrClip->echoed);
+        $this->assertSame('continue record status stop todo', $this->mrClip->echoed);
     }
     // }}}
     // {{{ testCompletionR
@@ -402,6 +402,25 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
         $date = date('Y-m-d H:i', $timestamp);
 
         $this->assertSame("(stopped) 2015-10-21 19:00 - $date activity1@category2\n", $this->mrClip->echoed);
+    }
+    // }}}
+
+    // {{{ testCallRecordContinue
+    public function testCallRecordContinue()
+    {
+        $now = date('Y-m-d H:i');
+
+        $this->assertNull($this->mrClip->callRecordContinue());
+        $this->assertSame("(added) $now activity2@category1 +tag2\n", $this->mrClip->echoed);
+    }
+    // }}}
+    // {{{ testCallContinue
+    public function testCallContinue()
+    {
+        $now = date('Y-m-d H:i');
+
+        $this->assertNull($this->mrClip->callContinue());
+        $this->assertSame("(added) $now activity2@category1 +tag2\n", $this->mrClip->echoed);
     }
     // }}}
 
