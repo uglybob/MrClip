@@ -249,6 +249,12 @@ class MrClip
         return $result;
     }
     // }}}
+    // {{{ fsUnlink
+    protected function fsUnlink($path)
+    {
+        unlink($path);
+    }
+    // }}}
 
     // {{{ recordAdd
     protected function recordAdd()
@@ -301,6 +307,12 @@ class MrClip
                 $this->outputNl('Failed to fetch record');
             }
         }
+    }
+    // }}}
+    // {{{ status
+    protected function status()
+    {
+        $this->recordCurrent();
     }
     // }}}
     // {{{ recordStop
@@ -366,13 +378,6 @@ class MrClip
     protected function todoEditAll()
     {
         $this->editTodos(true);
-    }
-    // }}}
-
-    // {{{ status
-    protected function status()
-    {
-        $this->recordCurrent();
     }
     // }}}
 
@@ -589,22 +594,10 @@ class MrClip
         $temp = tempnam(Setup::get('storage') . '/', 'MrClip');
         $this->fsWrite($temp, $string);
 
-        $pipes = array();
+        $this->procRun(Setup::get('editor'), $temp);
 
-        $editRes = proc_open(
-            Setup::get('editor') . ' ' . $temp,
-            [
-                0 => STDIN,
-                1 => STDOUT,
-                2 => STDERR,
-            ],
-            $pipes
-        );
-
-        proc_close($editRes);
-
-        $newString = file($temp);
-        unlink($temp);
+        $newString = $this->fsRead($temp);
+        $this->fsUnlink($temp);
 
         return $newString;
     }
@@ -745,6 +738,25 @@ class MrClip
     protected function input($string = '')
     {
         return Cli::input($string);
+    }
+    // }}}
+
+    // {{{ procRun
+    protected function procRun($executable, $arguments)
+    {
+        $pipes = array();
+
+        $editRes = proc_open(
+            $executable . ' ' . $arguments,
+            [
+                0 => STDIN,
+                1 => STDOUT,
+                2 => STDERR,
+            ],
+            $pipes
+        );
+
+        proc_close($editRes);
     }
     // }}}
 }

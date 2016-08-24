@@ -54,6 +54,12 @@ class MrClipTestClass extends MrClip
         return (isset($this->fs[$name])) ? $this->fs[$name] : false;
     }
     // }}}
+    // {{{ fsUnlink
+    protected function fsUnlink($path)
+    {
+        unset($this->fs[$path]);
+    }
+    // }}}
 
     // {{{ recordAdd
     public function recordAdd()
@@ -111,10 +117,11 @@ class MrClipTestClass extends MrClip
         return parent::editAndParse($string, $todos);
     }
     // }}}
-    // {{{ userEditString
-    public function userEditString($string)
+
+    // {{{ procRun
+    public function procRun($executable, $arguments)
     {
-        return $this->userEditString;
+        $this->fsWrite($arguments, $this->userEditString);
     }
     // }}}
 }
