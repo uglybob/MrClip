@@ -591,13 +591,13 @@ class MrClip
     // {{{ userEditString
     protected function userEditString($string)
     {
-        $temp = tempnam(Setup::get('storage') . '/', 'MrClip');
-        $this->fsWrite($temp, $string);
+        $parser = $this->parser;
+        $todo = new Todo(null, $parser->getActivity(), $parser->getCategory(), $parser->getTags());
+        $path = Setup::get('storage') . '/' . $todo->formatBase();
 
-        $this->procRun(Setup::get('editor'), $temp);
-
-        $newString = $this->fsRead($temp);
-        $this->fsUnlink($temp);
+        $this->fsWrite($path, $string);
+        $this->procRun(Setup::get('editor'), $path);
+        $newString = $this->fsRead($path);
 
         return $newString;
     }
