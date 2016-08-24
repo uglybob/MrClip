@@ -114,7 +114,7 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
     public function testCompletionEmpty()
     {
         $this->comp('');
-        $this->assertSame('record status stop todo', $this->mrClip->echoed);
+        $this->assertSame('continue record status stop todo', $this->mrClip->echoed);
     }
     // }}}
     // {{{ testCompletionR
@@ -259,24 +259,24 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
     }
     // }}}
 
-    // {{{ testRecordAddEmpty
-    public function testRecordAddEmpty()
+    // {{{ testCallRecordAddEmpty
+    public function testCallRecordAddEmpty()
     {
-        $record = $this->mrClip->recordAdd();
+        $record = $this->mrClip->callRecordAdd();
 
         $this->assertSame("Activity/category missing\n", $this->mrClip->echoed);
         $this->assertNull($record);
     }
     // }}}
-    // {{{ testRecordAdd
-    public function testRecordAdd()
+    // {{{ testCallRecordAdd
+    public function testCallRecordAdd()
     {
         $options = 'testActivity@testCategory +testTag1 +testTag2 testText';
         $this->mrClip->parser = new ParserTestClass(explode(' ', $options));
 
         $now = date($this->dateFormat);
 
-        $record = $this->mrClip->recordAdd();
+        $record = $this->mrClip->callRecordAdd();
 
         $this->assertSame("(added) $now testActivity@testCategory +testTag1 +testTag2 testText\n", $this->mrClip->echoed);
 
@@ -290,38 +290,38 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($record->isRunning());
     }
     // }}}
-    // {{{ testRecordAddNoActivity
-    public function testRecordAddNoActivity()
+    // {{{ testCallRecordAddNoActivity
+    public function testCallRecordAddNoActivity()
     {
         $options = '@testCategory +testTag1 +testTag2 testText';
         $this->mrClip->parser = new ParserTestClass(explode(' ', $options));
 
-        $record = $this->mrClip->recordAdd();
+        $record = $this->mrClip->callRecordAdd();
 
         $this->assertSame("Activity/category missing\n", $this->mrClip->echoed);
         $this->assertNull($record);
     }
     // }}}
-    // {{{ testRecordAddNoCategory
-    public function testRecordAddNoCategory()
+    // {{{ testCallRecordAddNoCategory
+    public function testCallRecordAddNoCategory()
     {
         $options = 'testActivity@ +testTag1 +testTag2 testText';
         $this->mrClip->parser = new ParserTestClass(explode(' ', $options));
 
-        $record = $this->mrClip->recordAdd();
+        $record = $this->mrClip->callRecordAdd();
 
         $this->assertSame("Activity/category missing\n", $this->mrClip->echoed);
         $this->assertNull($record);
     }
     // }}}
-    // {{{ testRecordAddNoTag
-    public function testRecordAddNoTag()
+    // {{{ testCallRecordAddNoTag
+    public function testCallRecordAddNoTag()
     {
         $options = 'testActivity@testCategory testText';
         $now = date($this->dateFormat);
         $this->mrClip->parser = new ParserTestClass(explode(' ', $options));
 
-        $record = $this->mrClip->recordAdd();
+        $record = $this->mrClip->callRecordAdd();
 
         $this->assertSame("(added) $now testActivity@testCategory testText\n", $this->mrClip->echoed);
 
@@ -335,14 +335,14 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($record->isRunning());
     }
     // }}}
-    // {{{ testRecordAddNoText
-    public function testRecordAddNoText()
+    // {{{ testCallRecordAddNoText
+    public function testCallRecordAddNoText()
     {
         $options = 'testActivity@testCategory +testTag1 +testTag2';
         $now = date($this->dateFormat);
         $this->mrClip->parser = new ParserTestClass(explode(' ', $options));
 
-        $record = $this->mrClip->recordAdd();
+        $record = $this->mrClip->callRecordAdd();
 
         $this->assertSame("(added) $now testActivity@testCategory +testTag1 +testTag2\n", $this->mrClip->echoed);
 
@@ -357,34 +357,34 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
     }
     // }}}
 
-    // {{{ testRecordCurrent
-    public function testRecordCurrent()
+    // {{{ testCallRecordCurrent
+    public function testCallRecordCurrent()
     {
-        $this->assertNull($this->mrClip->recordCurrent());
+        $this->assertNull($this->mrClip->callRecordCurrent());
         $this->assertSame("(last) 2015-10-21 21:00 - 2015-10-21 22:00 activity2@category1 +tag2\n", $this->mrClip->echoed);
     }
     // }}}
-    // {{{ testRecordCurrentRunning
-    public function testRecordCurrentRunning()
+    // {{{ testCallRecordCurrentRunning
+    public function testCallRecordCurrentRunning()
     {
         $this->prm->getConnection()->records[3]->end = null;
-        $this->assertNull($this->mrClip->status());
+        $this->assertNull($this->mrClip->callRecordCurrent());
         $this->assertSame("(running) 2015-10-21 19:00 activity1@category2\n", $this->mrClip->echoed);
     }
     // }}}
-    // {{{ testStatus
-    public function testStatus()
+    // {{{ testCallStatus
+    public function testCallStatus()
     {
-        $this->assertNull($this->mrClip->status());
+        $this->assertNull($this->mrClip->callStatus());
         $this->assertSame("(last) 2015-10-21 21:00 - 2015-10-21 22:00 activity2@category1 +tag2\n", $this->mrClip->echoed);
     }
     // }}}
 
-    // {{{ testRecordStop
-    public function testRecordStop()
+    // {{{ testCallRecordStop
+    public function testCallRecordStop()
     {
         $this->prm->getConnection()->records[3]->end = null;
-        $this->assertNull($this->mrClip->recordStop());
+        $this->assertNull($this->mrClip->callRecordStop());
 
         $timestamp = $this->prm->getConnection()->records[3]->end;
         $date = date('Y-m-d H:i', $timestamp);
@@ -392,16 +392,35 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
         $this->assertSame("(stopped) 2015-10-21 19:00 - $date activity1@category2\n", $this->mrClip->echoed);
     }
     // }}}
-    // {{{ testStop
-    public function testStop()
+    // {{{ testCallStop
+    public function testCallStop()
     {
         $this->prm->getConnection()->records[3]->end = null;
-        $this->assertNull($this->mrClip->stop());
+        $this->assertNull($this->mrClip->callStop());
 
         $timestamp = $this->prm->getConnection()->records[3]->end;
         $date = date('Y-m-d H:i', $timestamp);
 
         $this->assertSame("(stopped) 2015-10-21 19:00 - $date activity1@category2\n", $this->mrClip->echoed);
+    }
+    // }}}
+
+    // {{{ testCallRecordContinue
+    public function testCallRecordContinue()
+    {
+        $now = date('Y-m-d H:i');
+
+        $this->assertNull($this->mrClip->callRecordContinue());
+        $this->assertSame("(added) $now activity2@category1 +tag2\n", $this->mrClip->echoed);
+    }
+    // }}}
+    // {{{ testCallContinue
+    public function testCallContinue()
+    {
+        $now = date('Y-m-d H:i');
+
+        $this->assertNull($this->mrClip->callContinue());
+        $this->assertSame("(added) $now activity2@category1 +tag2\n", $this->mrClip->echoed);
     }
     // }}}
 
@@ -1464,14 +1483,14 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
             "other tags\n" .
             "    other tags\n";
 
-        $this->assertNull($this->mrClip->todoEdit());
+        $this->assertNull($this->mrClip->callTodoEdit());
         $this->assertSame("(stopped) 2015-10-21 19:00 - activity1@category2\n", $this->mrClip->echoed);
     }
     // }}}
     // {{{ testTodoList
     public function testTodoList()
     {
-        $this->assertNull($this->mrClip->todoList());
+        $this->assertNull($this->mrClip->callTodoList());
         $this->assertSame(
             "activity1@category1 +tag1 +tag2\n" .
             "\n" .

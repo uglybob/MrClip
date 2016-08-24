@@ -17,8 +17,7 @@ class MrClipTestClass extends MrClip
     // {{{ constructor
     public function __construct($options = [])
     {
-        parent::__construct($options);
-
+        $this->parser = new ParserTestClass($options, $this->commands);
         $this->prm = new PrmTestClass();
     }
     // }}}
@@ -42,6 +41,12 @@ class MrClipTestClass extends MrClip
     }
     // }}}
 
+    // {{{ cacheAttributes
+    protected function cacheAttributes()
+    {
+        // no caching here
+    }
+    // }}}
     // {{{ fsWrite
     protected function fsWrite($name, $data)
     {
@@ -61,47 +66,59 @@ class MrClipTestClass extends MrClip
     }
     // }}}
 
-    // {{{ recordAdd
-    public function recordAdd()
+    // {{{ callRecordAdd
+    public function callRecordAdd()
     {
-        return parent::recordAdd();
+        return parent::callRecordAdd();
     }
     // }}}
-    // {{{ recordCurrent
-    public function recordCurrent()
+    // {{{ callRecordCurrent
+    public function callRecordCurrent()
     {
-        return parent::recordCurrent();
+        return parent::callRecordCurrent();
     }
     // }}}
-    // {{{ recordStop
-    public function recordStop()
+    // {{{ callRecordStop
+    public function callRecordStop()
     {
-        return parent::recordStop();
+        return parent::callRecordStop();
     }
     // }}}
-    // {{{ stop
-    public function stop()
+    // {{{ callStop
+    public function callStop()
     {
-        return parent::stop();
+        return parent::callStop();
     }
     // }}}
-    // {{{ status
-    public function status()
+    // {{{ callStatus
+    public function callStatus()
     {
-        return parent::status();
+        return parent::callStatus();
+    }
+    // }}}
+    // {{{ callRecordContinue
+    public function callRecordContinue()
+    {
+        return parent::callRecordContinue();
+    }
+    // }}}
+    // {{{ callContinue
+    public function callContinue()
+    {
+        return parent::callContinue();
     }
     // }}}
 
-    // {{{ todoList
-    public function todoList()
+    // {{{ callTodoList
+    public function callTodoList()
     {
-        return parent::todoList();
+        return parent::callTodoList();
     }
     // }}}
-    // {{{ todoEdit
-    public function todoEdit()
+    // {{{ callTodoEdit
+    public function callTodoEdit()
     {
-        return parent::todoEdit();
+        return parent::callTodoEdit();
     }
     // }}}
 
