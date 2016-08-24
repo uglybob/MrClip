@@ -595,6 +595,8 @@ class MrClip
         $todo = new Todo(null, $parser->getActivity(), $parser->getCategory(), $parser->getTags());
         $path = Setup::get('storage') . '/' . $todo->formatBase();
 
+        $oldString = $this->fsRead($path);
+
         $this->fsWrite($path, $string);
         $this->procRun(Setup::get('editor'), $path);
         $newString = $this->fsRead($path);

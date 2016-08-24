@@ -214,4 +214,10 @@ class ApiMock
         return $filtered;
     }
     // }}}
+    // {{{ deleteTodo
+    public function deleteTodo($id)
+    {
+        unset($this->todos[$id]);
+    }
+    // }}}
 }

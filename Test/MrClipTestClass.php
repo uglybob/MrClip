@@ -92,6 +92,19 @@ class MrClipTestClass extends MrClip
     }
     // }}}
 
+    // {{{ todoList
+    public function todoList()
+    {
+        return parent::todoList();
+    }
+    // }}}
+    // {{{ todoEdit
+    public function todoEdit()
+    {
+        return parent::todoEdit();
+    }
+    // }}}
+
     // {{{ formatTodos
     public function formatTodos($todos)
     {
@@ -122,6 +135,12 @@ class MrClipTestClass extends MrClip
     public function procRun($executable, $arguments)
     {
         $this->fsWrite($arguments, $this->userEditString);
+    }
+    // }}}
+    // {{{ input
+    public function input($string = '')
+    {
+        return 'y';
     }
     // }}}
 }

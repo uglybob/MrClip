@@ -1444,4 +1444,56 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
         $this->assertSame("2 old, 2 new\n\n", $this->mrClip->echoed);
     }
     // }}}
+
+    // {{{ testTodoEdit
+    public function testTodoEdit()
+    {
+        $this->mrClip->userEditString =
+            "activity1@category1 +tag1 +tag2\n" .
+            "\n" .
+            "parent1\n" .
+            "    child1\n" .
+            "        subchild1\n" .
+            "    child2\n" .
+            "    extra tag\n" .
+            "parent2\n" .
+            "    child3\n" .
+            "\n" .
+            "activity2@category1 +tag2\n" .
+            "\n" .
+            "other tags\n" .
+            "    other tags\n";
+
+        $this->assertNull($this->mrClip->todoEdit());
+        $this->assertSame("(stopped) 2015-10-21 19:00 - activity1@category2\n", $this->mrClip->echoed);
+    }
+    // }}}
+    // {{{ testTodoList
+    public function testTodoList()
+    {
+        $this->assertNull($this->mrClip->todoList());
+        $this->assertSame(
+            "activity1@category1 +tag1 +tag2\n" .
+            "\n" .
+            "parent1\n" .
+            "    child1\n" .
+            "        subchild1\n" .
+            "    child2\n" .
+            "    extra tag\n" .
+            "parent2\n" .
+            "    child3\n" .
+            "\n" .
+            "activity2@category1 +tag2\n" .
+            "\n" .
+            "other tags\n" .
+            "    other tags\n",
+            $this->mrClip->echoed
+        );
+    }
+    // }}}
+    // {{{ testTodoStorageNaming
+    public function testTodoStorageNaming()
+    {
+    }
+    // }}}
 }
