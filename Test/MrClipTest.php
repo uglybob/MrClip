@@ -440,8 +440,8 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('category1', $todo->getCategory());
         $this->assertSame(['tag1', 'tag2', 'tag3'], $todo->getTags());
         $this->assertSame('extra tag', $todo->getText());
-        $this->assertSame(1, $todo->getParentId());
-        $this->assertSame(2, $todo->getPosition());
+        $this->assertSame(null, $todo->getParentId());
+        $this->assertSame(0, $todo->getPosition());
         $this->assertFalse($todo->isDone());
     }
     // }}}
@@ -1467,24 +1467,28 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
     // {{{ testTodoEdit
     public function testTodoEdit()
     {
-        $this->mrClip->userEditString =
-            "activity1@category1 +tag1 +tag2\n" .
-            "\n" .
-            "parent1\n" .
-            "    child1\n" .
-            "        subchild1\n" .
-            "    child2\n" .
-            "    extra tag\n" .
-            "parent2\n" .
-            "    child3\n" .
-            "\n" .
-            "activity2@category1 +tag2\n" .
-            "\n" .
-            "other tags\n" .
-            "    other tags\n";
+        $this->mrClip->userEditString = [
+            'activity1@category1 +tag1 +tag2',
+            '',
+            'parent1',
+            '    child1',
+            '        subchild1',
+            '    child2',
+            'parent2',
+            '    child3',
+            '',
+            'activity1@category1 +tag1 +tag2 +tag3',
+            '',
+            'extra tag',
+            '',
+            'activity2@category1 +tag2',
+            '',
+            'other tags',
+            '    other tags',
+        ];
 
         $this->assertNull($this->mrClip->callTodoEdit());
-        $this->assertSame("(stopped) 2015-10-21 19:00 - activity1@category2\n", $this->mrClip->echoed);
+        $this->assertSame("9 old, 9 new\n\nno change\n", $this->mrClip->echoed);
     }
     // }}}
     // {{{ testTodoList
@@ -1498,9 +1502,12 @@ class MrClipTest extends \PHPUnit_Framework_TestCase
             "    child1\n" .
             "        subchild1\n" .
             "    child2\n" .
-            "    extra tag\n" .
             "parent2\n" .
             "    child3\n" .
+            "\n" .
+            "activity1@category1 +tag1 +tag2 +tag3\n" .
+            "\n" .
+            "extra tag\n" .
             "\n" .
             "activity2@category1 +tag2\n" .
             "\n" .

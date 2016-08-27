@@ -24,11 +24,11 @@ class ApiMock
         $this->todos[2]     = $this->createTodo(2,  'activity1', 'category1', ['tag1', 'tag2'],         'child1',       1,      0,  false);
         $this->todos[3]     = $this->createTodo(3,  'activity1', 'category1', ['tag1', 'tag2'],         'child2',       1,      1,  false);
         $this->todos[4]     = $this->createTodo(4,  'activity1', 'category1', ['tag1', 'tag2'],         'subchild1',    2,      0,  false);
-        $this->todos[5]     = $this->createTodo(5,  'activity1', 'category1', ['tag1', 'tag2', 'tag3'], 'extra tag',    1,      2,  false);
+        $this->todos[5]     = $this->createTodo(5,  'activity1', 'category1', ['tag1', 'tag2', 'tag3'], 'extra tag',    null,   0,  false);
         $this->todos[6]     = $this->createTodo(6,  'activity1', 'category1', ['tag1', 'tag2'],         'parent2',      null,   1,  false);
         $this->todos[7]     = $this->createTodo(7,  'activity1', 'category1', ['tag1', 'tag2'],         'child3',       6,      0,  false);
         $this->todos[8]     = $this->createTodo(8,  'activity1', 'category1', ['tag1', 'tag2'],         'done',         6,      1,  true);
-        $this->todos[9]     = $this->createTodo(9,  'activity2', 'category1', ['tag2'],                 'other tags',   null,   2,  false);
+        $this->todos[9]     = $this->createTodo(9,  'activity2', 'category1', ['tag2'],                 'other tags',   null,   0,  false);
         $this->todos[10]    = $this->createTodo(10, 'activity2', 'category1', ['tag2'],                 'other tags',   9,      0,  false);
     }
     // }}}
