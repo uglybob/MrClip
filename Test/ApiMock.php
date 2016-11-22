@@ -220,4 +220,18 @@ class ApiMock
         unset($this->todos[$id]);
     }
     // }}}
+    // {{{ editTodo
+    public function editTodo($id, $activity, $category, $tags, $text, $parent, $position, $done)
+    {
+        $todo = $this->createTodo($id, $activity, $category, $tags, $text, $parent, $position, $done);
+
+        if (is_null($todo->id)) {
+            $todo->id = count($this->todos);
+        }
+
+            $this->todos[$todo->id] = $todo;
+
+        return $todo;
+    }
+    // }}}
 }
