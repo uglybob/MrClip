@@ -13,8 +13,8 @@ class PRM
     {
         if (!$this->connection) {
             $soapOptions = [
-                'uri' => Setup::get('url') . '/',
-                'location' => Setup::get('url') . '/soap.php',
+                'uri' => Setup::get('url'),
+                'location' => Setup::get('url') . '/Soap.php',
                 'compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP | 9,
             ];
 
